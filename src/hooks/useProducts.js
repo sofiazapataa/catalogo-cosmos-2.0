@@ -2,34 +2,37 @@ import { useEffect, useState } from "react";
 import { getProducts } from "../services/productsServices";
 
 export function useProducts() {
-  const [data, setData] = useState({ combos: [], stock: [] });
+  const [stock, setStock] = useState([]);
+  const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let alive = true;
+  async function loadProducts() {
+    try {
+      setLoading(true);
+      setError("");
 
-    async function load() {
-      try {
-        setLoading(true);
-        setError("");
-        const res = await getProducts();
-        if (!alive) return;
-        setData(res);
-      } catch (e) {
-        if (!alive) return;
-        setError("No se pudieron cargar los productos.");
-      } finally {
-        if (!alive) return;
-        setLoading(false);
-      }
+      const data = await getProducts();
+
+      setStock(data.stock || []);
+      setCombos(data.combos || []);
+    } catch (err) {
+      console.error(err);
+      setError("No se pudieron cargar los productos.");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    load();
-    return () => {
-      alive = false;
-    };
+  useEffect(() => {
+    loadProducts();
   }, []);
 
-  return { ...data, loading, error };
+  return {
+    stock,
+    combos,
+    loading,
+    error,
+    reload: loadProducts,
+  };
 }

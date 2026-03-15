@@ -1,16 +1,54 @@
-import { combos, stock } from "../data/products";
+import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import { db } from "./firebase";
+import { resolveImage, resolveImages } from "../utils/imageMap";
 
-/**
- * Contrato estable:
- * - Devuelve { combos: [], stock: [] }
- * - En el futuro esto se reemplaza por Firestore sin tocar HomePage
- */
 export async function getProducts() {
-  // Simulamos asincronía para que el día de mañana Firebase encaje perfecto
-  await new Promise((r) => setTimeout(r, 150));
+  const productsRef = collection(db, "products");
+  const combosRef = collection(db, "combos");
+
+  const [productsSnapshot, combosSnapshot] = await Promise.all([
+    getDocs(productsRef),
+    getDocs(combosRef),
+  ]);
+
+  const stock = productsSnapshot.docs.map((docItem) => {
+    const data = docItem.data();
+
+    return {
+      firebaseId: docItem.id,
+      ...data,
+      image: data.imageKey ? resolveImage(data.imageKey) : null,
+      images: Array.isArray(data.imagesKeys)
+        ? resolveImages(data.imagesKeys)
+        : [],
+      benefits: Array.isArray(data.benefits) ? data.benefits : [],
+    };
+  });
+
+  const combos = combosSnapshot.docs.map((docItem) => {
+    const data = docItem.data();
+
+    return {
+      firebaseId: docItem.id,
+      ...data,
+      image: data.imageKey ? resolveImage(data.imageKey) : null,
+      images: Array.isArray(data.imagesKeys)
+        ? resolveImages(data.imagesKeys)
+        : [],
+      benefits: Array.isArray(data.benefits) ? data.benefits : [],
+    };
+  });
 
   return {
     combos,
     stock,
   };
+}
+
+export async function saveProduct(product) {
+  await setDoc(doc(db, "products", product.id), product);
+}
+
+export async function saveCombo(combo) {
+  await setDoc(doc(db, "combos", combo.id), combo);
 }

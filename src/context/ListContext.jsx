@@ -1,3 +1,4 @@
+// Sirve para compartir datos entre componentes. Sirve para compartir datos entre componentes.
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const ListContext = createContext(null);

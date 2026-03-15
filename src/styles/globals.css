@@ -1048,6 +1048,142 @@ body{
   font-size: 12px;
   color: var(--muted);
 }
+/* =========================
+   ADMIN
+========================= */
+
+.admin-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+
+.admin-card{
+  display:block;
+  text-decoration:none;
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  border-radius:18px;
+  padding:16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: transform .15s ease, box-shadow .15s ease;
+  color:inherit;
+}
+
+.admin-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.10);
+}
+
+.admin-card h3{
+  margin:0 0 8px;
+  font-size:16px;
+  font-weight:900;
+  color:#2b3512;
+}
+
+.admin-card p{
+  margin:0;
+  font-size:13px;
+  color:#555;
+  line-height:1.4;
+}
+
+.admin-card-disabled{
+  opacity:.72;
+}
+
+.admin-topbar{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.admin-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.admin-list-item{
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  border-radius:18px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.admin-list-main h3{
+  margin:0 0 6px;
+  font-size:15px;
+  font-weight:900;
+  color:#2b3512;
+}
+
+.admin-list-main p{
+  margin:0 0 8px;
+  font-size:13px;
+  color:#555;
+}
+
+.admin-list-side{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.admin-meta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.admin-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #dfe5d1;
+  background:#f6f7f2;
+  color:#2b3512;
+  font-size:12px;
+  font-weight:800;
+}
+
+.admin-chip-soft{
+  background:#fafafa;
+  border-color:var(--border);
+  color:#666;
+}
+
+@media (min-width: 640px){
+  .admin-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-topbar{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+
+  .admin-list-item{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .admin-list-side{
+    flex-direction:column;
+    align-items:flex-end;
+  }
+}
 
 /* =========================
    BREAKPOINTS

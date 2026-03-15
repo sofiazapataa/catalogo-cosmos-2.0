@@ -1,6 +1,6 @@
 // src/data/products.js
 
-// Imágenes que ya tenés (reutilizadas para no romper deploy)
+// Imágenes locales (para el frontend actual)
 import aceiteLimpieza from "../assets/images/aceite-limpieza.jpg";
 import cremaReparadora from "../assets/images/crema-reparadora.jpg";
 import cremaSuave from "../assets/images/crema-suave.jpg";
@@ -25,6 +25,18 @@ export const combos = [
     category: "combo",
     type: "combos",
     image: comboLimpieza,
+    imageKey: "combo-limpieza.jpg",
+    imagesKeys: ["combo-limpieza.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Limpieza completa en dos pasos",
+      "Ayuda a remover suciedad, protector y maquillaje",
+      "Ideal para una rutina de limpieza diaria",
+    ],
+    howToUse:
+      "Primero aplicar Cleansing Oil sobre piel seca. Luego retirar o emulsionar. Continuar con Cleansing Bubbles.",
+    details:
+      "Combo pensado para una limpieza completa y efectiva, ideal como base de cualquier rutina.",
   },
   {
     id: "combo-rutina-glow",
@@ -35,7 +47,18 @@ export const combos = [
     category: "combo",
     type: "combos",
     image: comboRefresh,
-
+    imageKey: "combo-refresh.jpg",
+    imagesKeys: ["combo-refresh.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Rutina simple y completa",
+      "Aporta luminosidad",
+      "Ahorro frente a compra individual",
+    ],
+    howToUse:
+      "Usar Purifying Toner después de la limpieza, luego Boosting Drops y finalizar con Smooth Potion.",
+    details:
+      "Combo ideal para una rutina glow, práctica y fácil de sostener.",
   },
   {
     id: "combo-rutina-completa",
@@ -45,11 +68,23 @@ export const combos = [
     discount: 5,
     category: "combo",
     type: "combos",
-     image: comboLimpieza,
+    image: comboLimpieza,
+    imageKey: "combo-limpieza.jpg",
+    imagesKeys: ["combo-limpieza.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Rutina completa de limpieza + tratamiento + hidratación",
+      "Ideal para empezar con una rutina armada",
+      "Ahorro frente a compra individual",
+    ],
+    howToUse:
+      "Usar Cleansing Bubbles, luego Purifying Toner, continuar con Boosting Drops y finalizar con Smooth Potion.",
+    details:
+      "Combo pensado para quien quiere una rutina completa, simple y efectiva.",
   },
 ];
 
-// ✅ Productos en stock (tu compra mayorista)
+// ✅ Productos en stock
 export const stock = [
   // LIMPIEZA
   {
@@ -60,7 +95,19 @@ export const stock = [
     discount: 0,
     category: "stock",
     type: "limpieza",
-    image: jabonLimpieza, 
+    image: jabonLimpieza,
+    imageKey: "jabon-limpieza.jpg",
+    imagesKeys: ["jabon-limpieza.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Limpieza diaria",
+      "Ayuda a remover impurezas",
+      "Textura cómoda de usar",
+    ],
+    howToUse:
+      "Aplicar sobre piel húmeda, masajear suavemente y enjuagar.",
+    details:
+      "Gel de limpieza ideal para usar mañana y noche como primer paso de la rutina.",
   },
   {
     id: "rf-cleansing-bubbles-200",
@@ -71,6 +118,18 @@ export const stock = [
     category: "stock",
     type: "limpieza",
     image: refilLimpieza,
+    imageKey: "refil-limpieza.jpg",
+    imagesKeys: ["refil-limpieza.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Formato refill",
+      "Más práctico para reponer",
+      "Mantiene tu rutina activa",
+    ],
+    howToUse:
+      "Transferir al envase correspondiente y usar como tu gel de limpieza habitual.",
+    details:
+      "Opción refill para reponer tu producto de limpieza de forma más práctica.",
   },
   {
     id: "cleansing-oil-125",
@@ -81,6 +140,18 @@ export const stock = [
     category: "stock",
     type: "limpieza",
     image: aceiteLimpieza,
+    imageKey: "aceite-limpieza.jpg",
+    imagesKeys: ["aceite-limpieza.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Limpieza en seco",
+      "Ideal para remover protector solar y maquillaje",
+      "Complementa la doble limpieza",
+    ],
+    howToUse:
+      "Aplicar sobre piel seca, masajear y luego retirar o emulsionar.",
+    details:
+      "Aceite de limpieza ideal como primer paso en una rutina de doble limpieza.",
   },
 
   // TÓNICOS
@@ -92,33 +163,44 @@ export const stock = [
     discount: 0,
     category: "stock",
     type: "tonicos",
-    image: tonicoExfoliante, // (reemplazar por foto real luego)
+    image: tonicoExfoliante,
+    imageKey: "tonico-exfoliante.jpg",
+    imagesKeys: ["tonico-exfoliante.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Prepara la piel",
+      "Ayuda a refrescar la rutina",
+      "Se integra fácil con otros productos",
+    ],
+    howToUse:
+      "Aplicar luego de la limpieza con manos o algodón, antes del serum.",
+    details:
+      "Tónico pensado para complementar una rutina simple y efectiva.",
   },
 
   // SERUMS
   {
-  id: "boosting-drops",
-  title: "Boosting Drops",
-  desc: "Serum booster para potenciar tu rutina",
-  price: 47900,
-  discount: 0,
-  category: "stock",
-  type: "serums",
-  image: serumHidratante,
-
-  // 👇 NUEVO
-  images: [serumHidratante], // acá sumás más imágenes cuando tengas
-  skinType: "Apto para todo tipo de piel",
-  benefits: [
-    "Potencia la rutina y mejora la absorción",
-    "Aporta luminosidad",
-    "Hidratación ligera"
-  ],
-  howToUse:
-    "Aplicar 3–4 gotas sobre piel limpia. Luego continuar con tu crema. AM/PM.",
-  details:
-    "Ideal como primer serum para comenzar una rutina y potenciar otros activos.",
-},
+    id: "boosting-drops",
+    title: "Boosting Drops",
+    desc: "Serum booster para potenciar tu rutina",
+    price: 47900,
+    discount: 0,
+    category: "stock",
+    type: "serums",
+    image: serumHidratante,
+    imageKey: "serum-hidratante.jpg",
+    imagesKeys: ["serum-hidratante.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Potencia la rutina y mejora la absorción",
+      "Aporta luminosidad",
+      "Hidratación ligera",
+    ],
+    howToUse:
+      "Aplicar 3–4 gotas sobre piel limpia. Luego continuar con tu crema. AM/PM.",
+    details:
+      "Ideal como primer serum para comenzar una rutina y potenciar otros activos.",
+  },
   {
     id: "balancing-drops",
     title: "Balancing Drops",
@@ -128,6 +210,18 @@ export const stock = [
     category: "stock",
     type: "serums",
     image: serumNiacinamida,
+    imageKey: "serum-niacinamida.jpg",
+    imagesKeys: ["serum-niacinamida.jpg"],
+    skinType: "Mixta a grasa",
+    benefits: [
+      "Ayuda a equilibrar",
+      "Complementa rutinas de control",
+      "Textura liviana",
+    ],
+    howToUse:
+      "Aplicar sobre piel limpia antes de la crema, mañana o noche.",
+    details:
+      "Serum ideal para rutinas enfocadas en balance y control.",
   },
   {
     id: "beta-glow-oil",
@@ -137,7 +231,19 @@ export const stock = [
     discount: 0,
     category: "stock",
     type: "serums",
-    image: serumOil, 
+    image: serumOil,
+    imageKey: "serum-betaOil.jpg",
+    imagesKeys: ["serum-betaOil.jpg"],
+    skinType: "Normal a seca",
+    benefits: [
+      "Aporta glow",
+      "Nutrición ligera",
+      "Ideal para sumar luminosidad",
+    ],
+    howToUse:
+      "Aplicar pocas gotas al final de la rutina o mezclar con la crema.",
+    details:
+      "Aceite facial pensado para aportar luminosidad y confort.",
   },
 
   // CREMAS
@@ -150,6 +256,18 @@ export const stock = [
     category: "stock",
     type: "cremas",
     image: cremaSuave,
+    imageKey: "crema-suave.jpg",
+    imagesKeys: ["crema-suave.jpg"],
+    skinType: "Apto para todo tipo de piel",
+    benefits: [
+      "Hidratación diaria",
+      "Textura cómoda",
+      "Acompaña rutinas AM/PM",
+    ],
+    howToUse:
+      "Aplicar luego del serum sobre rostro y cuello.",
+    details:
+      "Crema facial pensada para hidratar y sellar la rutina.",
   },
   {
     id: "aqua-potion",
@@ -159,6 +277,18 @@ export const stock = [
     discount: 0,
     category: "stock",
     type: "cremas",
-    image: cremaReparadora, // (reemplazar por foto real luego)
+    image: cremaReparadora,
+    imageKey: "crema-reparadora.jpg",
+    imagesKeys: ["crema-reparadora.jpg"],
+    skinType: "Normal a mixta",
+    benefits: [
+      "Hidratación liviana",
+      "Ideal para uso diario",
+      "Se integra bien en rutinas simples",
+    ],
+    howToUse:
+      "Aplicar después del serum como último paso de hidratación.",
+    details:
+      "Crema de hidratación ligera para una rutina cómoda y simple.",
   },
 ];

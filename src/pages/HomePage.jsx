@@ -1,29 +1,33 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useProducts } from "../hooks/useProducts";
+import { seedFirestore } from "../services/seedFirestore"; // ✅ TEMPORAL: borrar después del seed
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
-import { useProducts } from "../hooks/useProducts";
 import CatalogControls from "../components/CatalogControls";
 import SectionHeader from "../components/SectionHeader";
 import { filterProducts } from "../utils/catalog";
-import ProductModal from "../components/ProductModal"; // ✅ NUEVO
+import ProductModal from "../components/ProductModal";
 
 export default function HomePage() {
   const { combos, stock, loading, error } = useProducts();
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-
   const [showAllCombos, setShowAllCombos] = useState(false);
   const [showAllStock, setShowAllStock] = useState(false);
+  const [selected, setSelected] = useState(null);
 
-  const [selected, setSelected] = useState(null); // ✅ NUEVO
+  // ✅ TEMPORAL: usar SOLO una vez para cargar products y combos en Firestore
+  useEffect(() => {
+    seedFirestore();
+  }, []);
 
   const combosProcessed = useMemo(() => {
     const filtered = filterProducts(combos, query);
 
     if (category === "combos") return filtered;
-    if (category !== "all") return []; // si es otra categoría, no mostramos combos
+    if (category !== "all") return [];
 
     return filtered;
   }, [combos, query, category]);
@@ -35,13 +39,18 @@ export default function HomePage() {
       filtered = filtered.filter((p) => p.type === category);
     }
 
-    if (category === "combos") return []; // si filtro combos, no mostramos stock
+    if (category === "combos") return [];
 
     return filtered;
   }, [stock, query, category]);
 
-  const combosToShow = showAllCombos ? combosProcessed : combosProcessed.slice(0, 4);
-  const stockToShow = showAllStock ? stockProcessed : stockProcessed.slice(0, 6);
+  const combosToShow = showAllCombos
+    ? combosProcessed
+    : combosProcessed.slice(0, 4);
+
+  const stockToShow = showAllStock
+    ? stockProcessed
+    : stockProcessed.slice(0, 6);
 
   const nothingFound =
     !loading && !error && combosProcessed.length + stockProcessed.length === 0;
@@ -76,7 +85,7 @@ export default function HomePage() {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onOpen={() => setSelected(p)} // ✅ NUEVO
+                  onOpen={() => setSelected(p)}
                 />
               ))}
             </div>
@@ -98,7 +107,7 @@ export default function HomePage() {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onOpen={() => setSelected(p)} // ✅ NUEVO
+                  onOpen={() => setSelected(p)}
                 />
               ))}
             </div>
@@ -114,7 +123,6 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* ✅ MODAL */}
       {selected ? (
         <ProductModal product={selected} onClose={() => setSelected(null)} />
       ) : null}
