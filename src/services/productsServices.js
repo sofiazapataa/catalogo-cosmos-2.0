@@ -1,4 +1,10 @@
-import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "./firebase";
 import { resolveImage, resolveImages } from "../utils/imageMap";
 
@@ -51,4 +57,12 @@ export async function saveProduct(product) {
 
 export async function saveCombo(combo) {
   await setDoc(doc(db, "combos", combo.id), combo);
+}
+
+export async function deleteProduct(id) {
+  await deleteDoc(doc(db, "products", id));
+}
+
+export async function deleteCombo(id) {
+  await deleteDoc(doc(db, "combos", id));
 }

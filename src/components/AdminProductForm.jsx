@@ -36,6 +36,8 @@ const EMPTY_FORM = {
   benefits: [],
   howToUse: "",
   details: "",
+  stockQty: 0,
+  lowStockThreshold: 3,
   active: true,
 };
 
@@ -55,6 +57,8 @@ export default function AdminProductForm({
       setForm({
         ...EMPTY_FORM,
         ...initialData,
+        stockQty: Number(initialData.stockQty ?? 0),
+        lowStockThreshold: Number(initialData.lowStockThreshold ?? 3),
       });
       setBenefitsText(benefitsToText(initialData.benefits));
       setImagesText(imagesToText(initialData.imagesKeys));
@@ -72,12 +76,14 @@ export default function AdminProductForm({
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
 
+    const numericFields = ["price", "discount", "stockQty", "lowStockThreshold"];
+
     setForm((prev) => ({
       ...prev,
       [name]:
         type === "checkbox"
           ? checked
-          : name === "price" || name === "discount"
+          : numericFields.includes(name)
           ? Number(value)
           : value,
     }));
@@ -90,6 +96,8 @@ export default function AdminProductForm({
       ...form,
       benefits: textToBenefits(benefitsText),
       imagesKeys: textToImages(imagesText),
+      stockQty: Number(form.stockQty || 0),
+      lowStockThreshold: Number(form.lowStockThreshold || 0),
     };
 
     if (!payload.imageKey && payload.imagesKeys.length > 0) {
@@ -201,6 +209,28 @@ export default function AdminProductForm({
             value={form.skinType}
             onChange={handleChange}
             placeholder="Apto para todo tipo de piel"
+          />
+        </label>
+
+        <label className="admin-field">
+          <span>Stock</span>
+          <input
+            className="input"
+            type="number"
+            name="stockQty"
+            value={form.stockQty}
+            onChange={handleChange}
+          />
+        </label>
+
+        <label className="admin-field">
+          <span>Alerta stock bajo</span>
+          <input
+            className="input"
+            type="number"
+            name="lowStockThreshold"
+            value={form.lowStockThreshold}
+            onChange={handleChange}
           />
         </label>
 

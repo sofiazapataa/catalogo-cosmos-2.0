@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import AdminLogoutButton from "../../components/AdminLogoutButton";
 
 export default function AdminPage() {
   return (
@@ -8,53 +9,31 @@ export default function AdminPage() {
       <Header />
 
       <main className="container">
-        <section className="page-hero">
-          <div>
-            <h2 className="page-title">Panel Admin</h2>
-            <p className="page-lead">
-              Desde acá vas a poder administrar productos, combos y más, sin tocar el catálogo público.
-            </p>
+        <section className="admin-panel">
+          <div className="admin-topbar">
+            <div>
+              <h2 className="page-title">Panel Admin</h2>
+              <p className="page-lead">
+                Gestioná productos, combos y stock del catálogo.
+              </p>
+            </div>
 
-            <div className="page-badges">
-              <span className="page-badge">Productos</span>
-              <span className="page-badge">Combos</span>
-              <span className="page-badge">Stock</span>
+            <div className="admin-topbar-actions">
+              <AdminLogoutButton />
             </div>
           </div>
 
-          <div className="page-heroCard">
-            <div className="page-heroCardTitle">Fase 1</div>
-            <p className="page-heroCardText">
-              Vamos a empezar con una estructura visual simple y ordenada.
-            </p>
-            <div className="page-heroCardTip">
-              Después la conectamos con datos reales y edición.
-            </div>
-          </div>
-        </section>
-
-        <section className="page-section">
-          <div className="admin-grid">
+          <section className="admin-grid">
             <Link to="/admin/productos" className="admin-card">
               <h3>Productos</h3>
-              <p>Ver y organizar productos del catálogo.</p>
+              <p>Administrar productos del catálogo.</p>
             </Link>
 
             <Link to="/admin/combos" className="admin-card">
               <h3>Combos</h3>
-              <p>Ver y organizar combos y promociones.</p>
+              <p>Administrar combos y promociones.</p>
             </Link>
-
-            <div className="admin-card admin-card-disabled">
-              <h3>Pedidos</h3>
-              <p>Lo vamos a sumar en una siguiente fase.</p>
-            </div>
-
-            <div className="admin-card admin-card-disabled">
-              <h3>Configuración</h3>
-              <p>Más adelante: textos, contacto y banners.</p>
-            </div>
-          </div>
+          </section>
         </section>
       </main>
 

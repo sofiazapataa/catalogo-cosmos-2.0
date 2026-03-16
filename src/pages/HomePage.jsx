@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useProducts } from "../hooks/useProducts";
-import { seedFirestore } from "../services/seedFirestore"; // ✅ TEMPORAL: borrar después del seed
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
@@ -18,10 +17,6 @@ export default function HomePage() {
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  // ✅ TEMPORAL: usar SOLO una vez para cargar products y combos en Firestore
-  useEffect(() => {
-    seedFirestore();
-  }, []);
 
   const combosProcessed = useMemo(() => {
     const filtered = filterProducts(combos, query);
