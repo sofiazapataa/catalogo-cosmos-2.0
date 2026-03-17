@@ -1,57 +1,60 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useList } from "../context/ListContext";
 
 const TRANSFER_OFF = 0.05;
 
-function buildReserveText(items, totalNormal, totalTransfer, paymentMethod) {
-  const lines = items.map(
-    (it) =>
-      `- ${it.title} x${it.qty} ($${(it.price * it.qty).toLocaleString("es-AR")})`
-  );
+function buildReserveText(items, finalTotal, paymentMethod, deliveryMethod, postalCode) {
+  const lines = items.map((it) => `- ${it.title} x${it.qty}`);
 
-  let paymentLine = "Pago: a coordinar";
-  if (paymentMethod === "transfer") paymentLine = "Pago: transferencia (5% OFF)";
-  if (paymentMethod === "cash") paymentLine = "Pago: efectivo";
-  if (paymentMethod === "other") paymentLine = "Pago: a coordinar";
+  let paymentLine = "A coordinar";
+  if (paymentMethod === "transfer") paymentLine = "Transferencia (5% OFF)";
+  if (paymentMethod === "cash") paymentLine = "Efectivo";
 
-  return `Hola! Quiero reservar:\n${lines.join(
+  let deliveryLine = "En Necochea";
+  if (deliveryMethod === "shipping") deliveryLine = "Envío";
+
+  return `Hola! Quiero reservar:\n\n${lines.join(
     "\n"
-  )}\n\nTotal: $${Number(totalNormal || 0).toLocaleString(
+  )}\n\nTotal: $${finalTotal.toLocaleString(
     "es-AR"
-  )}\nTotal transferencia (5% OFF): $${Number(totalTransfer || 0).toLocaleString(
-    "es-AR"
-  )}\n${paymentLine}`;
+  )}\nPago: ${paymentLine}\nEntrega: ${deliveryLine}${
+    deliveryMethod === "shipping" && postalCode ? `\nCP: ${postalCode}` : ""
+  }`;
 }
 
 export default function MyListPage() {
   const { items, clearList, total, addToList, removeOne, deleteItem } = useList();
 
-  // ✅ método de pago
-  const [paymentMethod, setPaymentMethod] = useState("transfer"); // transfer | cash | other
+  const [paymentMethod, setPaymentMethod] = useState("transfer");
+  const [deliveryMethod, setDeliveryMethod] = useState("necochea");
+  const [postalCode, setPostalCode] = useState("");
 
   const totalTransfer = useMemo(() => {
     return Math.round(Number(total || 0) * (1 - TRANSFER_OFF));
   }, [total]);
 
+  const finalTotal = useMemo(() => {
+    return paymentMethod === "transfer" ? totalTransfer : total;
+  }, [paymentMethod, total, totalTransfer]);
+
   const reserveText = useMemo(() => {
-    return buildReserveText(items, total, totalTransfer, paymentMethod);
-  }, [items, total, totalTransfer, paymentMethod]);
+    return buildReserveText(
+      items,
+      finalTotal,
+      paymentMethod,
+      deliveryMethod,
+      postalCode
+    );
+  }, [items, finalTotal, paymentMethod, deliveryMethod, postalCode]);
 
   const whatsappHref =
     "https://wa.me/542262357366?text=" + encodeURIComponent(reserveText);
 
   return (
     <>
-      <Header
-        right={
-          <Link className="btn btn-outline" to="/">
-            Volver
-          </Link>
-        }
-      />
+      <Header />
 
       <main className="container">
         <div className="panel">
@@ -97,13 +100,13 @@ export default function MyListPage() {
                       <div className="name">
                         <div className="name-title">{it.title}</div>
                         <div className="name-sub">
-                          Unit: ${Number(it.price || 0).toLocaleString("es-AR")}
+                          Unit: ${it.price.toLocaleString("es-AR")}
                         </div>
                       </div>
 
                       <div className="rightcol">
                         <div className="price">
-                          ${Number((it.price || 0) * it.qty).toLocaleString("es-AR")}
+                          ${(it.price * it.qty).toLocaleString("es-AR")}
                         </div>
 
                         <button
@@ -120,41 +123,91 @@ export default function MyListPage() {
                   ))}
                 </div>
 
-                {/* ✅ Pago + CTA */}
                 <div className="reserve-actions">
-                  <div className="pay-methods" role="group" aria-label="Método de pago">
-                    <label className="pay-option">
-                      <input
-                        type="radio"
-                        name="pay"
-                        value="transfer"
-                        checked={paymentMethod === "transfer"}
-                        onChange={() => setPaymentMethod("transfer")}
-                      />
-                      <span>Transferencia (5% OFF)</span>
-                    </label>
+                  <div className="list-configs">
+                    <div className="pay-methods" role="group" aria-label="Método de pago">
+                      <label className="pay-option">
+                        <input
+                          type="radio"
+                          name="pay"
+                          value="transfer"
+                          checked={paymentMethod === "transfer"}
+                          onChange={() => setPaymentMethod("transfer")}
+                        />
+                        <span>Transferencia (5% OFF)</span>
+                      </label>
 
-                    <label className="pay-option">
-                      <input
-                        type="radio"
-                        name="pay"
-                        value="cash"
-                        checked={paymentMethod === "cash"}
-                        onChange={() => setPaymentMethod("cash")}
-                      />
-                      <span>Efectivo</span>
-                    </label>
+                      <label className="pay-option">
+                        <input
+                          type="radio"
+                          name="pay"
+                          value="cash"
+                          checked={paymentMethod === "cash"}
+                          onChange={() => setPaymentMethod("cash")}
+                        />
+                        <span>Efectivo</span>
+                      </label>
 
-                    <label className="pay-option">
-                      <input
-                        type="radio"
-                        name="pay"
-                        value="other"
-                        checked={paymentMethod === "other"}
-                        onChange={() => setPaymentMethod("other")}
-                      />
-                      <span>A coordinar</span>
-                    </label>
+                      <label className="pay-option">
+                        <input
+                          type="radio"
+                          name="pay"
+                          value="other"
+                          checked={paymentMethod === "other"}
+                          onChange={() => setPaymentMethod("other")}
+                        />
+                        <span>A coordinar</span>
+                      </label>
+                    </div>
+
+                    <div
+                      className="pay-methods"
+                      role="group"
+                      aria-label="Método de entrega"
+                    >
+                      <label className="pay-option">
+                        <input
+                          type="radio"
+                          name="delivery"
+                          value="necochea"
+                          checked={deliveryMethod === "necochea"}
+                          onChange={() => {
+                            setDeliveryMethod("necochea");
+                            setPostalCode("");
+                          }}
+                        />
+                        <span>En Necochea</span>
+                      </label>
+
+                      <label className="pay-option">
+                        <input
+                          type="radio"
+                          name="delivery"
+                          value="shipping"
+                          checked={deliveryMethod === "shipping"}
+                          onChange={() => setDeliveryMethod("shipping")}
+                        />
+                        <span>Envío</span>
+                      </label>
+                    </div>
+
+                    {deliveryMethod === "shipping" ? (
+                      <div className="shipping-box">
+                        <label className="admin-field" style={{ gap: 6 }}>
+                          <span>CP</span>
+                          <input
+                            className="input"
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Ej: 7600"
+                            value={postalCode}
+                            onChange={(e) =>
+                              setPostalCode(e.target.value.replace(/\D/g, ""))
+                            }
+                          />
+                        </label>
+                      </div>
+                    ) : null}
                   </div>
 
                   <a className="btn" href={whatsappHref} target="_blank" rel="noreferrer">
@@ -165,18 +218,24 @@ export default function MyListPage() {
             )}
           </div>
 
-          {/* ✅ Totales (normal + transferencia) */}
           <div className="panel-foot totals">
             <div className="totals-left">
-              <strong>Total</strong>
+              <strong>
+                {paymentMethod === "transfer" ? "Total con transferencia" : "Total"}
+              </strong>
+
               <span className="totals-sub">
-                Transferencia (5% OFF):{" "}
-                <strong>${totalTransfer.toLocaleString("es-AR")}</strong>
+                Entrega:{" "}
+                <strong>
+                  {deliveryMethod === "necochea"
+                    ? "En Necochea"
+                    : `Envío${postalCode ? ` · CP ${postalCode}` : ""}`}
+                </strong>
               </span>
             </div>
 
             <div className="totals-right">
-              <strong>${Number(total || 0).toLocaleString("es-AR")}</strong>
+              <strong>${finalTotal.toLocaleString("es-AR")}</strong>
             </div>
           </div>
         </div>

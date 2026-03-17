@@ -1388,7 +1388,35 @@ body{
   .admin-form-grid{
     grid-template-columns:repeat(2, 1fr);
   }
+}/* =========================
+   MY LIST · ENTREGA
+========================= */
+
+.list-configs{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex:1;
+  min-width:0;
 }
+
+.shipping-box{
+  padding:10px;
+  border:1px solid var(--border);
+  background:#f6f7f2;
+  border-radius:12px;
+}
+
+@media (max-width: 480px){
+  .list-configs{
+    width:100%;
+  }
+
+  .shipping-box{
+    padding:12px;
+  }
+}
+
 /* =========================
    BREAKPOINTS
 ========================= */

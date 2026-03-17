@@ -1,16 +1,41 @@
-# React + Vite
+# Catálogo Kosmos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web para gestionar y mostrar el catálogo de productos de Kosmos.  
+Incluye un panel de administración para crear, editar y eliminar productos, y una interfaz pública para que los usuarios puedan explorar el catálogo y armar su lista.
 
-Currently, two official plugins are available:
+## Tecnologías
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React
+- Vite
+- Firebase (Firestore + Auth)
+- React Router
+- Vercel (deploy)
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Catálogo público
+- Visualización de productos
+- Detalle de cada producto
+- Sección "Mi lista" para guardar productos
+- Página de contacto
+- Página sobre la marca
 
-## Expanding the ESLint configuration
+### Panel Admin
+- Login con Firebase Auth
+- Crear productos
+- Editar productos
+- Eliminar productos
+- Manejo de stock
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Estructura del proyecto
+- src: 
+- components → componentes reutilizables
+- pages → páginas de la aplicación
+- services → conexión con Firebase
+- utils → helpers y utilidades
+- context → estado global (ej: lista)
+- hooks → hooks personalizados
+- styles → estilos globales
+
+## Variables de entorno
+Si se utilizan variables para Firebase, agregarlas en `.env`.
