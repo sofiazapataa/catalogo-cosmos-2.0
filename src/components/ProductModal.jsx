@@ -1,29 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
 import { useList } from "../context/ListContext";
 
-const TRANSFER_OFF = 0.05;
-
 function formatARS(n) {
   return Number(n || 0).toLocaleString("es-AR");
 }
 
 export default function ProductModal({ product, onClose }) {
   const { addToList, removeOne, getQty } = useList();
-  const qty = getQty(product.id);
 
+  if (!product) return null;
+
+  const qty = getQty(product.id);
   const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
 
+  const transferEnabled = product.transferEnabled !== false;
+  const transferDiscountPct = Number(product.transferDiscountPct ?? 5);
+  const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
+
   const images = useMemo(() => {
-    if (Array.isArray(product.images) && product.images.length > 0) return product.images;
-    if (product.image) return [product.image];
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images;
+    }
+    if (product.image) {
+      return [product.image];
+    }
     return [];
   }, [product]);
 
   const [idx, setIdx] = useState(0);
 
   const transferPrice = useMemo(() => {
-    return Math.round((product.price || 0) * (1 - TRANSFER_OFF));
-  }, [product.price]);
+    const p = Number(product.price || 0);
+    if (!hasTransferDiscount) return p;
+    return Math.round(p * (1 - transferDiscountPct / 100));
+  }, [product.price, hasTransferDiscount, transferDiscountPct]);
 
   function prev() {
     setIdx((v) => (v - 1 + images.length) % images.length);
@@ -34,12 +44,14 @@ export default function ProductModal({ product, onClose }) {
   }
 
   useEffect(() => {
+    setIdx(0);
+  }, [product.id]);
+
+  useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") onClose();
-      if (images.length > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
-        if (e.key === "ArrowLeft") prev();
-        if (e.key === "ArrowRight") next();
-      }
+      if (images.length > 1 && e.key === "ArrowLeft") prev();
+      if (images.length > 1 && e.key === "ArrowRight") next();
     }
 
     window.addEventListener("keydown", onKey);
@@ -56,9 +68,19 @@ export default function ProductModal({ product, onClose }) {
   }, []);
 
   return (
-    <div className="modal-overlay" onMouseDown={onClose} role="dialog" aria-modal="true">
+    <div
+      className="modal-overlay"
+      onMouseDown={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={onClose} aria-label="Cerrar">
+        <button
+          className="modal-close"
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+        >
           ✕
         </button>
 
@@ -73,10 +95,19 @@ export default function ProductModal({ product, onClose }) {
 
               {images.length > 1 ? (
                 <>
-                  <button className="modal-nav modal-nav-left" type="button" onClick={prev}>
+                  <button
+                    className="modal-nav modal-nav-left"
+                    type="button"
+                    onClick={prev}
+                  >
                     ‹
                   </button>
-                  <button className="modal-nav modal-nav-right" type="button" onClick={next}>
+
+                  <button
+                    className="modal-nav modal-nav-right"
+                    type="button"
+                    onClick={next}
+                  >
                     ›
                   </button>
 
@@ -111,9 +142,12 @@ export default function ProductModal({ product, onClose }) {
           <div className="modal-pricebox">
             <div className="modal-price-main">${formatARS(product.price)}</div>
 
-            <div className="modal-price-transfer">
-              Transferencia: <strong>${formatARS(transferPrice)}</strong> (5% OFF)
-            </div>
+            {hasTransferDiscount ? (
+              <div className="modal-price-transfer">
+                Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
+                ({transferDiscountPct}% OFF)
+              </div>
+            ) : null}
           </div>
 
           {product.skinType ? (
@@ -154,11 +188,21 @@ export default function ProductModal({ product, onClose }) {
               </button>
             ) : qty > 0 ? (
               <div className="qtybar">
-                <button className="iconbtn" type="button" onClick={() => removeOne(product.id)}>
+                <button
+                  className="iconbtn"
+                  type="button"
+                  onClick={() => removeOne(product.id)}
+                >
                   −
                 </button>
+
                 <span className="qtypill">x{qty}</span>
-                <button className="iconbtn" type="button" onClick={() => addToList(product)}>
+
+                <button
+                  className="iconbtn"
+                  type="button"
+                  onClick={() => addToList(product)}
+                >
                   +
                 </button>
               </div>

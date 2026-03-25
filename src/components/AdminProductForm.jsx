@@ -39,6 +39,18 @@ const EMPTY_FORM = {
   stockQty: 0,
   lowStockThreshold: 3,
   active: true,
+
+  paymentOptions: {
+    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
+    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
+    other: { enabled: true, discountPct: 0, label: "Otro medio" },
+  },
+
+  deliveryOptions: {
+    necochea: { enabled: true, label: "En Necochea" },
+    shipping: { enabled: true, label: "Envío" },
+    moto: { enabled: true, label: "Motoenvío", price: 2100 },
+  },
 };
 
 export default function AdminProductForm({
@@ -59,7 +71,43 @@ export default function AdminProductForm({
         ...initialData,
         stockQty: Number(initialData.stockQty ?? 0),
         lowStockThreshold: Number(initialData.lowStockThreshold ?? 3),
+
+        paymentOptions: {
+          ...EMPTY_FORM.paymentOptions,
+          ...(initialData.paymentOptions || {}),
+          transfer: {
+            ...EMPTY_FORM.paymentOptions.transfer,
+            ...(initialData.paymentOptions?.transfer || {}),
+          },
+          cash: {
+            ...EMPTY_FORM.paymentOptions.cash,
+            ...(initialData.paymentOptions?.cash || {}),
+          },
+          other: {
+            ...EMPTY_FORM.paymentOptions.other,
+            ...(initialData.paymentOptions?.other || {}),
+          },
+        },
+
+        deliveryOptions: {
+          ...EMPTY_FORM.deliveryOptions,
+          ...(initialData.deliveryOptions || {}),
+          necochea: {
+            ...EMPTY_FORM.deliveryOptions.necochea,
+            ...(initialData.deliveryOptions?.necochea || {}),
+          },
+          shipping: {
+            ...EMPTY_FORM.deliveryOptions.shipping,
+            ...(initialData.deliveryOptions?.shipping || {}),
+          },
+          moto: {
+            ...EMPTY_FORM.deliveryOptions.moto,
+            ...(initialData.deliveryOptions?.moto || {}),
+            price: Number(initialData.deliveryOptions?.moto?.price ?? 2100),
+          },
+        },
       });
+
       setBenefitsText(benefitsToText(initialData.benefits));
       setImagesText(imagesToText(initialData.imagesKeys));
     } else {
@@ -89,6 +137,42 @@ export default function AdminProductForm({
     }));
   }
 
+  function handlePaymentChange(method, field, value) {
+    setForm((prev) => ({
+      ...prev,
+      paymentOptions: {
+        ...prev.paymentOptions,
+        [method]: {
+          ...prev.paymentOptions[method],
+          [field]:
+            field === "enabled"
+              ? value
+              : field === "discountPct"
+              ? Number(value)
+              : value,
+        },
+      },
+    }));
+  }
+
+  function handleDeliveryChange(method, field, value) {
+    setForm((prev) => ({
+      ...prev,
+      deliveryOptions: {
+        ...prev.deliveryOptions,
+        [method]: {
+          ...prev.deliveryOptions[method],
+          [field]:
+            field === "enabled"
+              ? value
+              : field === "price"
+              ? Number(value)
+              : value,
+        },
+      },
+    }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -112,115 +196,185 @@ export default function AdminProductForm({
       <div className="admin-form-grid">
         <label className="admin-field">
           <span>ID</span>
-          <input
-            className="input"
-            name="id"
-            value={form.id}
-            onChange={handleChange}
-            placeholder="boosting-drops"
-            required
-          />
+          <input className="input" name="id" value={form.id} onChange={handleChange} required />
         </label>
 
         <label className="admin-field">
           <span>Título</span>
-          <input
-            className="input"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Boosting Drops"
-            required
-          />
+          <input className="input" name="title" value={form.title} onChange={handleChange} required />
         </label>
 
         <label className="admin-field admin-field-full">
           <span>Descripción</span>
-          <input
-            className="input"
-            name="desc"
-            value={form.desc}
-            onChange={handleChange}
-            placeholder="Serum booster para potenciar tu rutina"
-            required
-          />
+          <input className="input" name="desc" value={form.desc} onChange={handleChange} required />
         </label>
 
         <label className="admin-field">
-          <span>Precio</span>
-          <input
-            className="input"
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            required
-          />
+          <span>Precio final</span>
+          <input className="input" type="number" name="price" value={form.price} onChange={handleChange} required />
+          <small className="admin-help">Precio que se muestra en la web.</small>
         </label>
 
         <label className="admin-field">
-          <span>Descuento</span>
-          <input
-            className="input"
-            type="number"
-            name="discount"
-            value={form.discount}
-            onChange={handleChange}
-          />
+          <span>Descuento visual (%)</span>
+          <input className="input" type="number" name="discount" value={form.discount} onChange={handleChange} />
+          <small className="admin-help">Solo para la etiqueta visual del producto.</small>
         </label>
+
+        <div className="admin-field admin-field-full">
+          <span>Métodos de pago</span>
+
+          <div className="admin-payment-grid">
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.transfer.enabled}
+                  onChange={(e) =>
+                    handlePaymentChange("transfer", "enabled", e.target.checked)
+                  }
+                />
+                <span>Transferencia</span>
+              </label>
+
+              <input
+                className="input"
+                type="number"
+                value={form.paymentOptions.transfer.discountPct}
+                onChange={(e) =>
+                  handlePaymentChange("transfer", "discountPct", e.target.value)
+                }
+                placeholder="5"
+              />
+            </div>
+
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.cash.enabled}
+                  onChange={(e) =>
+                    handlePaymentChange("cash", "enabled", e.target.checked)
+                  }
+                />
+                <span>Efectivo</span>
+              </label>
+
+              <input
+                className="input"
+                type="number"
+                value={form.paymentOptions.cash.discountPct}
+                onChange={(e) =>
+                  handlePaymentChange("cash", "discountPct", e.target.value)
+                }
+                placeholder="0"
+              />
+            </div>
+
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.other.enabled}
+                  onChange={(e) =>
+                    handlePaymentChange("other", "enabled", e.target.checked)
+                  }
+                />
+                <span>Otro medio</span>
+              </label>
+
+              <input
+                className="input"
+                type="number"
+                value={form.paymentOptions.other.discountPct}
+                onChange={(e) =>
+                  handlePaymentChange("other", "discountPct", e.target.value)
+                }
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-field admin-field-full">
+          <span>Opciones de entrega</span>
+
+          <div className="admin-payment-grid">
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.deliveryOptions.necochea.enabled}
+                  onChange={(e) =>
+                    handleDeliveryChange("necochea", "enabled", e.target.checked)
+                  }
+                />
+                <span>En Necochea</span>
+              </label>
+            </div>
+
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.deliveryOptions.shipping.enabled}
+                  onChange={(e) =>
+                    handleDeliveryChange("shipping", "enabled", e.target.checked)
+                  }
+                />
+                <span>Envío</span>
+              </label>
+            </div>
+
+            <div className="admin-method-card">
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.deliveryOptions.moto.enabled}
+                  onChange={(e) =>
+                    handleDeliveryChange("moto", "enabled", e.target.checked)
+                  }
+                />
+                <span>Motoenvío</span>
+              </label>
+
+              <input
+                className="input"
+                type="number"
+                value={form.deliveryOptions.moto.price}
+                onChange={(e) =>
+                  handleDeliveryChange("moto", "price", e.target.value)
+                }
+                placeholder="2100"
+              />
+            </div>
+          </div>
+        </div>
 
         <label className="admin-field">
           <span>Categoría</span>
-          <input
-            className="input"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-          />
+          <input className="input" name="category" value={form.category} onChange={handleChange} />
         </label>
 
         <label className="admin-field">
           <span>Tipo</span>
-          <input
-            className="input"
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-            placeholder={mode === "combo" ? "combos" : "serums"}
-          />
+          <input className="input" name="type" value={form.type} onChange={handleChange} />
         </label>
 
         <label className="admin-field">
           <span>Imagen principal (`imageKey`)</span>
-          <input
-            className="input"
-            name="imageKey"
-            value={form.imageKey}
-            onChange={handleChange}
-            placeholder="serum-hidratante.jpg"
-          />
+          <input className="input" name="imageKey" value={form.imageKey} onChange={handleChange} />
         </label>
 
         <label className="admin-field">
           <span>Tipo de piel</span>
-          <input
-            className="input"
-            name="skinType"
-            value={form.skinType}
-            onChange={handleChange}
-            placeholder="Apto para todo tipo de piel"
-          />
+          <input className="input" name="skinType" value={form.skinType} onChange={handleChange} />
         </label>
 
         <label className="admin-field">
           <span>Stock</span>
-          <input
-            className="input"
-            type="number"
-            name="stockQty"
-            value={form.stockQty}
-            onChange={handleChange}
-          />
+          <input className="input" type="number" name="stockQty" value={form.stockQty} onChange={handleChange} />
+          <small className="admin-help">Si llega a 0, se muestra como “Sin stock”.</small>
         </label>
 
         <label className="admin-field">
@@ -232,6 +386,9 @@ export default function AdminProductForm({
             value={form.lowStockThreshold}
             onChange={handleChange}
           />
+          <small className="admin-help">
+            Ej: si ponés 2, cuando queden 2 o menos te lo marca como bajo.
+          </small>
         </label>
 
         <label className="admin-field admin-field-full">
@@ -240,7 +397,6 @@ export default function AdminProductForm({
             className="input admin-textarea"
             value={imagesText}
             onChange={(e) => setImagesText(e.target.value)}
-            placeholder={"serum-hidratante.jpg\nserum-hidratante-2.jpg"}
           />
         </label>
 
@@ -250,39 +406,21 @@ export default function AdminProductForm({
             className="input admin-textarea"
             value={benefitsText}
             onChange={(e) => setBenefitsText(e.target.value)}
-            placeholder={
-              "Potencia la rutina\nAporta luminosidad\nHidratación ligera"
-            }
           />
         </label>
 
         <label className="admin-field admin-field-full">
           <span>Cómo usar</span>
-          <textarea
-            className="input admin-textarea"
-            name="howToUse"
-            value={form.howToUse}
-            onChange={handleChange}
-          />
+          <textarea className="input admin-textarea" name="howToUse" value={form.howToUse} onChange={handleChange} />
         </label>
 
         <label className="admin-field admin-field-full">
           <span>Detalles</span>
-          <textarea
-            className="input admin-textarea"
-            name="details"
-            value={form.details}
-            onChange={handleChange}
-          />
+          <textarea className="input admin-textarea" name="details" value={form.details} onChange={handleChange} />
         </label>
 
         <label className="admin-check">
-          <input
-            type="checkbox"
-            name="active"
-            checked={form.active}
-            onChange={handleChange}
-          />
+          <input type="checkbox" name="active" checked={form.active} onChange={handleChange} />
           <span>Activo</span>
         </label>
       </div>

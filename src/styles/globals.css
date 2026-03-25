@@ -640,6 +640,39 @@ body{
 .card-out{
   opacity:0.92;
 }
+.admin-help{
+  margin-top: -2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--admin-text-soft);
+}
+.admin-payment-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.admin-method-card{
+  background:#f7f8f3;
+  border:1px solid #e3e7d8;
+  border-radius:18px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.admin-help{
+  font-size:13px;
+  color:#6b7280;
+  line-height:1.4;
+}
+
+@media (min-width: 768px){
+  .admin-payment-grid{
+    grid-template-columns:repeat(3, 1fr);
+  }
+}
 /* ========= MEDIA ========= */
 .modal-media{
   position: relative;

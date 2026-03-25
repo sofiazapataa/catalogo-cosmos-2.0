@@ -2,8 +2,6 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useList } from "../context/ListContext";
 
-const TRANSFER_OFF = 0.05;
-
 function formatARS(value) {
   return Number(value || 0).toLocaleString("es-AR");
 }
@@ -17,15 +15,20 @@ export default function ProductCard({ product, onOpen }) {
   const qty = getQty(product.id);
   const canOpen = typeof onOpen === "function";
 
-  const transferPrice = useMemo(() => {
-    const p = Number(product.price || 0);
-    return Math.round(p * (1 - TRANSFER_OFF));
-  }, [product.price]);
-
   const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
   const isLowStock =
     !isOutOfStock &&
     Number(product.stockQty ?? 0) <= Number(product.lowStockThreshold ?? 0);
+
+  const transferEnabled = product.transferEnabled !== false;
+  const transferDiscountPct = Number(product.transferDiscountPct ?? 5);
+  const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
+
+  const transferPrice = useMemo(() => {
+    const p = Number(product.price || 0);
+    if (!hasTransferDiscount) return p;
+    return Math.round(p * (1 - transferDiscountPct / 100));
+  }, [product.price, hasTransferDiscount, transferDiscountPct]);
 
   function handleKeyOpen(e) {
     if (!canOpen) return;
@@ -55,7 +58,9 @@ export default function ProductCard({ product, onOpen }) {
           <div className="stock-badge stock-badge-low">Últimas unidades</div>
         ) : null}
 
-        {product.image ? <img src={product.image} alt={product.title} loading="lazy" /> : null}
+        {product.image ? (
+          <img src={product.image} alt={product.title} loading="lazy" />
+        ) : null}
       </div>
 
       <h3
@@ -77,10 +82,13 @@ export default function ProductCard({ product, onOpen }) {
       <div className="card-foot">
         <div className="priceblock">
           <div className="card-price">${formatARS(product.price)}</div>
-          <div className="card-price-off">
-            Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
-            <span className="off-tag">(5% OFF)</span>
-          </div>
+
+          {hasTransferDiscount ? (
+            <div className="card-price-off">
+              Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
+              <span className="off-tag">({transferDiscountPct}% OFF)</span>
+            </div>
+          ) : null}
         </div>
 
         <div className="card-actions">
