@@ -45,7 +45,7 @@ export default function HomePage() {
 
   const stockToShow = showAllStock
     ? stockProcessed
-    : stockProcessed.slice(0, 6);
+    : stockProcessed.slice(0, 10);
 
   const nothingFound =
     !loading && !error && combosProcessed.length + stockProcessed.length === 0;

@@ -4,16 +4,16 @@ import { useList } from "../context/ListContext";
 const TRANSFER_OFF = 0.05;
 
 function formatARS(n) {
-  return n.toLocaleString("es-AR");
+  return Number(n || 0).toLocaleString("es-AR");
 }
 
 export default function ProductModal({ product, onClose }) {
   const { addToList, removeOne, getQty } = useList();
   const qty = getQty(product.id);
 
+  const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
+
   const images = useMemo(() => {
-    // Si product.images existe y tiene algo, usamos eso.
-    // Si no, si product.image existe, armamos array con esa.
     if (Array.isArray(product.images) && product.images.length > 0) return product.images;
     if (product.image) return [product.image];
     return [];
@@ -28,11 +28,11 @@ export default function ProductModal({ product, onClose }) {
   function prev() {
     setIdx((v) => (v - 1 + images.length) % images.length);
   }
+
   function next() {
     setIdx((v) => (v + 1) % images.length);
   }
 
-  // ESC para cerrar
   useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") onClose();
@@ -41,15 +41,15 @@ export default function ProductModal({ product, onClose }) {
         if (e.key === "ArrowRight") next();
       }
     }
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images.length, onClose]);
 
-  // Bloqueo scroll cuando el modal está abierto
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     return () => {
       document.body.style.overflow = prevOverflow;
     };
@@ -62,11 +62,14 @@ export default function ProductModal({ product, onClose }) {
           ✕
         </button>
 
-        {/* Galería */}
         <div className="modal-media">
           {images.length > 0 ? (
             <>
               <img className="modal-img" src={images[idx]} alt={product.title} />
+
+              {isOutOfStock ? (
+                <div className="stock-badge stock-badge-out">Sin stock</div>
+              ) : null}
 
               {images.length > 1 ? (
                 <>
@@ -92,24 +95,26 @@ export default function ProductModal({ product, onClose }) {
               ) : null}
             </>
           ) : (
-            <div className="modal-img-empty">Sin imagen</div>
+            <div className="modal-img-empty">
+              {isOutOfStock ? (
+                <div className="stock-badge stock-badge-out">Sin stock</div>
+              ) : null}
+              Sin imagen
+            </div>
           )}
         </div>
 
-        {/* Info */}
         <div className="modal-info">
           <h3 className="modal-title">{product.title}</h3>
           <p className="modal-desc">{product.desc}</p>
 
           <div className="modal-pricebox">
-  <div className="modal-price-main">
-    ${formatARS(product.price)}
-  </div>
+            <div className="modal-price-main">${formatARS(product.price)}</div>
 
-  <div className="modal-price-transfer">
-    Transferencia: <strong>${formatARS(transferPrice)}</strong> (5% OFF)
-  </div>
-</div>
+            <div className="modal-price-transfer">
+              Transferencia: <strong>${formatARS(transferPrice)}</strong> (5% OFF)
+            </div>
+          </div>
 
           {product.skinType ? (
             <div className="modal-chip">
@@ -142,9 +147,12 @@ export default function ProductModal({ product, onClose }) {
             </div>
           ) : null}
 
-          {/* CTA */}
           <div className="modal-actions">
-            {qty > 0 ? (
+            {isOutOfStock ? (
+              <button className="btn btn-disabled" type="button" disabled>
+                Sin stock
+              </button>
+            ) : qty > 0 ? (
               <div className="qtybar">
                 <button className="iconbtn" type="button" onClick={() => removeOne(product.id)}>
                   −

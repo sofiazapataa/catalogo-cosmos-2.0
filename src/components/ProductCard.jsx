@@ -12,17 +12,20 @@ export default function ProductCard({ product, onOpen }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
 
-  // ✅ FIX: si por algún motivo llega undefined, NO rompemos la app
   if (!product) return null;
 
   const qty = getQty(product.id);
+  const canOpen = typeof onOpen === "function";
 
   const transferPrice = useMemo(() => {
     const p = Number(product.price || 0);
     return Math.round(p * (1 - TRANSFER_OFF));
   }, [product.price]);
 
-  const canOpen = typeof onOpen === "function";
+  const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
+  const isLowStock =
+    !isOutOfStock &&
+    Number(product.stockQty ?? 0) <= Number(product.lowStockThreshold ?? 0);
 
   function handleKeyOpen(e) {
     if (!canOpen) return;
@@ -33,35 +36,27 @@ export default function ProductCard({ product, onOpen }) {
   }
 
   return (
-    <article className="card">
-      {product.image ? (
-        <div
-          className="card-image"
-          onClick={canOpen ? onOpen : undefined}
-          onKeyDown={handleKeyOpen}
-          role={canOpen ? "button" : undefined}
-          tabIndex={canOpen ? 0 : undefined}
-          aria-label={canOpen ? `Ver ${product.title}` : undefined}
-        >
-          {product.discount > 0 && (
-            <div className="badge">-{product.discount}%</div>
-          )}
-          <img src={product.image} alt={product.title} loading="lazy" />
-        </div>
-      ) : (
-        <div
-          className="card-image card-image--empty"
-          onClick={canOpen ? onOpen : undefined}
-          onKeyDown={handleKeyOpen}
-          role={canOpen ? "button" : undefined}
-          tabIndex={canOpen ? 0 : undefined}
-          aria-label={canOpen ? `Ver ${product.title}` : undefined}
-        >
-          {product.discount > 0 && (
-            <div className="badge">-{product.discount}%</div>
-          )}
-        </div>
-      )}
+    <article className={`card ${isOutOfStock ? "card-out" : ""}`}>
+      <div
+        className={`card-image ${!product.image ? "card-image--empty" : ""}`}
+        onClick={canOpen ? onOpen : undefined}
+        onKeyDown={handleKeyOpen}
+        role={canOpen ? "button" : undefined}
+        tabIndex={canOpen ? 0 : undefined}
+        aria-label={canOpen ? `Ver ${product.title}` : undefined}
+      >
+        {isOutOfStock ? (
+          <div className="stock-badge stock-badge-out">Sin stock</div>
+        ) : product.discount > 0 ? (
+          <div className="badge">-{product.discount}%</div>
+        ) : null}
+
+        {isLowStock ? (
+          <div className="stock-badge stock-badge-low">Últimas unidades</div>
+        ) : null}
+
+        {product.image ? <img src={product.image} alt={product.title} loading="lazy" /> : null}
+      </div>
 
       <h3
         className="card-title"
@@ -88,9 +83,12 @@ export default function ProductCard({ product, onOpen }) {
           </div>
         </div>
 
-        {/* ✅ "Ver lista" solo cuando qty > 0 */}
         <div className="card-actions">
-          {qty > 0 ? (
+          {isOutOfStock ? (
+            <button className="btn btn-small btn-disabled" type="button" disabled>
+              Sin stock
+            </button>
+          ) : qty > 0 ? (
             <>
               <div className="qtybar">
                 <button

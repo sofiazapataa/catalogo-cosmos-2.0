@@ -599,8 +599,47 @@ body{
   cursor:pointer;
   font-weight: 900;
   z-index: 5;
+}/* =========================
+   STOCK BADGES
+========================= */
+
+.stock-badge{
+  position:absolute;
+  z-index:3;
+  right:12px;
+  top:12px;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.2px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
 }
 
+.stock-badge-out{
+  background:#1f1f1f;
+  color:#fff;
+}
+
+.stock-badge-low{
+  top:auto;
+  bottom:12px;
+  right:12px;
+  background:rgba(255,255,255,0.92);
+  color:var(--green);
+  border:1px solid rgba(63,79,25,0.18);
+}
+
+.btn-disabled{
+  background:#d9d9d9;
+  border-color:#d9d9d9;
+  color:#666;
+  cursor:not-allowed;
+}
+
+.card-out{
+  opacity:0.92;
+}
 /* ========= MEDIA ========= */
 .modal-media{
   position: relative;
