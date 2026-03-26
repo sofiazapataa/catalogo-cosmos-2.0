@@ -29,7 +29,7 @@ export const imageMap = {
   "combo-LimpiezaBasica.jpg": comboLimpiezaBasica,
   "combo-limpieza.jpg": combolimpieza,
   "aqua-fotos.jpg": aquaFotos,
-  "aqua-fotos-2.jpg": aquaFotos2,
+  "aqua-fotos2.jpg": aquaFotos2,
   "brightening-drops-fotos.jpg": brighteningFotos,
   "cleaninsing-bubbles-fotos.jpg": cleaninsingFotos,
 };

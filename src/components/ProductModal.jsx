@@ -46,13 +46,12 @@ export default function ProductModal({ product, onClose }) {
   const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
 
   const images = useMemo(() => {
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images;
-    }
-    if (product.image) {
-      return [product.image];
-    }
-    return [];
+    const merged = [
+      product.image,
+      ...(Array.isArray(product.images) ? product.images : []),
+    ].filter(Boolean);
+
+    return [...new Set(merged)];
   }, [product]);
 
   const [idx, setIdx] = useState(0);
@@ -132,6 +131,7 @@ export default function ProductModal({ product, onClose }) {
                     className="modal-nav modal-nav-left"
                     type="button"
                     onClick={prev}
+                    aria-label="Foto anterior"
                   >
                     ‹
                   </button>
@@ -140,6 +140,7 @@ export default function ProductModal({ product, onClose }) {
                     className="modal-nav modal-nav-right"
                     type="button"
                     onClick={next}
+                    aria-label="Foto siguiente"
                   >
                     ›
                   </button>
