@@ -1,11 +1,38 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useList } from "../context/ListContext";
 
 function formatARS(n) {
   return Number(n || 0).toLocaleString("es-AR");
 }
 
+function getPaymentConfig(product) {
+  const defaults = {
+    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
+    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
+    other: { enabled: true, discountPct: 0, label: "Otro medio" },
+  };
+
+  return {
+    ...defaults,
+    ...(product.paymentOptions || {}),
+    transfer: {
+      ...defaults.transfer,
+      ...(product.paymentOptions?.transfer || {}),
+    },
+    cash: {
+      ...defaults.cash,
+      ...(product.paymentOptions?.cash || {}),
+    },
+    other: {
+      ...defaults.other,
+      ...(product.paymentOptions?.other || {}),
+    },
+  };
+}
+
 export default function ProductModal({ product, onClose }) {
+  const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
 
   if (!product) return null;
@@ -13,8 +40,9 @@ export default function ProductModal({ product, onClose }) {
   const qty = getQty(product.id);
   const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
 
-  const transferEnabled = product.transferEnabled !== false;
-  const transferDiscountPct = Number(product.transferDiscountPct ?? 5);
+  const paymentConfig = getPaymentConfig(product);
+  const transferEnabled = Boolean(paymentConfig.transfer.enabled);
+  const transferDiscountPct = Number(paymentConfig.transfer.discountPct || 0);
   const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
 
   const images = useMemo(() => {
@@ -66,6 +94,11 @@ export default function ProductModal({ product, onClose }) {
       document.body.style.overflow = prevOverflow;
     };
   }, []);
+
+  function goToList() {
+    onClose();
+    navigate("/mi-lista");
+  }
 
   return (
     <div
@@ -187,25 +220,35 @@ export default function ProductModal({ product, onClose }) {
                 Sin stock
               </button>
             ) : qty > 0 ? (
-              <div className="qtybar">
-                <button
-                  className="iconbtn"
-                  type="button"
-                  onClick={() => removeOne(product.id)}
-                >
-                  −
-                </button>
+              <>
+                <div className="qtybar">
+                  <button
+                    className="iconbtn"
+                    type="button"
+                    onClick={() => removeOne(product.id)}
+                  >
+                    −
+                  </button>
 
-                <span className="qtypill">x{qty}</span>
+                  <span className="qtypill">x{qty}</span>
+
+                  <button
+                    className="iconbtn"
+                    type="button"
+                    onClick={() => addToList(product)}
+                  >
+                    +
+                  </button>
+                </div>
 
                 <button
-                  className="iconbtn"
+                  className="btn btn-outline btn-small"
                   type="button"
-                  onClick={() => addToList(product)}
+                  onClick={goToList}
                 >
-                  +
+                  Ver lista
                 </button>
-              </div>
+              </>
             ) : (
               <button className="btn" type="button" onClick={() => addToList(product)}>
                 Agregar a la lista

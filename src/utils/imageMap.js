@@ -4,12 +4,16 @@ import refilLimpieza from "../assets/images/refil-limpieza.jpg";
 import serumHidratante from "../assets/images/serum-hidratante.jpg";
 import serumNiacinamida from "../assets/images/serum-niacinamida.jpg";
 import jabonLimpieza from "../assets/images/jabon-limpieza.jpg";
-import comboLimpieza from "../assets/images/combo-limpieza.jpg";
-import comboRefresh from "../assets/images/combo-refresh.jpg";
 import refreshPotion from "../assets/images/refreshPotion.jpg";
 import comboRutinaPielGrasa from "../assets/images/combo-rutinaPielGrasa.jpg";
-import comboRutinaBasica from "../assets/images/combo-rutinaBasica.jpg"
-import tonicoPuryfing from "../assets/images/tonico-puryfing.jpg"
+import tonicoPuryfing from "../assets/images/tonico-puryfing.jpg";
+import comboLimpiezaGlow from "../assets/images/combo-limpiezaGlow.jpg";
+import comboLimpiezaBasica from "../assets/images/combo-LimipiezaBasica.jpg";
+import combolimpieza from "../assets/images/combo-limpieza.jpg";
+import aquaFotos from "../assets/images/aqua-fotos.jpg";
+import aquaFotos2 from "../assets/images/aqua-fotos2.jpg";
+import brighteningFotos from "../assets/images/brightening-drops-fotos.jpg";
+import cleaninsingFotos from "../assets/images/cleaninsing-bubbles-fotos.jpg";
 
 export const imageMap = {
   "aceite-limpieza.jpg": aceiteLimpieza,
@@ -18,12 +22,16 @@ export const imageMap = {
   "serum-hidratante.jpg": serumHidratante,
   "serum-niacinamida.jpg": serumNiacinamida,
   "jabon-limpieza.jpg": jabonLimpieza,
-  "combo-limpieza.jpg": comboLimpieza,
-  "combo-refresh.jpg": comboRefresh,
   "refreshPotion.jpg": refreshPotion,
   "combo-rutinaPielGrasa.jpg": comboRutinaPielGrasa,
-  "combo-rutinaBasica.jpg": comboRutinaBasica,
   "tonico-puryfing.jpg": tonicoPuryfing,
+  "combo-limpiezaGlow.jpg": comboLimpiezaGlow,
+  "combo-LimpiezaBasica.jpg": comboLimpiezaBasica,
+  "combo-limpieza.jpg": combolimpieza,
+  "aqua-fotos.jpg": aquaFotos,
+  "aqua-fotos-2.jpg": aquaFotos2,
+  "brightening-drops-fotos.jpg": brighteningFotos,
+  "cleaninsing-bubbles-fotos.jpg": cleaninsingFotos,
 };
 
 export function resolveImage(imageKey) {
