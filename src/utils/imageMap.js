@@ -1,27 +1,29 @@
 import aceiteLimpieza from "../assets/images/aceite-limpieza.jpg";
 import cremaReparadora from "../assets/images/crema-reparadora.jpg";
-import cremaSuave from "../assets/images/crema-suave.jpg";
 import refilLimpieza from "../assets/images/refil-limpieza.jpg";
 import serumHidratante from "../assets/images/serum-hidratante.jpg";
 import serumNiacinamida from "../assets/images/serum-niacinamida.jpg";
-import serumOil from "../assets/images/serum-betaOil.jpg";
-import tonicoExfoliante from "../assets/images/tonico-exfoliante.jpg";
 import jabonLimpieza from "../assets/images/jabon-limpieza.jpg";
 import comboLimpieza from "../assets/images/combo-limpieza.jpg";
 import comboRefresh from "../assets/images/combo-refresh.jpg";
+import refreshPotion from "../assets/images/refreshPotion.jpg";
+import comboRutinaPielGrasa from "../assets/images/combo-rutinaPielGrasa.jpg";
+import comboRutinaBasica from "../assets/images/combo-rutinaBasica.jpg"
+import tonicoPuryfing from "../assets/images/tonico-puryfing.jpg"
 
 export const imageMap = {
   "aceite-limpieza.jpg": aceiteLimpieza,
   "crema-reparadora.jpg": cremaReparadora,
-  "crema-suave.jpg": cremaSuave,
   "refil-limpieza.jpg": refilLimpieza,
   "serum-hidratante.jpg": serumHidratante,
   "serum-niacinamida.jpg": serumNiacinamida,
-  "serum-betaOil.jpg": serumOil,
-  "tonico-exfoliante.jpg": tonicoExfoliante,
   "jabon-limpieza.jpg": jabonLimpieza,
   "combo-limpieza.jpg": comboLimpieza,
   "combo-refresh.jpg": comboRefresh,
+  "refreshPotion.jpg": refreshPotion,
+  "combo-rutinaPielGrasa.jpg": comboRutinaPielGrasa,
+  "combo-rutinaBasica.jpg": comboRutinaBasica,
+  "tonico-puryfing.jpg": tonicoPuryfing,
 };
 
 export function resolveImage(imageKey) {
