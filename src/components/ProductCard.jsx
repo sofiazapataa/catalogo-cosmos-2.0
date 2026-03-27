@@ -6,31 +6,6 @@ function formatARS(value) {
   return Number(value || 0).toLocaleString("es-AR");
 }
 
-function getPaymentConfig(product) {
-  const defaults = {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
-    other: { enabled: true, discountPct: 0, label: "Otro medio" },
-  };
-
-  return {
-    ...defaults,
-    ...(product.paymentOptions || {}),
-    transfer: {
-      ...defaults.transfer,
-      ...(product.paymentOptions?.transfer || {}),
-    },
-    cash: {
-      ...defaults.cash,
-      ...(product.paymentOptions?.cash || {}),
-    },
-    other: {
-      ...defaults.other,
-      ...(product.paymentOptions?.other || {}),
-    },
-  };
-}
-
 export default function ProductCard({ product, onOpen }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
@@ -45,9 +20,8 @@ export default function ProductCard({ product, onOpen }) {
     !isOutOfStock &&
     Number(product.stockQty ?? 0) <= Number(product.lowStockThreshold ?? 0);
 
-  const paymentConfig = getPaymentConfig(product);
-  const transferEnabled = Boolean(paymentConfig.transfer.enabled);
-  const transferDiscountPct = Number(paymentConfig.transfer.discountPct || 0);
+  const transferEnabled = product.transferEnabled !== false;
+  const transferDiscountPct = Number(product.transferDiscountPct ?? 5);
   const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
 
   const transferPrice = useMemo(() => {

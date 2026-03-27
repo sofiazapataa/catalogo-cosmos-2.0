@@ -1,0 +1,301 @@
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 480px){
+  .reserve-actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .reserve-actions .btn{
+    width:100%;
+  }
+
+  .nav-inner{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+
+  .nav-left{
+    flex-wrap:nowrap;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+
+  .nav-left::-webkit-scrollbar{
+    height:6px;
+  }
+
+  .nav-left::-webkit-scrollbar-thumb{
+    background:rgba(0,0,0,0.12);
+    border-radius:999px;
+  }
+
+  .navlink{
+    white-space:nowrap;
+  }
+
+  .wpp-fab{
+    bottom:calc(84px + env(safe-area-inset-bottom));
+  }
+
+  .modal{
+    border-radius:16px;
+    max-height:92vh;
+  }
+
+  .modal-img,
+  .modal-img-empty{
+    max-height:200px;
+    height:200px;
+  }
+
+  .modal-info{
+    padding:12px 14px 16px;
+  }
+
+  .list-configs{
+    width:100%;
+  }
+
+  .shipping-box{
+    padding:12px;
+  }
+
+  .admin-topbar,
+  .admin-card,
+  .admin-list-item,
+  .admin-form{
+    padding:18px;
+    border-radius:18px;
+  }
+
+  .admin-topbar-actions .btn,
+  .admin-form-actions .btn{
+    width:100%;
+  }
+
+  .admin-list-side{
+    width:100%;
+  }
+
+  .admin-list-side .btn{
+    flex:1 1 auto;
+  }
+   .card-actions{
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+}
+
+/* =========================
+   TABLET
+========================= */
+@media (min-width: 640px){
+  .topbar-inner{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    padding:18px 14px;
+  }
+
+  .brand-big{
+    font-size:40px;
+  }
+
+  .topbar-right{
+    flex-direction:row;
+    align-items:flex-start;
+    justify-content:flex-end;
+    gap:16px;
+  }
+
+  .contact{
+    text-align:right;
+  }
+
+  .controls{
+    flex-direction:row;
+    align-items:center;
+    margin:14px 0 10px;
+  }
+
+  .select{
+    width:220px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2, 1fr);
+  }
+  
+  .card-actions{
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:nowrap;
+  min-width:260px;
+}
+.card{
+  padding:16px;
+  min-height:360px;
+}
+
+.card-title{
+  font-size:18px;
+}
+
+.card-desc{
+  font-size:13px;
+}
+
+.iconbtn{
+  width:42px;
+  height:42px;
+}
+
+.card-foot{
+  grid-template-columns:minmax(170px, 220px) 1fr;
+  align-items:end;
+}
+
+.card-actions{
+  align-items:flex-end;
+}
+
+.card-actions-inline{
+  justify-content:flex-end;
+}
+
+.priceblock{
+  min-width:170px;
+}
+
+.card-price{
+  font-size:22px;
+}
+
+.priceblock{
+  min-width:0;
+}
+
+  .list-row{
+    grid-template-columns:120px 1fr 140px;
+    padding:12px 6px;
+    gap:12px;
+  }
+
+  .rightcol{
+    justify-content:flex-end;
+  }
+
+  .footer-inner{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+  }
+
+  .wpp-fab{
+    bottom:calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .page-title{
+    font-size:30px;
+  }
+
+  .page-hero{
+    grid-template-columns:1.2fr 0.8fr;
+    align-items:start;
+  }
+
+  .page-grid{
+    grid-template-columns:repeat(3, 1fr);
+  }
+
+  .page-steps{
+    grid-template-columns:repeat(2, 1fr);
+  }
+
+  .contact-actions{
+    flex-direction:row;
+    align-items:center;
+  }
+
+  .contact-btn{
+    width:auto;
+  }
+
+  .admin-grid{
+    grid-template-columns:repeat(2, 1fr);
+  }
+
+  .admin-topbar{
+    flex-direction:row;
+    align-items:flex-start;
+    justify-content:space-between;
+  }
+
+  .admin-list-item{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+
+  .admin-list-side{
+    justify-content:flex-end;
+  }
+
+  .admin-form-grid{
+    grid-template-columns:repeat(2, 1fr);
+  }
+}
+
+/* =========================
+   MODAL DESKTOP
+========================= */
+@media (min-width: 820px){
+  .modal{
+    grid-template-columns:1.05fr 1fr;
+    grid-template-rows:minmax(0, 1fr);
+  }
+
+  .modal-media{
+    padding:18px;
+    align-items:center;
+  }
+
+  .modal-img,
+  .modal-img-empty{
+    max-height:520px;
+    height:520px;
+  }
+
+  .modal-info{
+    padding:18px 18px 20px;
+    min-height:0;
+    overflow:auto;
+  }
+
+  .admin-payment-grid{
+    grid-template-columns:repeat(3, 1fr);
+  }
+}
+
+/* =========================
+   DESKTOP
+========================= */
+@media (min-width: 1024px){
+  .brand-big{
+    font-size:44px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(3, 1fr);
+  }
+}

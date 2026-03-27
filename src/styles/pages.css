@@ -1,0 +1,252 @@
+
+/* =========================
+   PAGES
+========================= */
+.page-title{
+  margin:10px 0 8px;
+  font-size:26px;
+  font-weight:900;
+  color:#2b3512;
+}
+
+.page-lead{
+  margin:0;
+  color:#444;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.page-section{
+  margin-top:18px;
+}
+
+.page-h3{
+  margin:0 0 10px;
+  font-size:16px;
+  font-weight:900;
+  color:#2b3512;
+}
+
+.page-h4{
+  margin:0 0 8px;
+  font-size:14px;
+  font-weight:900;
+  color:#2b3512;
+}
+
+.page-p{
+  margin:0;
+  font-size:13px;
+  color:#444;
+  line-height:1.5;
+}
+
+.page-hero{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  padding:14px;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.06);
+}
+
+.page-heroCard{
+  border-radius:16px;
+  border:1px solid #dfe5d1;
+  background:#f6f7f2;
+  padding:12px;
+}
+
+.page-heroCardTitle{
+  font-weight:900;
+  color:#2b3512;
+  margin-bottom:6px;
+}
+
+.page-heroCardText{
+  margin:0;
+  font-size:13px;
+  color:#444;
+  line-height:1.45;
+}
+
+.page-heroCardTip{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.page-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.page-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid #dfe5d1;
+  background:#f6f7f2;
+  color:#2b3512;
+  font-weight:900;
+  font-size:12px;
+}
+
+.page-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.page-card{
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.06);
+}
+
+.page-steps{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.page-step{
+  display:grid;
+  grid-template-columns:34px 1fr;
+  gap:10px;
+  align-items:start;
+  padding:12px 14px;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#fff;
+}
+
+.page-stepNum{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  background:#f2f4ee;
+  border:1px solid #dfe5d1;
+  color:var(--green);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+
+.page-stepTitle{
+  font-weight:900;
+  color:#2b3512;
+  margin-bottom:4px;
+  font-size:13px;
+}
+
+.page-stepText{
+  font-size:13px;
+  color:#444;
+  line-height:1.45;
+}
+
+.page-note{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:16px;
+  border:1px solid #dfe5d1;
+  background:#f6f7f2;
+  color:#2b3512;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.page-faq{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.page-faqItem{
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#fff;
+  padding:10px 12px;
+}
+
+.page-faqItem summary{
+  cursor:pointer;
+  font-weight:900;
+  color:#2b3512;
+  font-size:13px;
+}
+
+.page-faqItem p{
+  margin:8px 0 0;
+}
+
+/* =========================
+   CONTACT
+========================= */
+.contact-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:12px;
+}
+
+.contact-btn{
+  width:100%;
+}
+
+.contact-block{
+  padding:2px 0;
+}
+
+.contact-row{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.contact-label{
+  font-size:12px;
+  font-weight:900;
+  color:#2b3512;
+  opacity:.9;
+}
+
+.contact-value{
+  font-size:14px;
+  font-weight:800;
+  color:#1b1b1b;
+}
+
+.contact-value--email{
+  font-weight:700;
+  word-break:break-word;
+}
+
+.contact-rowActions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+
+.contact-divider{
+  height:1px;
+  background:rgba(0,0,0,0.06);
+  margin:12px 0;
+}
+
+.contact-miniNote{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+}

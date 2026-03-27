@@ -1,0 +1,116 @@
+/* =========================
+   TOKENS
+========================= */
+:root{
+  --bg:#ececec;
+  --card:#ffffff;
+  --text:#1b1b1b;
+  --muted:#6b6b6b;
+  --green:#3f4f19;
+  --green-2:#2f3d12;
+  --border:#d9d9d9;
+  --radius:14px;
+
+  --admin-bg:#f7f7f4;
+  --admin-surface:#ffffff;
+  --admin-border:rgba(27, 27, 27, 0.08);
+  --admin-border-soft:rgba(27, 27, 27, 0.05);
+  --admin-text:#233014;
+  --admin-text-soft:#6b7280;
+  --admin-shadow:0 8px 24px rgba(15, 23, 42, 0.04);
+  --admin-shadow-hover:0 14px 34px rgba(15, 23, 42, 0.08);
+  --admin-radius:20px;
+  --admin-radius-sm:14px;
+  --admin-accent:var(--green);
+  --admin-accent-soft:#f2f4ee;
+}
+
+/* =========================
+   BASE
+========================= */
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+.container{
+  width:100%;
+  max-width:980px;
+  margin:0 auto;
+  padding:16px 14px 24px;
+}
+
+/* =========================
+   BUTTONS / LINKS
+========================= */
+.btn{
+  background:var(--green);
+  color:#fff;
+  border:1px solid var(--green);
+  padding:10px 14px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease,
+    background .12s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 24px rgba(0,0,0,0.08);
+}
+
+.btn-outline{
+  background:#fff;
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+.btn-small{
+  padding:9px 12px;
+  border-radius:12px;
+  font-size:12px;
+  letter-spacing:.2px;
+}
+
+.btn-disabled{
+  background:#d9d9d9;
+  border-color:#d9d9d9;
+  color:#666;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
+
+.linklike{
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  text-decoration:underline;
+  cursor:pointer;
+}
