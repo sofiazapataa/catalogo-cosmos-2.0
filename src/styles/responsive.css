@@ -1,320 +1,112 @@
-
 /* =========================
-   MOBILE
-========================= */
-@media (max-width: 480px){
-  .reserve-actions{
-    flex-direction:column;
-    align-items:stretch;
+   1. MOBILE (HASTA 480px)
+   ========================= */
+@media (max-width: 480px) {
+  .nav-inner {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  .reserve-actions .btn{
-    width:100%;
+  .grid {
+    grid-template-columns: 1fr; /* Una columna en celulares */
+    gap: 16px;
   }
 
-  .nav-inner{
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
+  .card-foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
-  .nav-left{
-    flex-wrap:nowrap;
-    overflow:auto;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:2px;
-  }
-
-  .nav-left::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .nav-left::-webkit-scrollbar-thumb{
-    background:rgba(0,0,0,0.12);
-    border-radius:999px;
-  }
-
-  .navlink{
-    white-space:nowrap;
-  }
-
-  .wpp-fab{
-    bottom:calc(84px + env(safe-area-inset-bottom));
-  }
-
-  .modal{
-    border-radius:16px;
-    max-height:92vh;
-  }
-
-  .modal-img,
-  .modal-img-empty{
-    max-height:200px;
-    height:200px;
-  }
-
-  .modal-info{
-    padding:12px 14px 16px;
-  }
-
-  .list-configs{
-    width:100%;
-  }
-
-  .shipping-box{
-    padding:12px;
-  }
-
-  .admin-topbar,
-  .admin-card,
-  .admin-list-item,
-  .admin-form{
-    padding:18px;
-    border-radius:18px;
-  }
-
-  .admin-topbar-actions .btn,
-  .admin-form-actions .btn{
-    width:100%;
-  }
-
-  .admin-list-side{
-    width:100%;
-  }
-
-  .admin-list-side .btn{
-    flex:1 1 auto;
-  }
-   .card-actions{
-    flex-direction:row;
-    align-items:center;
-    justify-content:flex-end;
-    flex-wrap:wrap;
+  .priceblock, .card-actions, .card-actions .btn {
+    width: 100%;
   }
 }
 
+
 /* =========================
-   TABLET
-========================= */
-@media (min-width: 640px){
-  .topbar-inner{
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    padding:18px 14px;
-  }
-
-  .brand-big{
-    font-size:40px;
-  }
-
-  .topbar-right{
-    flex-direction:row;
-    align-items:flex-start;
-    justify-content:flex-end;
-    gap:16px;
-  }
-
-  .contact{
-    text-align:right;
-  }
-
-  .controls{
-    flex-direction:row;
-    align-items:center;
-    margin:14px 0 10px;
-  }
-
-  .select{
-    width:220px;
-  }
-
-  .grid{
-    grid-template-columns:repeat(2, 1fr);
-  }
+   TABLET / DESKTOP (640px en adelante)
+   ========================= */
+@media (min-width: 640px) {
   
-  .card-actions{
-  flex-direction:row;
-  align-items:center;
-  justify-content:flex-end;
-  flex-wrap:nowrap;
-  min-width:260px;
-}
-.card{
-  padding:16px;
-  min-height:360px;
-}
-
-.card-title{
-  font-size:18px;
-}
-
-.card-desc{
-  font-size:13px;
-}
-
-.iconbtn{
-  width:42px;
-  height:42px;
-}
-
-.card-foot{
-  grid-template-columns:minmax(170px, 220px) 1fr;
-  align-items:end;
-}
-
-.card-actions{
-  align-items:flex-end;
-}
-
-.card-actions-inline{
-  justify-content:flex-end;
-}
-
-.priceblock{
-  min-width:170px;
-}
-
-.card-price{
-  font-size:22px;
-}
-
-.priceblock{
-  min-width:0;
-}
-
-  .list-row{
-    grid-template-columns:120px 1fr 140px;
-    padding:12px 6px;
-    gap:12px;
+  /* 1. Forzamos la grilla a 2 columnas prolijas */
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px;
   }
 
-  .rightcol{
-    justify-content:flex-end;
+  /* ... tus otras reglas de topbar y grid ... */
+
+  .card-foot {
+    display: flex;
+    flex-direction: column; /* Apilamos para que no peleen */
+    align-items: stretch;
+    gap: 12px;
+    margin-top: auto;
   }
 
-  .footer-inner{
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
+  .priceblock {
+    /* QUITAMOS EL FLEX CON PIXELES FIJOS */
+    flex: none; 
+    width: 100%;
+    min-width: 0; 
+    max-width: none;
   }
 
-  .wpp-fab{
-    bottom:calc(18px + env(safe-area-inset-bottom));
+  .card-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    /* AQUÍ ESTABA EL ERROR: QUITAMOS EL FLEX Y EL MIN-WIDTH FIJO */
+    flex: none; 
+    min-width: 0; 
+    margin-left: 0;
   }
 
-  .page-title{
-    font-size:30px;
-  }
-
-  .page-hero{
-    grid-template-columns:1.2fr 0.8fr;
-    align-items:start;
-  }
-
-  .page-grid{
-    grid-template-columns:repeat(3, 1fr);
-  }
-
-  .page-steps{
-    grid-template-columns:repeat(2, 1fr);
-  }
-
-  .contact-actions{
-    flex-direction:row;
-    align-items:center;
-  }
-
-  .contact-btn{
-    width:auto;
-  }
-
-  .admin-grid{
-    grid-template-columns:repeat(2, 1fr);
-  }
-
-  .admin-topbar{
-    flex-direction:row;
-    align-items:flex-start;
-    justify-content:space-between;
-  }
-
-  .admin-list-item{
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:flex-start;
-  }
-
-  .admin-list-side{
-    justify-content:flex-end;
-  }
-
-  .admin-form-grid{
-    grid-template-columns:repeat(2, 1fr);
+  .card-actions .btn {
+    flex: 1; /* Que el botón use el espacio que necesite de forma fluida */
   }
 }
-@media (max-width: 760px){
-  .card-foot{
-    flex-direction:column;
-    align-items:stretch;
-  }
 
-  .priceblock{
-    width:100%;
-  }
-
-  .card-actions{
-    width:100%;
-    min-width:0;
-    margin-left:0;
-  }
-
-  .card-actions-inline{
-    justify-content:flex-start;
-  }
+@media (max-width: 760px) {
+    .card-actions {
+        width: 100%;
+        min-width: 0px;
+        margin-left: 0px;
+    }
 }
-/* =========================
-   MODAL DESKTOP
-========================= */
-@media (min-width: 820px){
-  .modal{
-    grid-template-columns:1.05fr 1fr;
-    grid-template-rows:minmax(0, 1fr);
-  }
-
-  .modal-media{
-    padding:18px;
-    align-items:center;
-  }
-
-  .modal-img,
-  .modal-img-empty{
-    max-height:520px;
-    height:520px;
-  }
-
-  .modal-info{
-    padding:18px 18px 20px;
-    min-height:0;
-    overflow:auto;
-  }
-
-  .admin-payment-grid{
-    grid-template-columns:repeat(3, 1fr);
-  }
+.card-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    min-width: 250px;
+    gap: 8px;
 }
 
 /* =========================
-   DESKTOP
-========================= */
-@media (min-width: 1024px){
-  .brand-big{
-    font-size:44px;
+   3. DESKTOP (1024px en adelante)
+   ========================= */
+@media (min-width: 1024px) {
+  .grid {
+    /* Tres columnas cuando hay espacio de sobra */
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .grid{
-    grid-template-columns:repeat(3, 1fr);
+  .container {
+    max-width: 1100px;
   }
+
+  /* En pantallas grandes, si quieres que el precio y botón vuelvan 
+     a estar en una sola línea, puedes habilitar esto: */
+  /*
+  .card-foot {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  */
 }
