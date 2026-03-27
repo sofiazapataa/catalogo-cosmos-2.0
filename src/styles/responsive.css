@@ -255,7 +255,26 @@
     grid-template-columns:repeat(2, 1fr);
   }
 }
+@media (max-width: 760px){
+  .card-foot{
+    flex-direction:column;
+    align-items:stretch;
+  }
 
+  .priceblock{
+    width:100%;
+  }
+
+  .card-actions{
+    width:100%;
+    min-width:0;
+    margin-left:0;
+  }
+
+  .card-actions-inline{
+    justify-content:flex-start;
+  }
+}
 /* =========================
    MODAL DESKTOP
 ========================= */

@@ -134,9 +134,11 @@
 }
 
 .card-foot{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:14px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
   margin-top:16px;
   padding-top:14px;
   border-top:1px solid rgba(0,0,0,0.06);
@@ -146,16 +148,18 @@
   display:flex;
   flex-direction:column;
   gap:6px;
-  padding:12px 14px;
-  border-radius:16px;
+  padding:10px 12px;
+  border-radius:14px;
   background:#f7f8f3;
   border:1px solid #e3e7d8;
-  min-width:0;
+  flex:0 0 auto;
+  min-width:150px;
+  max-width:100%;
 }
 
 .card-price{
   font-weight:900;
-  font-size:21px;
+  font-size:18px;
   line-height:1;
   color:var(--green);
 }
@@ -174,20 +178,23 @@
 .card-actions{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
   align-items:stretch;
+  flex:1 1 220px;
+  min-width:220px;
+  margin-left:auto;
 }
 
 .card-actions-inline{
   display:flex;
   flex-wrap:wrap;
+  justify-content:flex-end;
   gap:10px;
-  align-items:center;
-  justify-content:flex-start;
+  width:100%;
 }
 
 .card-actions .btn{
-  min-width:140px;
+  width:100%;
 }
 
 .qtybar{
