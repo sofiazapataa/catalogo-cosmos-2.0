@@ -2,111 +2,92 @@
    1. MOBILE (HASTA 480px)
    ========================= */
 @media (max-width: 480px) {
+  .card-actions{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:10px;
+  flex:1 1 auto;
+  min-width:0;
+  margin-left:auto;
+}
+
+.card-actions .btn{
+  width:auto;
+  min-width:140px;
+}
+
+.qtybar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+
+  .card-actions .btn{
+    min-width:0;
+    flex:1 1 140px;
+  }
+
+  .qtybar{
+    flex:0 0 auto;
+  }
+}
   .nav-inner {
     flex-direction: column;
     gap: 10px;
   }
 
   .grid {
-    grid-template-columns: 1fr; /* Una columna en celulares */
+    grid-template-columns: 1fr;
     gap: 16px;
   }
 
   .card-foot {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
   }
 
-  .priceblock, .card-actions, .card-actions .btn {
+  .priceblock {
     width: 100%;
+    min-width: 0;
+    max-width: none;
   }
-}
+
 
 
 /* =========================
-   TABLET / DESKTOP (640px en adelante)
+   2. TABLET / DESKTOP (640px en adelante)
    ========================= */
 @media (min-width: 640px) {
-  
-  /* 1. Forzamos la grilla a 2 columnas prolijas */
   .grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 16px;
   }
+}
 
-  /* ... tus otras reglas de topbar y grid ... */
-
-  .card-foot {
-    display: flex;
-    flex-direction: column; /* Apilamos para que no peleen */
-    align-items: stretch;
-    gap: 12px;
-    margin-top: auto;
-  }
-
-  .priceblock {
-    /* QUITAMOS EL FLEX CON PIXELES FIJOS */
-    flex: none; 
-    width: 100%;
-    min-width: 0; 
-    max-width: none;
-  }
-
+/* =========================
+   3. MOBILE / TABLET GENERAL
+   ========================= */
+@media (max-width: 760px) {
   .card-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
     width: 100%;
-    /* AQUÍ ESTABA EL ERROR: QUITAMOS EL FLEX Y EL MIN-WIDTH FIJO */
-    flex: none; 
-    min-width: 0; 
+    min-width: 0;
     margin-left: 0;
   }
-
-  .card-actions .btn {
-    flex: 1; /* Que el botón use el espacio que necesite de forma fluida */
-  }
 }
-
-@media (max-width: 760px) {
-    .card-actions {
-        width: 100%;
-        min-width: 0px;
-        margin-left: 0px;
-    }
-}
-.card-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    min-width: 250px;
-    gap: 8px;
-}
-
 /* =========================
    3. DESKTOP (1024px en adelante)
    ========================= */
 @media (min-width: 1024px) {
   .grid {
-    /* Tres columnas cuando hay espacio de sobra */
     grid-template-columns: repeat(3, 1fr);
   }
 
   .container {
     max-width: 1100px;
   }
-
-  /* En pantallas grandes, si quieres que el precio y botón vuelvan 
-     a estar en una sola línea, puedes habilitar esto: */
-  /*
-  .card-foot {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-  */
 }
