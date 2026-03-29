@@ -122,7 +122,37 @@
   );
   pointer-events:none;
 }
+.card-foot{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  align-items:center;
+  gap:12px;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid rgba(0,0,0,0.06);
+}
 
+.card-actions{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:nowrap;
+  min-width:fit-content;
+  width:auto;
+}
+
+.card-actions .btn{
+  min-width:120px;
+  white-space:nowrap;
+}
+.qtybar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
 .badge{
   position:absolute;
   top:12px;
