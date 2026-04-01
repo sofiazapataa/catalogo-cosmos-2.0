@@ -14,6 +14,14 @@ import aquaFotos from "../assets/images/aqua-fotos.jpg";
 import aquaFotos2 from "../assets/images/aqua-fotos2.jpg";
 import brighteningFotos from "../assets/images/brightening-drops-fotos.jpg";
 import cleaninsingFotos from "../assets/images/cleaninsing-bubbles-fotos.jpg";
+import balancingDropsFotos from "../assets/images/balancingDrops.JPG";
+import brighteningFotos2 from "../assets/images/brighteningDrops.JPG";
+import cleansingBubbles from "../assets/images/cleansingBubbles.JPG";
+import comboLimpiezaFoto from "../assets/images/comboLimpieza.JPG";
+import comboLimpiezaBasica2 from "../assets/images/comboRutinaBasica.JPG";
+import comboLimiezaCompleta from "../assets/images/comboLimpiezaCompleta.JPG";
+import tonicoFoto from "../assets/images/tonico.JPG";
+
 
 export const imageMap = {
   "aceite-limpieza.jpg": aceiteLimpieza,
@@ -32,6 +40,13 @@ export const imageMap = {
   "aqua-fotos2.jpg": aquaFotos2,
   "brightening-drops-fotos.jpg": brighteningFotos,
   "cleaninsing-bubbles-fotos.jpg": cleaninsingFotos,
+  "balancingDrops.JPG": balancingDropsFotos,
+  "brighteningDrops.JPG": brighteningFotos2,
+  "cleansingBubbles.JPG": cleansingBubbles,
+  "comboLimpieza.JPG": comboLimpiezaFoto,
+  "comboRutinaBasica.JPG": comboLimpiezaBasica2,
+  "comboLimpiezaCompleta.JPG": comboLimiezaCompleta,
+  "tonico.JPG": tonicoFoto,
 };
 
 export function resolveImage(imageKey) {

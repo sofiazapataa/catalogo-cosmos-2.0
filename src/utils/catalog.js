@@ -36,3 +36,8 @@ export function sortProducts(list, sort) {
       return copy.sort((a, b) => (b.discount || 0) - (a.discount || 0));
   }
 }
+
+
+
+
+
