@@ -1,21 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AVAILABLE_IMAGES, resolveImage } from "../utils/imageMap";
 
 function benefitsToText(benefits) {
   return Array.isArray(benefits) ? benefits.join("\n") : "";
 }
 
 function textToBenefits(text) {
-  return text
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function imagesToText(imagesKeys) {
-  return Array.isArray(imagesKeys) ? imagesKeys.join("\n") : "";
-}
-
-function textToImages(text) {
   return text
     .split("\n")
     .map((item) => item.trim())
@@ -62,13 +52,16 @@ export default function AdminProductForm({
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [benefitsText, setBenefitsText] = useState("");
-  const [imagesText, setImagesText] = useState("");
 
   useEffect(() => {
     if (initialData) {
       setForm({
         ...EMPTY_FORM,
         ...initialData,
+        imageKey: initialData.imageKey || "",
+        imagesKeys: Array.isArray(initialData.imagesKeys)
+          ? initialData.imagesKeys
+          : [],
         stockQty: Number(initialData.stockQty ?? 0),
         lowStockThreshold: Number(initialData.lowStockThreshold ?? 3),
 
@@ -109,7 +102,6 @@ export default function AdminProductForm({
       });
 
       setBenefitsText(benefitsToText(initialData.benefits));
-      setImagesText(imagesToText(initialData.imagesKeys));
     } else {
       setForm({
         ...EMPTY_FORM,
@@ -117,13 +109,11 @@ export default function AdminProductForm({
         type: mode === "combo" ? "combos" : "",
       });
       setBenefitsText("");
-      setImagesText("");
     }
   }, [initialData, mode]);
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-
     const numericFields = ["price", "discount", "stockQty", "lowStockThreshold"];
 
     setForm((prev) => ({
@@ -173,20 +163,67 @@ export default function AdminProductForm({
     }));
   }
 
+  function handleMainImageChange(e) {
+    const value = e.target.value;
+
+    setForm((prev) => {
+      const currentImages = Array.isArray(prev.imagesKeys) ? prev.imagesKeys : [];
+
+      const nextImages =
+        value && !currentImages.includes(value)
+          ? [value, ...currentImages]
+          : currentImages;
+
+      return {
+        ...prev,
+        imageKey: value,
+        imagesKeys: nextImages,
+      };
+    });
+  }
+
+  function handleToggleGalleryImage(imageName) {
+    setForm((prev) => {
+      const currentImages = Array.isArray(prev.imagesKeys) ? prev.imagesKeys : [];
+      const exists = currentImages.includes(imageName);
+
+      const nextImages = exists
+        ? currentImages.filter((item) => item !== imageName)
+        : [...currentImages, imageName];
+
+      let nextImageKey = prev.imageKey;
+
+      if (prev.imageKey === imageName && !nextImages.includes(imageName)) {
+        nextImageKey = nextImages[0] || "";
+      }
+
+      return {
+        ...prev,
+        imageKey: nextImageKey,
+        imagesKeys: nextImages,
+      };
+    });
+  }
+
+  const mainImagePreview = useMemo(() => {
+    return resolveImage(form.imageKey);
+  }, [form.imageKey]);
+
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const cleanedImages = Array.from(
+      new Set((form.imagesKeys || []).map((item) => item.trim()).filter(Boolean))
+    );
 
     const payload = {
       ...form,
       benefits: textToBenefits(benefitsText),
-      imagesKeys: textToImages(imagesText),
+      imagesKeys: cleanedImages,
+      imageKey: form.imageKey?.trim() || cleanedImages[0] || "",
       stockQty: Number(form.stockQty || 0),
       lowStockThreshold: Number(form.lowStockThreshold || 0),
     };
-
-    if (!payload.imageKey && payload.imagesKeys.length > 0) {
-      payload.imageKey = payload.imagesKeys[0];
-    }
 
     await onSave(payload);
   }
@@ -196,29 +233,62 @@ export default function AdminProductForm({
       <div className="admin-form-grid">
         <label className="admin-field">
           <span>ID</span>
-          <input className="input" name="id" value={form.id} onChange={handleChange} required />
+          <input
+            className="input"
+            name="id"
+            value={form.id}
+            onChange={handleChange}
+            required
+          />
         </label>
 
         <label className="admin-field">
           <span>Título</span>
-          <input className="input" name="title" value={form.title} onChange={handleChange} required />
+          <input
+            className="input"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+          />
         </label>
 
         <label className="admin-field admin-field-full">
           <span>Descripción</span>
-          <input className="input" name="desc" value={form.desc} onChange={handleChange} required />
+          <input
+            className="input"
+            name="desc"
+            value={form.desc}
+            onChange={handleChange}
+            required
+          />
         </label>
 
         <label className="admin-field">
           <span>Precio final</span>
-          <input className="input" type="number" name="price" value={form.price} onChange={handleChange} required />
+          <input
+            className="input"
+            type="number"
+            name="price"
+            value={form.price}
+            onChange={handleChange}
+            required
+          />
           <small className="admin-help">Precio que se muestra en la web.</small>
         </label>
 
         <label className="admin-field">
           <span>Descuento visual (%)</span>
-          <input className="input" type="number" name="discount" value={form.discount} onChange={handleChange} />
-          <small className="admin-help">Solo para la etiqueta visual del producto.</small>
+          <input
+            className="input"
+            type="number"
+            name="discount"
+            value={form.discount}
+            onChange={handleChange}
+          />
+          <small className="admin-help">
+            Solo para la etiqueta visual del producto.
+          </small>
         </label>
 
         <div className="admin-field admin-field-full">
@@ -353,28 +423,66 @@ export default function AdminProductForm({
 
         <label className="admin-field">
           <span>Categoría</span>
-          <input className="input" name="category" value={form.category} onChange={handleChange} />
+          <input
+            className="input"
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+          />
         </label>
 
         <label className="admin-field">
           <span>Tipo</span>
-          <input className="input" name="type" value={form.type} onChange={handleChange} />
+          <input
+            className="input"
+            name="type"
+            value={form.type}
+            onChange={handleChange}
+          />
         </label>
 
         <label className="admin-field">
-          <span>Imagen principal (`imageKey`)</span>
-          <input className="input" name="imageKey" value={form.imageKey} onChange={handleChange} />
+          <span>Imagen principal</span>
+          <select
+            className="input"
+            name="imageKey"
+            value={form.imageKey}
+            onChange={handleMainImageChange}
+          >
+            <option value="">Seleccionar imagen</option>
+            {AVAILABLE_IMAGES.map((img) => (
+              <option key={img} value={img}>
+                {img}
+              </option>
+            ))}
+          </select>
+          <small className="admin-help">
+            Elegí una imagen del catálogo ya cargado en assets.
+          </small>
         </label>
 
         <label className="admin-field">
           <span>Tipo de piel</span>
-          <input className="input" name="skinType" value={form.skinType} onChange={handleChange} />
+          <input
+            className="input"
+            name="skinType"
+            value={form.skinType}
+            onChange={handleChange}
+          />
         </label>
 
         <label className="admin-field">
           <span>Stock</span>
-          <input className="input" type="number" name="stockQty" value={form.stockQty} onChange={handleChange} />
-          <small className="admin-help">Si llega a 0, se muestra como “Sin stock”.</small>
+          <input
+            className="input"
+            type="number"
+            name="stockQty"
+            value={form.stockQty}
+            onChange={handleChange}
+          />
+          <small className="admin-help">
+            Si llega a 0, se muestra como “Sin stock”.
+          </small>
         </label>
 
         <label className="admin-field">
@@ -391,14 +499,70 @@ export default function AdminProductForm({
           </small>
         </label>
 
-        <label className="admin-field admin-field-full">
-          <span>Imágenes (`imagesKeys`) · una por línea</span>
-          <textarea
-            className="input admin-textarea"
-            value={imagesText}
-            onChange={(e) => setImagesText(e.target.value)}
-          />
-        </label>
+        <div className="admin-field admin-field-full">
+          <span>Galería de imágenes</span>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 10,
+              marginTop: 8,
+            }}
+          >
+            {AVAILABLE_IMAGES.map((img) => (
+              <label
+                key={img}
+                className="admin-check"
+                style={{
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  borderRadius: 12,
+                  padding: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.imagesKeys.includes(img)}
+                  onChange={() => handleToggleGalleryImage(img)}
+                />
+                <span style={{ fontSize: 13 }}>{img}</span>
+              </label>
+            ))}
+          </div>
+          <small className="admin-help">
+            Marcá una o varias imágenes para la galería del producto.
+          </small>
+        </div>
+
+        {mainImagePreview ? (
+          <div className="admin-field admin-field-full">
+            <span>Vista previa imagen principal</span>
+            <div
+              style={{
+                marginTop: 8,
+                border: "1px solid rgba(0,0,0,0.08)",
+                borderRadius: 16,
+                padding: 12,
+                maxWidth: 260,
+                background: "#fff",
+              }}
+            >
+              <img
+                src={mainImagePreview}
+                alt={form.title || form.imageKey}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "cover",
+                  borderRadius: 12,
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <label className="admin-field admin-field-full">
           <span>Beneficios · uno por línea</span>
@@ -411,16 +575,31 @@ export default function AdminProductForm({
 
         <label className="admin-field admin-field-full">
           <span>Cómo usar</span>
-          <textarea className="input admin-textarea" name="howToUse" value={form.howToUse} onChange={handleChange} />
+          <textarea
+            className="input admin-textarea"
+            name="howToUse"
+            value={form.howToUse}
+            onChange={handleChange}
+          />
         </label>
 
         <label className="admin-field admin-field-full">
           <span>Detalles</span>
-          <textarea className="input admin-textarea" name="details" value={form.details} onChange={handleChange} />
+          <textarea
+            className="input admin-textarea"
+            name="details"
+            value={form.details}
+            onChange={handleChange}
+          />
         </label>
 
         <label className="admin-check">
-          <input type="checkbox" name="active" checked={form.active} onChange={handleChange} />
+          <input
+            type="checkbox"
+            name="active"
+            checked={form.active}
+            onChange={handleChange}
+          />
           <span>Activo</span>
         </label>
       </div>
