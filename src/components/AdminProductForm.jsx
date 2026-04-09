@@ -31,9 +31,9 @@ const EMPTY_FORM = {
   active: true,
 
   paymentOptions: {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
-    other: { enabled: true, discountPct: 0, label: "Otro medio" },
+    transfer: { enabled: true, discountPct: 5, label: "Transferencia", applyDiscount: true, showDiscountLabel: true },
+    cash: { enabled: true, discountPct: 0, label: "Efectivo", applyDiscount: true, showDiscountLabel: true },
+    other: { enabled: true, discountPct: 0, label: "Otro medio", applyDiscount: true, showDiscountLabel: true },
   },
 
   deliveryOptions: {
@@ -316,6 +316,28 @@ export default function AdminProductForm({
                 }
                 placeholder="5"
               />
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.transfer.applyDiscount}
+                  onChange={(e) =>
+                    handlePaymentChange("transfer", "applyDiscount", e.target.checked)
+                  }
+                />
+                <span>Aplicar descuento</span>
+              </label>
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.transfer.showDiscountLabel}
+                  onChange={(e) =>
+                    handlePaymentChange("transfer", "showDiscountLabel", e.target.checked)
+                  }
+                />
+                <span>Mostrar “% OFF”</span>
+              </label>
             </div>
 
             <div className="admin-method-card">
@@ -339,6 +361,28 @@ export default function AdminProductForm({
                 }
                 placeholder="0"
               />
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.cash.applyDiscount}
+                  onChange={(e) =>
+                    handlePaymentChange("cash", "applyDiscount", e.target.checked)
+                  }
+                />
+                <span>Aplicar descuento</span>
+              </label>
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.cash.showDiscountLabel}
+                  onChange={(e) =>
+                    handlePaymentChange("cash", "showDiscountLabel", e.target.checked)
+                  }
+                />
+                <span>Mostrar “% OFF”</span>
+              </label>
             </div>
 
             <div className="admin-method-card">
@@ -362,6 +406,28 @@ export default function AdminProductForm({
                 }
                 placeholder="0"
               />
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.other.applyDiscount}
+                  onChange={(e) =>
+                    handlePaymentChange("other", "applyDiscount", e.target.checked)
+                  }
+                />
+                <span>Aplicar descuento</span>
+              </label>
+
+              <label className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.paymentOptions.other.showDiscountLabel}
+                  onChange={(e) =>
+                    handlePaymentChange("other", "showDiscountLabel", e.target.checked)
+                  }
+                />
+                <span>Mostrar “% OFF”</span>
+              </label>
             </div>
           </div>
         </div>

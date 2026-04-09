@@ -5,9 +5,9 @@ import { useList } from "../context/ListContext";
 
 function getPaymentConfig(item) {
   const defaults = {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
-    other: { enabled: true, discountPct: 0, label: "Otro medio" },
+    transfer: { enabled: true, discountPct: 5, label: "Transferencia", applyDiscount: true, showDiscountLabel: true },
+    cash: { enabled: true, discountPct: 0, label: "Efectivo", applyDiscount: true, showDiscountLabel: true },
+    other: { enabled: true, discountPct: 0, label: "Otro medio", applyDiscount: true, showDiscountLabel: true },
   };
 
   return {
@@ -168,13 +168,25 @@ export default function MyListPage() {
       const cfg = getPaymentConfig(item);
 
       let discountPct = 0;
-      if (paymentMethod === "transfer" && cfg.transfer.enabled) {
+      if (
+        paymentMethod === "transfer" &&
+        cfg.transfer.enabled &&
+        cfg.transfer.applyDiscount
+      ) {
         discountPct = Number(cfg.transfer.discountPct || 0);
       }
-      if (paymentMethod === "cash" && cfg.cash.enabled) {
+      if (
+        paymentMethod === "cash" &&
+        cfg.cash.enabled &&
+        cfg.cash.applyDiscount
+      ) {
         discountPct = Number(cfg.cash.discountPct || 0);
       }
-      if (paymentMethod === "other" && cfg.other.enabled) {
+      if (
+        paymentMethod === "other" &&
+        cfg.other.enabled &&
+        cfg.other.applyDiscount
+      ) {
         discountPct = Number(cfg.other.discountPct || 0);
       }
 

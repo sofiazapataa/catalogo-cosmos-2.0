@@ -8,9 +8,27 @@ function formatARS(n) {
 
 function getPaymentConfig(product) {
   const defaults = {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia" },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo" },
-    other: { enabled: true, discountPct: 0, label: "Otro medio" },
+    transfer: {
+      enabled: true,
+      discountPct: 5,
+      label: "Transferencia",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    cash: {
+      enabled: true,
+      discountPct: 0,
+      label: "Efectivo",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    other: {
+      enabled: true,
+      discountPct: 0,
+      label: "Otro medio",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
   };
 
   return {
@@ -19,6 +37,16 @@ function getPaymentConfig(product) {
     transfer: {
       ...defaults.transfer,
       ...(product.paymentOptions?.transfer || {}),
+      enabled:
+        product.paymentOptions?.transfer?.enabled ??
+        (product.transferEnabled !== undefined
+          ? product.transferEnabled
+          : defaults.transfer.enabled),
+      discountPct:
+        product.paymentOptions?.transfer?.discountPct ??
+        (product.transferDiscountPct !== undefined
+          ? Number(product.transferDiscountPct)
+          : defaults.transfer.discountPct),
     },
     cash: {
       ...defaults.cash,
@@ -43,7 +71,12 @@ export default function ProductModal({ product, onClose }) {
   const paymentConfig = getPaymentConfig(product);
   const transferEnabled = Boolean(paymentConfig.transfer.enabled);
   const transferDiscountPct = Number(paymentConfig.transfer.discountPct || 0);
-  const hasTransferDiscount = transferEnabled && transferDiscountPct > 0;
+  const applyTransferDiscount = Boolean(paymentConfig.transfer.applyDiscount);
+  const showTransferDiscountLabel = Boolean(
+    paymentConfig.transfer.showDiscountLabel
+  );
+
+  const basePrice = Number(product.price || 0);
 
   const images = useMemo(() => {
     const merged = [
@@ -57,10 +90,16 @@ export default function ProductModal({ product, onClose }) {
   const [idx, setIdx] = useState(0);
 
   const transferPrice = useMemo(() => {
-    const p = Number(product.price || 0);
-    if (!hasTransferDiscount) return p;
-    return Math.round(p * (1 - transferDiscountPct / 100));
-  }, [product.price, hasTransferDiscount, transferDiscountPct]);
+    if (!transferEnabled || !applyTransferDiscount || transferDiscountPct <= 0) {
+      return basePrice;
+    }
+    return Math.round(basePrice * (1 - transferDiscountPct / 100));
+  }, [basePrice, transferEnabled, applyTransferDiscount, transferDiscountPct]);
+
+  const shouldShowTransferLine =
+    transferEnabled &&
+    (transferPrice < basePrice ||
+      (showTransferDiscountLabel && transferDiscountPct > 0));
 
   function prev() {
     setIdx((v) => (v - 1 + images.length) % images.length);
@@ -174,50 +213,50 @@ export default function ProductModal({ product, onClose }) {
           <p className="modal-desc">{product.desc}</p>
 
           <div className="modal-pricebox">
-            <div className="modal-price-main">${formatARS(product.price)}</div>
+            <div className="modal-price-main">${formatARS(basePrice)}</div>
 
-            {hasTransferDiscount ? (
+            {shouldShowTransferLine ? (
               <div className="modal-price-transfer">
                 Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
-                ({transferDiscountPct}% OFF)
+                {showTransferDiscountLabel && transferDiscountPct > 0 ? (
+                  <span>({transferDiscountPct}% OFF)</span>
+                ) : null}
               </div>
             ) : null}
           </div>
 
           {product.skinType ? (
-            <div className="modal-chip">
-              <strong>Tipo de piel:</strong> {product.skinType}
-            </div>
+            <div className="modal-chip">Ideal para: {product.skinType}</div>
           ) : null}
 
-          {product.benefits?.length ? (
-            <div className="modal-block">
+          {Array.isArray(product.benefits) && product.benefits.length > 0 ? (
+            <div className="modal-section">
               <h4>Beneficios</h4>
-              <ul>
-                {product.benefits.map((b, i) => (
-                  <li key={i}>{b}</li>
+              <ul className="modal-list">
+                {product.benefits.map((benefit, index) => (
+                  <li key={`${product.id}-benefit-${index}`}>{benefit}</li>
                 ))}
               </ul>
             </div>
           ) : null}
 
           {product.howToUse ? (
-            <div className="modal-block">
+            <div className="modal-section">
               <h4>Cómo usar</h4>
               <p>{product.howToUse}</p>
             </div>
           ) : null}
 
           {product.details ? (
-            <div className="modal-block">
-              <h4>Info</h4>
+            <div className="modal-section">
+              <h4>Detalles</h4>
               <p>{product.details}</p>
             </div>
           ) : null}
 
           <div className="modal-actions">
             {isOutOfStock ? (
-              <button className="btn btn-disabled" type="button" disabled>
+              <button className="btn btn-small btn-disabled" type="button" disabled>
                 Sin stock
               </button>
             ) : qty > 0 ? (
@@ -227,6 +266,8 @@ export default function ProductModal({ product, onClose }) {
                     className="iconbtn"
                     type="button"
                     onClick={() => removeOne(product.id)}
+                    aria-label="Restar uno"
+                    title="Restar uno"
                   >
                     −
                   </button>
@@ -237,6 +278,8 @@ export default function ProductModal({ product, onClose }) {
                     className="iconbtn"
                     type="button"
                     onClick={() => addToList(product)}
+                    aria-label="Sumar uno"
+                    title="Sumar uno"
                   >
                     +
                   </button>
@@ -251,7 +294,11 @@ export default function ProductModal({ product, onClose }) {
                 </button>
               </>
             ) : (
-              <button className="btn" type="button" onClick={() => addToList(product)}>
+              <button
+                className="btn btn-small"
+                type="button"
+                onClick={() => addToList(product)}
+              >
                 Agregar a la lista
               </button>
             )}

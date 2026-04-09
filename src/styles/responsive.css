@@ -2,6 +2,11 @@
    1. MOBILE (HASTA 480px)
    ========================= */
 @media (max-width: 480px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
   .nav-inner {
     flex-direction: column;
     gap: 10px;
@@ -9,45 +14,105 @@
 
   .grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
+  }
+
+  .card {
+    border-radius: 22px;
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .card-image {
+    border-radius: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    line-height: 1.1;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+  }
+
+  .card-meta {
+    font-size: 11px;
+    line-height: 1.35;
+    margin-top: 2px;
+  }
+
+  .card-body {
+    min-height: auto;
+    gap: 6px;
   }
 
   .card-foot {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
   }
 
   .priceblock {
     width: 100%;
     min-width: 0;
     max-width: none;
+    min-height: 58px;
+    padding: 10px 14px;
+    border-radius: 16px;
+  }
+
+  .card-price {
+    font-size: 18px;
+  }
+
+  .card-price-off {
+    font-size: 12px;
+    line-height: 1.2;
   }
 
   .card-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 10px;
-    flex: 1 1 auto;
-    min-width: 0;
-    margin-left: auto;
     width: 100%;
+    min-width: 0;
+    gap: 10px;
   }
 
   .card-actions .btn {
-    width: auto;
-    min-width: 140px;
-    flex: 1 1 140px;
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 800;
   }
 
   .qtybar {
-    display: flex;
-    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
     gap: 8px;
-    flex: 0 0 auto;
+  }
+
+  .iconbtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+
+  .qtypill {
+    min-width: 50px;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  .badge,
+  .stock-badge {
+    font-size: 11px;
+    padding: 7px 10px;
   }
 
   /* =========================
@@ -55,25 +120,26 @@
      ========================= */
   .reserve-actions {
     display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 12px;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 14px;
     width: 100%;
+    align-items: stretch;
   }
 
   .list-configs {
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
     gap: 12px;
-    flex: 0 0 38%;
-    min-width: 110px;
-    max-width: 150px;
+    flex: 1 1 auto;
   }
 
   .pay-methods,
   .delivery-methods,
-  .shipping-box {
+  .shipping-box,
+  .panel-total,
+  .total-box,
+  .summary-box {
     width: 100%;
     min-width: 0;
   }
@@ -82,15 +148,18 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 12px;
+    border-radius: 16px;
   }
 
   .pay-option {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    line-height: 1.2;
+    width: 100%;
+    min-height: 22px;
+    font-size: 14px;
+    line-height: 1.3;
     white-space: normal;
     word-break: break-word;
   }
@@ -109,22 +178,27 @@
 
   .reserve-actions .btn,
   .reserve-actions a.btn {
-    flex: 1 1 58%;
+    width: 100%;
+    max-width: none;
     min-width: 0;
-    width: auto;
-    display: flex;
+    min-height: 52px;
+    padding: 13px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.2px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 14px 16px;
+    box-shadow: 0 8px 20px rgba(63, 79, 25, 0.14);
   }
 
-  /* Total más prolijo */
-  .panel-total,
-  .total-box,
-  .summary-box {
-    width: 100%;
-    min-width: 0;
+  .reserve-actions .btn:hover,
+  .reserve-actions a.btn:hover {
+    transform: none;
+    box-shadow: 0 8px 20px rgba(63, 79, 25, 0.14);
   }
 }
 
@@ -143,7 +217,7 @@
   }
 
   .list-configs {
-    min-width: 120px;
+    min-width: 0;
   }
 
   .reserve-actions .btn,
@@ -157,8 +231,20 @@
    ========================= */
 @media (min-width: 640px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-price {
+    font-size: 19px;
   }
 }
 
@@ -167,72 +253,15 @@
    ========================= */
 @media (min-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
   }
 
   .container {
     max-width: 1100px;
   }
-}
-/* =========================
-   FIX BOTÓN WPP MOBILE
-   ========================= */
-@media (max-width: 480px) {
-  .reserve-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    width: 100%;
-    align-items: stretch;
-  }
 
-  .list-configs {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    gap: 12px;
-  }
-
-  .pay-methods,
-  .shipping-box {
-    width: 100%;
-  }
-
-  .pay-methods {
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .pay-option {
-    width: 100%;
-    min-height: 22px;
-    font-size: 14px;
-    white-space: normal;
-    word-break: break-word;
-  }
-
-  .reserve-actions .btn,
-  .reserve-actions a.btn {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    min-height: 52px;
-    padding: 13px 16px;
-    border-radius: 16px;
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.2px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(63,79,25,0.14);
-  }
-
-  .reserve-actions .btn:hover,
-  .reserve-actions a.btn:hover {
-    transform: none;
-    box-shadow: 0 8px 20px rgba(63,79,25,0.14);
+  .card {
+    padding: 16px;
   }
 }
