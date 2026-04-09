@@ -75,25 +75,32 @@
     line-height: 1.2;
   }
 
+  /* CAMBIO CLAVE MOBILE */
   .card-actions {
     width: 100%;
     min-width: 0;
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .card-actions .btn {
-    width: 100%;
+    width: auto;
     min-width: 0;
-    min-height: 50px;
-    border-radius: 16px;
+    min-height: 40px;
+    padding: 10px 14px;
+    border-radius: 14px;
     font-size: 14px;
     font-weight: 800;
+    flex: 1 1 auto;
   }
 
   .qtybar {
-    width: 100%;
+    width: auto;
     justify-content: flex-start;
     gap: 8px;
+    flex: 0 0 auto;
   }
 
   .iconbtn {
@@ -104,7 +111,7 @@
   }
 
   .qtypill {
-    min-width: 50px;
+    min-width: 46px;
     padding: 9px 10px;
     font-size: 13px;
   }
@@ -245,6 +252,21 @@
 
   .card-price {
     font-size: 19px;
+  }
+
+  .card-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .card-actions .btn {
+    width: auto;
+  }
+
+  .qtybar {
+    width: auto;
   }
 }
 
