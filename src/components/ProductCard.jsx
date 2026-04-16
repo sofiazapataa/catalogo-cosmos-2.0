@@ -99,15 +99,17 @@ export default function ProductCard({ product, onOpen }) {
     if (!transferEnabled || !applyTransferDiscount || transferDiscountPct <= 0) {
       return basePrice;
     }
+
     return Math.round(basePrice * (1 - transferDiscountPct / 100));
   }, [basePrice, transferEnabled, applyTransferDiscount, transferDiscountPct]);
 
-  const shouldShowTransferLine =
+  const hasTransferDiscount =
     transferEnabled &&
-    transferPrice < basePrice &&
     applyTransferDiscount &&
-    transferDiscountPct > 0;
+    transferDiscountPct > 0 &&
+    transferPrice < basePrice;
 
+  const finalPrice = hasTransferDiscount ? transferPrice : basePrice;
   const cardMeta = getCardMeta(product);
 
   function handleKeyOpen(e) {
@@ -130,6 +132,8 @@ export default function ProductCard({ product, onOpen }) {
       >
         {isOutOfStock ? (
           <div className="stock-badge stock-badge-out">Sin stock</div>
+        ) : hasTransferDiscount ? (
+          <div className="badge">-{transferDiscountPct}%</div>
         ) : product.discount > 0 ? (
           <div className="badge">-{product.discount}%</div>
         ) : null}
@@ -157,18 +161,20 @@ export default function ProductCard({ product, onOpen }) {
 
       <div className="card-body">
         <p className="card-desc">{product.desc}</p>
-
         {cardMeta ? <p className="card-meta">{cardMeta}</p> : null}
       </div>
 
       <div className="card-foot">
         <div className="priceblock">
-          <div className="card-price">${formatARS(basePrice)}</div>
+          <div className="card-price">${formatARS(finalPrice)}</div>
 
-          {shouldShowTransferLine ? (
+          {hasTransferDiscount ? (
             <div className="card-price-off">
-              Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
-              {showTransferDiscountLabel && transferDiscountPct > 0 ? (
+              <span style={{ textDecoration: "line-through", opacity: 0.8 }}>
+                ${formatARS(basePrice)}
+              </span>{" "}
+              · Transferencia{" "}
+              {showTransferDiscountLabel ? (
                 <span className="off-tag">({transferDiscountPct}% OFF)</span>
               ) : null}
             </div>

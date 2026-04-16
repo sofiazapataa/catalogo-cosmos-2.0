@@ -17,7 +17,6 @@ export default function HomePage() {
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
 
-
   const combosProcessed = useMemo(() => {
     const filtered = filterProducts(combos, query);
 

@@ -96,10 +96,13 @@ export default function ProductModal({ product, onClose }) {
     return Math.round(basePrice * (1 - transferDiscountPct / 100));
   }, [basePrice, transferEnabled, applyTransferDiscount, transferDiscountPct]);
 
-  const shouldShowTransferLine =
+  const hasTransferDiscount =
     transferEnabled &&
-    (transferPrice < basePrice ||
-      (showTransferDiscountLabel && transferDiscountPct > 0));
+    applyTransferDiscount &&
+    transferDiscountPct > 0 &&
+    transferPrice < basePrice;
+
+  const finalPrice = hasTransferDiscount ? transferPrice : basePrice;
 
   function prev() {
     setIdx((v) => (v - 1 + images.length) % images.length);
@@ -213,16 +216,21 @@ export default function ProductModal({ product, onClose }) {
           <p className="modal-desc">{product.desc}</p>
 
           <div className="modal-pricebox">
-            <div className="modal-price-main">${formatARS(basePrice)}</div>
+            <div className="modal-price-main">${formatARS(finalPrice)}</div>
 
-            {shouldShowTransferLine ? (
+            {hasTransferDiscount ? (
               <div className="modal-price-transfer">
-                Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
+                <span style={{ textDecoration: "line-through", opacity: 0.8 }}>
+                  ${formatARS(basePrice)}
+                </span>{" "}
+                · Transferencia{" "}
                 {showTransferDiscountLabel && transferDiscountPct > 0 ? (
                   <span>({transferDiscountPct}% OFF)</span>
                 ) : null}
               </div>
-            ) : null}
+            ) : (
+              <div className="modal-price-transfer">Precio final</div>
+            )}
           </div>
 
           {product.skinType ? (
