@@ -24,18 +24,46 @@ function cleanImagesKeys(value) {
   );
 }
 
+function toNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 function normalizeProductData(id, data) {
   const imageKey = cleanImageKey(data.imageKey);
   const imagesKeys = cleanImagesKeys(data.imagesKeys);
+  const discount = toNumber(data.discount, 0);
 
   return {
     firebaseId: id,
     ...data,
+    id: data.id || id,
+    price: toNumber(data.price, 0),
+    discount,
+    stockQty: toNumber(data.stockQty, 0),
+    lowStockThreshold: toNumber(data.lowStockThreshold, 3),
     imageKey,
     imagesKeys,
     image: imageKey ? resolveImage(imageKey) : null,
     images: resolveImages(imagesKeys),
     benefits: Array.isArray(data.benefits) ? data.benefits : [],
+  };
+}
+
+function buildSavePayload(item) {
+  const imageKey = cleanImageKey(item.imageKey);
+  const imagesKeys = cleanImagesKeys(item.imagesKeys);
+  const discount = toNumber(item.discount, 0);
+
+  return {
+    ...item,
+    price: toNumber(item.price, 0),
+    discount,
+    stockQty: toNumber(item.stockQty, 0),
+    lowStockThreshold: toNumber(item.lowStockThreshold, 3),
+    imageKey,
+    imagesKeys,
+    benefits: Array.isArray(item.benefits) ? item.benefits : [],
   };
 }
 
@@ -63,25 +91,13 @@ export async function getProducts() {
 }
 
 export async function saveProduct(product) {
-  const payload = {
-    ...product,
-    imageKey: cleanImageKey(product.imageKey),
-    imagesKeys: cleanImagesKeys(product.imagesKeys),
-    benefits: Array.isArray(product.benefits) ? product.benefits : [],
-  };
-
-  await setDoc(doc(db, "products", product.id), payload);
+  const payload = buildSavePayload(product);
+  await setDoc(doc(db, "products", payload.id), payload);
 }
 
 export async function saveCombo(combo) {
-  const payload = {
-    ...combo,
-    imageKey: cleanImageKey(combo.imageKey),
-    imagesKeys: cleanImagesKeys(combo.imagesKeys),
-    benefits: Array.isArray(combo.benefits) ? combo.benefits : [],
-  };
-
-  await setDoc(doc(db, "combos", combo.id), payload);
+  const payload = buildSavePayload(combo);
+  await setDoc(doc(db, "combos", payload.id), payload);
 }
 
 export async function deleteProduct(id) {

@@ -6,59 +6,6 @@ function formatARS(n) {
   return Number(n || 0).toLocaleString("es-AR");
 }
 
-function getPaymentConfig(product) {
-  const defaults = {
-    transfer: {
-      enabled: true,
-      discountPct: 5,
-      label: "Transferencia",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-    cash: {
-      enabled: true,
-      discountPct: 0,
-      label: "Efectivo",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-    other: {
-      enabled: true,
-      discountPct: 0,
-      label: "Otro medio",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-  };
-
-  return {
-    ...defaults,
-    ...(product.paymentOptions || {}),
-    transfer: {
-      ...defaults.transfer,
-      ...(product.paymentOptions?.transfer || {}),
-      enabled:
-        product.paymentOptions?.transfer?.enabled ??
-        (product.transferEnabled !== undefined
-          ? product.transferEnabled
-          : defaults.transfer.enabled),
-      discountPct:
-        product.paymentOptions?.transfer?.discountPct ??
-        (product.transferDiscountPct !== undefined
-          ? Number(product.transferDiscountPct)
-          : defaults.transfer.discountPct),
-    },
-    cash: {
-      ...defaults.cash,
-      ...(product.paymentOptions?.cash || {}),
-    },
-    other: {
-      ...defaults.other,
-      ...(product.paymentOptions?.other || {}),
-    },
-  };
-}
-
 export default function ProductModal({ product, onClose }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
@@ -68,15 +15,15 @@ export default function ProductModal({ product, onClose }) {
   const qty = getQty(product.id);
   const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
 
-  const paymentConfig = getPaymentConfig(product);
-  const transferEnabled = Boolean(paymentConfig.transfer.enabled);
-  const transferDiscountPct = Number(paymentConfig.transfer.discountPct || 0);
-  const applyTransferDiscount = Boolean(paymentConfig.transfer.applyDiscount);
-  const showTransferDiscountLabel = Boolean(
-    paymentConfig.transfer.showDiscountLabel
-  );
-
   const basePrice = Number(product.price || 0);
+  const discountPct = Number(product.discount || 0);
+
+  const finalPrice = useMemo(() => {
+    if (discountPct <= 0) return basePrice;
+    return Math.round(basePrice * (1 - discountPct / 100));
+  }, [basePrice, discountPct]);
+
+  const hasDiscount = discountPct > 0 && finalPrice < basePrice;
 
   const images = useMemo(() => {
     const merged = [
@@ -88,21 +35,6 @@ export default function ProductModal({ product, onClose }) {
   }, [product]);
 
   const [idx, setIdx] = useState(0);
-
-  const transferPrice = useMemo(() => {
-    if (!transferEnabled || !applyTransferDiscount || transferDiscountPct <= 0) {
-      return basePrice;
-    }
-    return Math.round(basePrice * (1 - transferDiscountPct / 100));
-  }, [basePrice, transferEnabled, applyTransferDiscount, transferDiscountPct]);
-
-  const hasTransferDiscount =
-    transferEnabled &&
-    applyTransferDiscount &&
-    transferDiscountPct > 0 &&
-    transferPrice < basePrice;
-
-  const finalPrice = hasTransferDiscount ? transferPrice : basePrice;
 
   function prev() {
     setIdx((v) => (v - 1 + images.length) % images.length);
@@ -218,15 +150,12 @@ export default function ProductModal({ product, onClose }) {
           <div className="modal-pricebox">
             <div className="modal-price-main">${formatARS(finalPrice)}</div>
 
-            {hasTransferDiscount ? (
+            {hasDiscount ? (
               <div className="modal-price-transfer">
                 <span style={{ textDecoration: "line-through", opacity: 0.8 }}>
                   ${formatARS(basePrice)}
                 </span>{" "}
-                · Transferencia{" "}
-                {showTransferDiscountLabel && transferDiscountPct > 0 ? (
-                  <span>({transferDiscountPct}% OFF)</span>
-                ) : null}
+                · <span>({discountPct}% OFF)</span>
               </div>
             ) : (
               <div className="modal-price-transfer">Precio final</div>

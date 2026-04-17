@@ -12,6 +12,15 @@ function textToBenefits(text) {
     .filter(Boolean);
 }
 
+function formatARS(value) {
+  return Number(value || 0).toLocaleString("es-AR");
+}
+
+function toNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 const EMPTY_FORM = {
   id: "",
   title: "",
@@ -31,9 +40,27 @@ const EMPTY_FORM = {
   active: true,
 
   paymentOptions: {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia", applyDiscount: true, showDiscountLabel: true },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo", applyDiscount: true, showDiscountLabel: true },
-    other: { enabled: true, discountPct: 0, label: "Otro medio", applyDiscount: true, showDiscountLabel: true },
+    transfer: {
+      enabled: true,
+      discountPct: 0,
+      label: "Transferencia",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    cash: {
+      enabled: true,
+      discountPct: 0,
+      label: "Efectivo",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    other: {
+      enabled: true,
+      discountPct: 0,
+      label: "Otro medio",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
   },
 
   deliveryOptions: {
@@ -58,12 +85,14 @@ export default function AdminProductForm({
       setForm({
         ...EMPTY_FORM,
         ...initialData,
+        price: toNumber(initialData.price, 0),
+        discount: toNumber(initialData.discount, 0),
         imageKey: initialData.imageKey || "",
         imagesKeys: Array.isArray(initialData.imagesKeys)
           ? initialData.imagesKeys
           : [],
-        stockQty: Number(initialData.stockQty ?? 0),
-        lowStockThreshold: Number(initialData.lowStockThreshold ?? 3),
+        stockQty: toNumber(initialData.stockQty, 0),
+        lowStockThreshold: toNumber(initialData.lowStockThreshold, 3),
 
         paymentOptions: {
           ...EMPTY_FORM.paymentOptions,
@@ -71,14 +100,26 @@ export default function AdminProductForm({
           transfer: {
             ...EMPTY_FORM.paymentOptions.transfer,
             ...(initialData.paymentOptions?.transfer || {}),
+            discountPct: toNumber(
+              initialData.paymentOptions?.transfer?.discountPct,
+              0
+            ),
           },
           cash: {
             ...EMPTY_FORM.paymentOptions.cash,
             ...(initialData.paymentOptions?.cash || {}),
+            discountPct: toNumber(
+              initialData.paymentOptions?.cash?.discountPct,
+              0
+            ),
           },
           other: {
             ...EMPTY_FORM.paymentOptions.other,
             ...(initialData.paymentOptions?.other || {}),
+            discountPct: toNumber(
+              initialData.paymentOptions?.other?.discountPct,
+              0
+            ),
           },
         },
 
@@ -96,7 +137,7 @@ export default function AdminProductForm({
           moto: {
             ...EMPTY_FORM.deliveryOptions.moto,
             ...(initialData.deliveryOptions?.moto || {}),
-            price: Number(initialData.deliveryOptions?.moto?.price ?? 2100),
+            price: toNumber(initialData.deliveryOptions?.moto?.price, 2100),
           },
         },
       });
@@ -135,7 +176,9 @@ export default function AdminProductForm({
         [method]: {
           ...prev.paymentOptions[method],
           [field]:
-            field === "enabled"
+            field === "enabled" ||
+            field === "applyDiscount" ||
+            field === "showDiscountLabel"
               ? value
               : field === "discountPct"
               ? Number(value)
@@ -209,6 +252,14 @@ export default function AdminProductForm({
     return resolveImage(form.imageKey);
   }, [form.imageKey]);
 
+  const basePrice = Number(form.price || 0);
+  const discountPct = Number(form.discount || 0);
+
+  const previewFinalPrice =
+    discountPct > 0
+      ? Math.round(basePrice * (1 - discountPct / 100))
+      : basePrice;
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -218,6 +269,8 @@ export default function AdminProductForm({
 
     const payload = {
       ...form,
+      price: Number(form.price || 0),
+      discount: Number(form.discount || 0),
       benefits: textToBenefits(benefitsText),
       imagesKeys: cleanedImages,
       imageKey: form.imageKey?.trim() || cleanedImages[0] || "",
@@ -265,7 +318,7 @@ export default function AdminProductForm({
         </label>
 
         <label className="admin-field">
-          <span>Precio final</span>
+          <span>Precio original</span>
           <input
             className="input"
             type="number"
@@ -274,11 +327,13 @@ export default function AdminProductForm({
             onChange={handleChange}
             required
           />
-          <small className="admin-help">Precio que se muestra en la web.</small>
+          <small className="admin-help">
+            Este es el precio antes del descuento.
+          </small>
         </label>
 
         <label className="admin-field">
-          <span>Descuento visual (%)</span>
+          <span>Descuento (%)</span>
           <input
             className="input"
             type="number"
@@ -287,9 +342,21 @@ export default function AdminProductForm({
             onChange={handleChange}
           />
           <small className="admin-help">
-            Solo para la etiqueta visual del producto.
+            Descuento general del producto.
           </small>
         </label>
+
+        <div className="admin-field admin-field-full">
+          <span>Vista previa de precios</span>
+          <div className="admin-method-card">
+            <div className="admin-help">
+              <strong>Precio original:</strong> ${formatARS(basePrice)}
+            </div>
+            <div className="admin-help">
+              <strong>Precio final con descuento:</strong> ${formatARS(previewFinalPrice)}
+            </div>
+          </div>
+        </div>
 
         <div className="admin-field admin-field-full">
           <span>Métodos de pago</span>
@@ -314,7 +381,7 @@ export default function AdminProductForm({
                 onChange={(e) =>
                   handlePaymentChange("transfer", "discountPct", e.target.value)
                 }
-                placeholder="5"
+                placeholder="0"
               />
 
               <label className="admin-check">
@@ -333,7 +400,11 @@ export default function AdminProductForm({
                   type="checkbox"
                   checked={form.paymentOptions.transfer.showDiscountLabel}
                   onChange={(e) =>
-                    handlePaymentChange("transfer", "showDiscountLabel", e.target.checked)
+                    handlePaymentChange(
+                      "transfer",
+                      "showDiscountLabel",
+                      e.target.checked
+                    )
                   }
                 />
                 <span>Mostrar “% OFF”</span>
@@ -522,10 +593,59 @@ export default function AdminProductForm({
               </option>
             ))}
           </select>
-          <small className="admin-help">
-            Elegí una imagen del catálogo ya cargado en assets.
-          </small>
         </label>
+
+        <div className="admin-field admin-field-full">
+          <span>Galería de imágenes</span>
+          <div className="admin-payment-grid">
+            {AVAILABLE_IMAGES.map((img) => {
+              const selected = form.imagesKeys.includes(img);
+              const preview = resolveImage(img);
+
+              return (
+                <label key={img} className="admin-method-card">
+                  <label className="admin-check">
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => handleToggleGalleryImage(img)}
+                    />
+                    <span>{img}</span>
+                  </label>
+
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={img}
+                      style={{
+                        width: "100%",
+                        maxWidth: 180,
+                        borderRadius: 12,
+                        border: "1px solid #e5e7eb",
+                      }}
+                    />
+                  ) : null}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {mainImagePreview ? (
+          <div className="admin-field admin-field-full">
+            <span>Vista previa imagen principal</span>
+            <img
+              src={mainImagePreview}
+              alt="Vista previa"
+              style={{
+                width: "100%",
+                maxWidth: 240,
+                borderRadius: 16,
+                border: "1px solid #e5e7eb",
+              }}
+            />
+          </div>
+        ) : null}
 
         <label className="admin-field">
           <span>Tipo de piel</span>
@@ -546,13 +666,10 @@ export default function AdminProductForm({
             value={form.stockQty}
             onChange={handleChange}
           />
-          <small className="admin-help">
-            Si llega a 0, se muestra como “Sin stock”.
-          </small>
         </label>
 
         <label className="admin-field">
-          <span>Alerta stock bajo</span>
+          <span>Umbral stock bajo</span>
           <input
             className="input"
             type="number"
@@ -560,78 +677,10 @@ export default function AdminProductForm({
             value={form.lowStockThreshold}
             onChange={handleChange}
           />
-          <small className="admin-help">
-            Ej: si ponés 2, cuando queden 2 o menos te lo marca como bajo.
-          </small>
         </label>
 
-        <div className="admin-field admin-field-full">
-          <span>Galería de imágenes</span>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 10,
-              marginTop: 8,
-            }}
-          >
-            {AVAILABLE_IMAGES.map((img) => (
-              <label
-                key={img}
-                className="admin-check"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  borderRadius: 12,
-                  padding: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={form.imagesKeys.includes(img)}
-                  onChange={() => handleToggleGalleryImage(img)}
-                />
-                <span style={{ fontSize: 13 }}>{img}</span>
-              </label>
-            ))}
-          </div>
-          <small className="admin-help">
-            Marcá una o varias imágenes para la galería del producto.
-          </small>
-        </div>
-
-        {mainImagePreview ? (
-          <div className="admin-field admin-field-full">
-            <span>Vista previa imagen principal</span>
-            <div
-              style={{
-                marginTop: 8,
-                border: "1px solid rgba(0,0,0,0.08)",
-                borderRadius: 16,
-                padding: 12,
-                maxWidth: 260,
-                background: "#fff",
-              }}
-            >
-              <img
-                src={mainImagePreview}
-                alt={form.title || form.imageKey}
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  display: "block",
-                }}
-              />
-            </div>
-          </div>
-        ) : null}
-
         <label className="admin-field admin-field-full">
-          <span>Beneficios · uno por línea</span>
+          <span>Beneficios (uno por línea)</span>
           <textarea
             className="input admin-textarea"
             value={benefitsText}
@@ -659,14 +708,14 @@ export default function AdminProductForm({
           />
         </label>
 
-        <label className="admin-check">
+        <label className="admin-check admin-field-full">
           <input
             type="checkbox"
             name="active"
             checked={form.active}
             onChange={handleChange}
           />
-          <span>Activo</span>
+          <span>Producto activo</span>
         </label>
       </div>
 
@@ -675,7 +724,12 @@ export default function AdminProductForm({
           {saving ? "Guardando..." : "Guardar"}
         </button>
 
-        <button className="btn btn-outline" type="button" onClick={onCancel}>
+        <button
+          className="btn btn-outline"
+          type="button"
+          onClick={onCancel}
+          disabled={saving}
+        >
           Cancelar
         </button>
       </div>
