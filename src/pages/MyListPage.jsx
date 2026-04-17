@@ -3,11 +3,33 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useList } from "../context/ListContext";
 
+function formatARS(value) {
+  return Number(value || 0).toLocaleString("es-AR");
+}
+
 function getPaymentConfig(item) {
   const defaults = {
-    transfer: { enabled: true, discountPct: 5, label: "Transferencia", applyDiscount: true, showDiscountLabel: true },
-    cash: { enabled: true, discountPct: 0, label: "Efectivo", applyDiscount: true, showDiscountLabel: true },
-    other: { enabled: true, discountPct: 0, label: "Otro medio", applyDiscount: true, showDiscountLabel: true },
+    transfer: {
+      enabled: true,
+      discountPct: 0,
+      label: "Transferencia",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    cash: {
+      enabled: true,
+      discountPct: 0,
+      label: "Efectivo",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    other: {
+      enabled: true,
+      discountPct: 0,
+      label: "Otro medio",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
   };
 
   return {
@@ -35,6 +57,15 @@ function getDeliveryConfig(item) {
   };
 }
 
+function getDiscountedUnitPrice(item) {
+  const basePrice = Number(item.price || 0);
+  const discountPct = Number(item.discount || 0);
+
+  if (discountPct <= 0) return basePrice;
+
+  return Math.round(basePrice * (1 - discountPct / 100));
+}
+
 function buildReserveText(
   items,
   baseTotal,
@@ -46,7 +77,17 @@ function buildReserveText(
   motoPrice,
   postalCode
 ) {
-  const lines = items.map((it) => `- ${it.title} x${it.qty}`);
+  const lines = items.map((it) => {
+    const unitFinal = getDiscountedUnitPrice(it);
+    const lineFinal = unitFinal * Number(it.qty || 0);
+    const discountPct = Number(it.discount || 0);
+
+    return `- ${it.title} x${it.qty}${
+      discountPct > 0
+        ? ` · $${unitFinal.toLocaleString("es-AR")} c/u (${discountPct}% OFF) = $${lineFinal.toLocaleString("es-AR")}`
+        : ` · $${lineFinal.toLocaleString("es-AR")}`
+    }`;
+  });
 
   const paymentLabel =
     paymentMethod === "transfer"
@@ -164,35 +205,11 @@ export default function MyListPage() {
 
   const discountedProductsTotal = useMemo(() => {
     return items.reduce((acc, item) => {
-      const lineTotal = Number(item.price || 0) * Number(item.qty || 0);
-      const cfg = getPaymentConfig(item);
-
-      let discountPct = 0;
-      if (
-        paymentMethod === "transfer" &&
-        cfg.transfer.enabled &&
-        cfg.transfer.applyDiscount
-      ) {
-        discountPct = Number(cfg.transfer.discountPct || 0);
-      }
-      if (
-        paymentMethod === "cash" &&
-        cfg.cash.enabled &&
-        cfg.cash.applyDiscount
-      ) {
-        discountPct = Number(cfg.cash.discountPct || 0);
-      }
-      if (
-        paymentMethod === "other" &&
-        cfg.other.enabled &&
-        cfg.other.applyDiscount
-      ) {
-        discountPct = Number(cfg.other.discountPct || 0);
-      }
-
-      return acc + Math.round(lineTotal * (1 - discountPct / 100));
+      const discountedUnit = getDiscountedUnitPrice(item);
+      const qty = Number(item.qty || 0);
+      return acc + discountedUnit * qty;
     }, 0);
-  }, [items, paymentMethod]);
+  }, [items]);
 
   const discountAmount = useMemo(() => {
     return Math.max(0, baseTotal - discountedProductsTotal);
@@ -255,32 +272,73 @@ export default function MyListPage() {
             ) : (
               <>
                 <div className="list-table">
-                  {items.map((it) => (
-                    <div className="list-row" key={it.id}>
-                      <div className="qtyctrl">
-                        <button className="iconbtn" type="button" onClick={() => removeOne(it.id)}>−</button>
-                        <div className="qtypill">{it.qty}</div>
-                        <button className="iconbtn" type="button" onClick={() => addToList(it)}>+</button>
-                      </div>
+                  {items.map((it) => {
+                    const unitFinal = getDiscountedUnitPrice(it);
+                    const lineFinal = unitFinal * Number(it.qty || 0);
+                    const discountPct = Number(it.discount || 0);
+                    const hasDiscount = discountPct > 0 && unitFinal < Number(it.price || 0);
 
-                      <div className="name">
-                        <div className="name-title">{it.title}</div>
-                        <div className="name-sub">
-                          Unit: ${it.price.toLocaleString("es-AR")}
+                    return (
+                      <div className="list-row" key={it.id}>
+                        <div className="qtyctrl">
+                          <button
+                            className="iconbtn"
+                            type="button"
+                            onClick={() => removeOne(it.id)}
+                          >
+                            −
+                          </button>
+
+                          <div className="qtypill">{it.qty}</div>
+
+                          <button
+                            className="iconbtn"
+                            type="button"
+                            onClick={() => addToList(it)}
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="name">
+                          <div className="name-title">{it.title}</div>
+                          <div className="name-sub">
+                            {hasDiscount ? (
+                              <>
+                                Unit: ${formatARS(unitFinal)}{" "}
+                                <span
+                                  style={{
+                                    textDecoration: "line-through",
+                                    opacity: 0.7,
+                                    marginLeft: 6,
+                                  }}
+                                >
+                                  ${formatARS(it.price)}
+                                </span>{" "}
+                                <span style={{ fontWeight: 700 }}>
+                                  ({discountPct}% OFF)
+                                </span>
+                              </>
+                            ) : (
+                              <>Unit: ${formatARS(it.price)}</>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="rightcol">
+                          <div className="price">${formatARS(lineFinal)}</div>
+
+                          <button
+                            className="trash"
+                            type="button"
+                            onClick={() => deleteItem(it.id)}
+                          >
+                            ✕
+                          </button>
                         </div>
                       </div>
-
-                      <div className="rightcol">
-                        <div className="price">
-                          ${(it.price * it.qty).toLocaleString("es-AR")}
-                        </div>
-
-                        <button className="trash" type="button" onClick={() => deleteItem(it.id)}>
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="reserve-actions">
@@ -365,7 +423,7 @@ export default function MyListPage() {
                             checked={motoSelected}
                             onChange={(e) => setMotoSelected(e.target.checked)}
                           />
-                          <span>Motoenvío (+${motoPrice.toLocaleString("es-AR")})</span>
+                          <span>Motoenvío (+${formatARS(motoPrice)})</span>
                         </label>
                       </div>
                     ) : null}
@@ -389,7 +447,12 @@ export default function MyListPage() {
                     ) : null}
                   </div>
 
-                  <a className="btn" href={whatsappHref} target="_blank" rel="noreferrer">
+                  <a
+                    className="btn"
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Comprar por WhatsApp
                   </a>
                 </div>
@@ -404,7 +467,7 @@ export default function MyListPage() {
               {discountAmount > 0 ? (
                 <span className="totals-sub">
                   Descuento aplicado:{" "}
-                  <strong>- ${discountAmount.toLocaleString("es-AR")}</strong>
+                  <strong>- ${formatARS(discountAmount)}</strong>
                 </span>
               ) : null}
 
@@ -413,19 +476,22 @@ export default function MyListPage() {
                   Entrega:{" "}
                   <strong>
                     {motoSelected
-                      ? `Motoenvío (+$${motoPrice.toLocaleString("es-AR")})`
+                      ? `Motoenvío (+$${formatARS(motoPrice)})`
                       : "En Necochea"}
                   </strong>
                 </span>
               ) : (
                 <span className="totals-sub">
-                  Entrega: <strong>Envío{postalCode ? ` · CP ${postalCode}` : ""}</strong>
+                  Entrega:{" "}
+                  <strong>
+                    Envío{postalCode ? ` · CP ${postalCode}` : ""}
+                  </strong>
                 </span>
               )}
             </div>
 
             <div className="totals-right">
-              <strong>${finalTotal.toLocaleString("es-AR")}</strong>
+              <strong>${formatARS(finalTotal)}</strong>
             </div>
           </div>
         </div>
