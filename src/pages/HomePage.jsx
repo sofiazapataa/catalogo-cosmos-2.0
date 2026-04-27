@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useProducts } from "../hooks/useProducts";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,9 +13,23 @@ export default function HomePage() {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
   const [showAllCombos, setShowAllCombos] = useState(false);
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  const allProducts = useMemo(() => {
+    return [...combos, ...stock];
+  }, [combos, stock]);
+
+  const featuredProcessed = useMemo(() => {
+    if (category !== "all") return [];
+
+    return filterProducts(
+      allProducts.filter((product) => product.featured === true),
+      query
+    );
+  }, [allProducts, query, category]);
 
   const combosProcessed = useMemo(() => {
     const filtered = filterProducts(combos, query);
@@ -38,6 +52,10 @@ export default function HomePage() {
     return filtered;
   }, [stock, query, category]);
 
+  const featuredToShow = showAllFeatured
+    ? featuredProcessed
+    : featuredProcessed.slice(0, 4);
+
   const combosToShow = showAllCombos
     ? combosProcessed
     : combosProcessed.slice(0, 4);
@@ -47,7 +65,9 @@ export default function HomePage() {
     : stockProcessed.slice(0, 10);
 
   const nothingFound =
-    !loading && !error && combosProcessed.length + stockProcessed.length === 0;
+    !loading &&
+    !error &&
+    featuredProcessed.length + combosProcessed.length + stockProcessed.length === 0;
 
   return (
     <>
@@ -63,6 +83,28 @@ export default function HomePage() {
 
         {loading ? <p style={{ opacity: 0.7 }}>Cargando productos…</p> : null}
         {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+
+        {featuredProcessed.length > 0 && (
+          <>
+            <SectionHeader
+              title="Destacados"
+              count={featuredProcessed.length}
+              shown={showAllFeatured}
+              onToggle={() => setShowAllFeatured((v) => !v)}
+              canToggle={featuredProcessed.length > 4}
+            />
+
+            <div className="grid">
+              {featuredToShow.map((p) => (
+                <ProductCard
+                  key={`featured-${p.id}`}
+                  product={p}
+                  onOpen={() => setSelected(p)}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {combosProcessed.length > 0 && (
           <>

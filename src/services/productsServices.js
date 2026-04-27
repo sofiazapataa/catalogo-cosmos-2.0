@@ -29,6 +29,12 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function removeUndefinedValues(obj) {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined)
+  );
+}
+
 function normalizeProductData(id, data) {
   const imageKey = cleanImageKey(data.imageKey);
   const imagesKeys = cleanImagesKeys(data.imagesKeys);
@@ -44,9 +50,11 @@ function normalizeProductData(id, data) {
     lowStockThreshold: toNumber(data.lowStockThreshold, 3),
     imageKey,
     imagesKeys,
-    image: imageKey ? resolveImage(imageKey) : null,
+   image: data.imageUrl || (imageKey ? resolveImage(imageKey) : null),
     images: resolveImages(imagesKeys),
     benefits: Array.isArray(data.benefits) ? data.benefits : [],
+    active: data.active !== false,
+    featured: data.featured === true,
   };
 }
 
@@ -55,8 +63,10 @@ function buildSavePayload(item) {
   const imagesKeys = cleanImagesKeys(item.imagesKeys);
   const discount = toNumber(item.discount, 0);
 
-  return {
-    ...item,
+  const { firebaseId, image, images, ...cleanItem } = item;
+
+  return removeUndefinedValues({
+    ...cleanItem,
     price: toNumber(item.price, 0),
     discount,
     stockQty: toNumber(item.stockQty, 0),
@@ -64,7 +74,9 @@ function buildSavePayload(item) {
     imageKey,
     imagesKeys,
     benefits: Array.isArray(item.benefits) ? item.benefits : [],
-  };
+    active: item.active !== false,
+    featured: item.featured === true,
+  });
 }
 
 export async function getProducts() {
@@ -84,10 +96,7 @@ export async function getProducts() {
     normalizeProductData(docItem.id, docItem.data())
   );
 
-  return {
-    combos,
-    stock,
-  };
+  return { combos, stock };
 }
 
 export async function saveProduct(product) {
@@ -98,6 +107,52 @@ export async function saveProduct(product) {
 export async function saveCombo(combo) {
   const payload = buildSavePayload(combo);
   await setDoc(doc(db, "combos", payload.id), payload);
+}
+
+export async function updateProductPartial(id, partialData) {
+  const payload = removeUndefinedValues({
+    ...partialData,
+    id,
+  });
+
+  await setDoc(doc(db, "products", id), payload, { merge: true });
+}
+
+export async function updateComboPartial(id, partialData) {
+  const payload = removeUndefinedValues({
+    ...partialData,
+    id,
+  });
+
+  await setDoc(doc(db, "combos", id), payload, { merge: true });
+}
+
+export async function duplicateProduct(product) {
+  const newId = `${product.id}-copia-${Date.now()}`;
+
+  const payload = buildSavePayload({
+    ...product,
+    id: newId,
+    title: `${product.title} copia`,
+    active: false,
+    featured: false,
+  });
+
+  await setDoc(doc(db, "products", newId), payload);
+}
+
+export async function duplicateCombo(combo) {
+  const newId = `${combo.id}-copia-${Date.now()}`;
+
+  const payload = buildSavePayload({
+    ...combo,
+    id: newId,
+    title: `${combo.title} copia`,
+    active: false,
+    featured: false,
+  });
+
+  await setDoc(doc(db, "combos", newId), payload);
 }
 
 export async function deleteProduct(id) {

@@ -8,8 +8,7 @@ import refreshPotion from "../assets/images/refreshPotion.jpg";
 import comboRutinaPielGrasa from "../assets/images/combo-rutinaPielGrasa.jpg";
 import tonicoPuryfing from "../assets/images/tonico-puryfing.jpg";
 import comboLimpiezaGlow from "../assets/images/combo-limpiezaGlow.jpg";
-
-// OJO: este nombre está tomado tal como aparece en tu carpeta
+import comboLimpiezaGlow2 from "../assets/images/combo-limpiezaGlow2.jpg";
 import comboLimpiezaBasica from "../assets/images/combo-LimipiezaBasica.jpg";
 
 import comboLimpieza from "../assets/images/combo-limpieza.jpg";
@@ -22,11 +21,12 @@ import brighteningFotos2 from "../assets/images/brighteningDrops.JPG";
 import cleansingBubbles from "../assets/images/cleansingBubbles.JPG";
 import comboLimpiezaFoto from "../assets/images/comboLimpieza.JPG";
 import comboRutinaBasica2 from "../assets/images/comboRutinaBasica.JPG";
-
-// OJO: este nombre también lo ajusté a lo que se ve en tu carpeta
 import comboRutinaCompleta from "../assets/images/comboRutinaCompleta.JPG";
-
 import tonicoFoto from "../assets/images/tonico.JPG";
+
+import comboSerumyCrema from "../assets/images/comboSerumyCrema.png";
+import comboTonicoSerumCrema from "../assets/images/comboTonicoSerumCrema.png";
+import comboTonicoySerum from "../assets/images/comboTonicoySerum.png";
 
 export const imageMap = {
   "aceite-limpieza.jpg": aceiteLimpieza,
@@ -39,8 +39,7 @@ export const imageMap = {
   "combo-rutinaPielGrasa.jpg": comboRutinaPielGrasa,
   "tonico-puryfing.jpg": tonicoPuryfing,
   "combo-limpiezaGlow.jpg": comboLimpiezaGlow,
-
-  // la key puede quedar prolija aunque el archivo real tenga typo
+  "combo-limpiezaGlow2.jpg": comboLimpiezaGlow2,
   "combo-LimpiezaBasica.jpg": comboLimpiezaBasica,
 
   "combo-limpieza.jpg": comboLimpieza,
@@ -53,17 +52,21 @@ export const imageMap = {
   "cleansingBubbles.JPG": cleansingBubbles,
   "comboLimpieza.JPG": comboLimpiezaFoto,
   "comboRutinaBasica.JPG": comboRutinaBasica2,
-
-  // key prolija, archivo real corregido según tu carpeta
   "comboRutinaCompleta.JPG": comboRutinaCompleta,
-
   "tonico.JPG": tonicoFoto,
+
+  "comboSerumyCrema.png": comboSerumyCrema,
+  "comboTonicoSerumCrema.png": comboTonicoSerumCrema,
+  "comboTonicoySerum.png": comboTonicoySerum,
 };
 
 export const AVAILABLE_IMAGES = Object.keys(imageMap);
 
 const normalizedImageMap = Object.fromEntries(
-  Object.entries(imageMap).map(([key, value]) => [key.trim().toLowerCase(), value])
+  Object.entries(imageMap).map(([key, value]) => [
+    key.trim().toLowerCase(),
+    value,
+  ])
 );
 
 export function resolveImage(imageKey) {

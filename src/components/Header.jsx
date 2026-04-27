@@ -19,7 +19,6 @@ export default function Header() {
             <div className="contact-title">Reservas por mensaje directo</div>
             <div className="contact-sub">Entrega inmediata</div>
             <div className="contact-sub">(2262) 357366</div>
-            <div className="contact-sub">sofizapata2004@gmail.com</div>
           </div>
         </div>
       </div>
