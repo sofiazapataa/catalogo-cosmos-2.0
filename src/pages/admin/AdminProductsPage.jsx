@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import AdminProductForm from "../../components/AdminProductForm";
+import { resolveImage } from "../../utils/imageMap";
 import {
   getProducts,
   saveProduct,
@@ -13,17 +14,9 @@ function getStockState(product) {
   const qty = Number(product.stockQty ?? 0);
   const low = Number(product.lowStockThreshold ?? 3);
 
-  if (qty <= 0) {
-    return { text: "Agotado", className: "admin-chip-stock-out" };
-  }
-
-  if (qty === 1) {
-    return { text: "Última unidad", className: "admin-chip-stock-last" };
-  }
-
-  if (qty <= low) {
-    return { text: `Quedan ${qty}`, className: "admin-chip-stock-low" };
-  }
+  if (qty <= 0) return { text: "Agotado", className: "admin-chip-stock-out" };
+  if (qty === 1) return { text: "Última unidad", className: "admin-chip-stock-last" };
+  if (qty <= low) return { text: `Quedan ${qty}`, className: "admin-chip-stock-low" };
 
   return { text: `Stock ${qty}`, className: "admin-chip-stock-ok" };
 }
@@ -89,9 +82,7 @@ export default function AdminProductsPage() {
           <div className="admin-topbar">
             <div>
               <h2 className="page-title">Admin · Productos</h2>
-              <p className="page-lead">
-                Crear, editar y borrar productos del catálogo.
-              </p>
+              <p className="page-lead">Crear, editar y borrar productos del catálogo.</p>
             </div>
 
             <div className="admin-topbar-actions">
@@ -132,23 +123,34 @@ export default function AdminProductsPage() {
           <section className="admin-list">
             {items.map((product) => {
               const stockState = getStockState(product);
+              const preview = resolveImage(product.imageKey);
 
               return (
                 <article key={product.id} className="admin-list-item">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={product.title}
+                      className="admin-list-image"
+                    />
+                  ) : (
+                    <div className="admin-list-image admin-list-image-empty">
+                      Sin foto
+                    </div>
+                  )}
+
                   <div className="admin-list-main">
                     <h3>{product.title}</h3>
                     <p>{product.desc}</p>
 
                     <div className="admin-meta">
-                      <span className="admin-chip">{product.type}</span>
+                      <span className="admin-chip">{product.type || "producto"}</span>
 
                       <span className="admin-chip admin-chip-soft">
                         ${Number(product.price || 0).toLocaleString("es-AR")}
                       </span>
 
-                      <span
-                        className={`admin-chip admin-chip-soft ${stockState.className}`}
-                      >
+                      <span className={`admin-chip admin-chip-soft ${stockState.className}`}>
                         {stockState.text}
                       </span>
 

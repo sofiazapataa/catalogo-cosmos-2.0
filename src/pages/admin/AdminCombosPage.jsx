@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import AdminProductForm from "../../components/AdminProductForm";
+import { resolveImage } from "../../utils/imageMap";
 import {
   getProducts,
   saveCombo,
@@ -70,9 +71,7 @@ export default function AdminCombosPage() {
           <div className="admin-topbar">
             <div>
               <h2 className="page-title">Admin · Combos</h2>
-              <p className="page-lead">
-                Crear, editar y borrar combos del catálogo.
-              </p>
+              <p className="page-lead">Crear, editar y borrar combos del catálogo.</p>
             </div>
 
             <div className="admin-topbar-actions">
@@ -111,47 +110,63 @@ export default function AdminCombosPage() {
           {loading ? <p>Cargando combos…</p> : null}
 
           <section className="admin-list">
-            {items.map((combo) => (
-              <article key={combo.id} className="admin-list-item">
-                <div className="admin-list-main">
-                  <h3>{combo.title}</h3>
-                  <p>{combo.desc}</p>
+            {items.map((combo) => {
+              const preview = resolveImage(combo.imageKey);
 
-                  <div className="admin-meta">
-                    <span className="admin-chip">combo</span>
+              return (
+                <article key={combo.id} className="admin-list-item">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={combo.title}
+                      className="admin-list-image"
+                    />
+                  ) : (
+                    <div className="admin-list-image admin-list-image-empty">
+                      Sin foto
+                    </div>
+                  )}
 
-                    <span className="admin-chip admin-chip-soft">
-                      ${Number(combo.price || 0).toLocaleString("es-AR")}
-                    </span>
+                  <div className="admin-list-main">
+                    <h3>{combo.title}</h3>
+                    <p>{combo.desc}</p>
 
-                    <span className="admin-chip admin-chip-soft">
-                      {combo.active ? "Activo" : "Oculto"}
-                    </span>
+                    <div className="admin-meta">
+                      <span className="admin-chip">combo</span>
+
+                      <span className="admin-chip admin-chip-soft">
+                        ${Number(combo.price || 0).toLocaleString("es-AR")}
+                      </span>
+
+                      <span className="admin-chip admin-chip-soft">
+                        {combo.active ? "Activo" : "Oculto"}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="admin-list-side">
-                  <button
-                    className="btn btn-small"
-                    type="button"
-                    onClick={() => {
-                      setEditing(combo);
-                      setShowForm(true);
-                    }}
-                  >
-                    Editar
-                  </button>
+                  <div className="admin-list-side">
+                    <button
+                      className="btn btn-small"
+                      type="button"
+                      onClick={() => {
+                        setEditing(combo);
+                        setShowForm(true);
+                      }}
+                    >
+                      Editar
+                    </button>
 
-                  <button
-                    className="btn btn-outline btn-small"
-                    type="button"
-                    onClick={() => handleDelete(combo.id, combo.title)}
-                  >
-                    Borrar
-                  </button>
-                </div>
-              </article>
-            ))}
+                    <button
+                      className="btn btn-outline btn-small"
+                      type="button"
+                      onClick={() => handleDelete(combo.id, combo.title)}
+                    >
+                      Borrar
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </section>
         </section>
       </main>
