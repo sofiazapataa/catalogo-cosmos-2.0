@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useList } from "../context/ListContext";
 
@@ -12,6 +11,70 @@ function getCardMeta(product) {
   if (product.mainIngredient) return `Activo clave: ${product.mainIngredient}`;
   if (product.skinType) return `Ideal para: ${product.skinType}`;
   return null;
+}
+
+function getPaymentConfig(product) {
+  const defaults = {
+    transfer: {
+      enabled: true,
+      discountPct: 0,
+      label: "Transferencia",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    cash: {
+      enabled: true,
+      discountPct: 0,
+      label: "Efectivo",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    other: {
+      enabled: true,
+      discountPct: 0,
+      label: "Otro medio",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+  };
+
+  return {
+    ...defaults,
+    ...(product.paymentOptions || {}),
+    transfer: {
+      ...defaults.transfer,
+      ...(product.paymentOptions?.transfer || {}),
+    },
+    cash: {
+      ...defaults.cash,
+      ...(product.paymentOptions?.cash || {}),
+    },
+    other: {
+      ...defaults.other,
+      ...(product.paymentOptions?.other || {}),
+    },
+  };
+}
+
+function getProductDiscountPrice(product) {
+  const basePrice = Number(product.price || 0);
+  const discountPct = Number(product.discount || 0);
+
+  if (discountPct <= 0) return basePrice;
+
+  return Math.round(basePrice * (1 - discountPct / 100));
+}
+
+function getPaymentPrice(product, method) {
+  const productPrice = getProductDiscountPrice(product);
+  const payment = getPaymentConfig(product)[method];
+  const paymentDiscount = Number(payment.discountPct || 0);
+
+  if (!payment.enabled || !payment.applyDiscount || paymentDiscount <= 0) {
+    return productPrice;
+  }
+
+  return Math.round(productPrice * (1 - paymentDiscount / 100));
 }
 
 export default function ProductCard({ product, onOpen }) {
@@ -30,17 +93,24 @@ export default function ProductCard({ product, onOpen }) {
 
   const basePrice = Number(product.price || 0);
   const discountPct = Number(product.discount || 0);
-
-  const finalPrice = useMemo(() => {
-    if (discountPct <= 0) return basePrice;
-    return Math.round(basePrice * (1 - discountPct / 100));
-  }, [basePrice, discountPct]);
-
+  const finalPrice = getProductDiscountPrice(product);
   const hasDiscount = discountPct > 0 && finalPrice < basePrice;
+
+  const paymentConfig = getPaymentConfig(product);
+  const transferPrice = getPaymentPrice(product, "transfer");
+  const transferDiscount = Number(paymentConfig.transfer.discountPct || 0);
+
+  const hasTransferDiscount =
+    paymentConfig.transfer.enabled &&
+    paymentConfig.transfer.applyDiscount &&
+    transferDiscount > 0 &&
+    transferPrice < finalPrice;
+
   const cardMeta = getCardMeta(product);
 
   function handleKeyOpen(e) {
     if (!canOpen) return;
+
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onOpen();
@@ -57,10 +127,22 @@ export default function ProductCard({ product, onOpen }) {
         tabIndex={canOpen ? 0 : undefined}
         aria-label={canOpen ? `Ver ${product.title}` : undefined}
       >
+        {!isOutOfStock && (hasDiscount || hasTransferDiscount) ? (
+          <div className="badges">
+            {hasDiscount ? (
+              <span className="badge-main">-{discountPct}%</span>
+            ) : null}
+
+            {hasTransferDiscount ? (
+              <span className="badge-sub">
+                Transferencia -{transferDiscount}%
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
         {isOutOfStock ? (
           <div className="stock-badge stock-badge-out">Sin stock</div>
-        ) : hasDiscount ? (
-          <div className="badge">-{discountPct}%</div>
         ) : null}
 
         {isLowStock ? (
@@ -101,8 +183,17 @@ export default function ProductCard({ product, onOpen }) {
               · <span className="off-tag">({discountPct}% OFF)</span>
             </div>
           ) : (
-            <div className="card-price-off">Precio final</div>
+            <div className="card-price-off">Precio lista</div>
           )}
+
+          {hasTransferDiscount ? (
+            <div className="card-price-off">
+              Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
+              {paymentConfig.transfer.showDiscountLabel ? (
+                <span className="off-tag">({transferDiscount}% OFF)</span>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="card-actions">

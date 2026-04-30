@@ -57,13 +57,31 @@ function getDeliveryConfig(item) {
   };
 }
 
-function getDiscountedUnitPrice(item) {
+function getProductDiscountPrice(item) {
   const basePrice = Number(item.price || 0);
   const discountPct = Number(item.discount || 0);
 
   if (discountPct <= 0) return basePrice;
 
   return Math.round(basePrice * (1 - discountPct / 100));
+}
+
+function getUnitPriceByPayment(item, paymentMethod) {
+  const productPrice = getProductDiscountPrice(item);
+  const payment = getPaymentConfig(item)[paymentMethod];
+  const paymentDiscount = Number(payment?.discountPct || 0);
+
+  if (!payment?.enabled || !payment.applyDiscount || paymentDiscount <= 0) {
+    return productPrice;
+  }
+
+  return Math.round(productPrice * (1 - paymentDiscount / 100));
+}
+
+function getPaymentLabel(method) {
+  if (method === "transfer") return "Transferencia";
+  if (method === "cash") return "Efectivo";
+  return "Otro medio";
 }
 
 function buildReserveText(
@@ -77,24 +95,40 @@ function buildReserveText(
   motoPrice,
   postalCode
 ) {
+  const paymentLabel = getPaymentLabel(paymentMethod);
+
   const lines = items.map((it) => {
-    const unitFinal = getDiscountedUnitPrice(it);
-    const lineFinal = unitFinal * Number(it.qty || 0);
-    const discountPct = Number(it.discount || 0);
+    const baseUnit = Number(it.price || 0);
+    const productUnit = getProductDiscountPrice(it);
+    const unitFinal = getUnitPriceByPayment(it, paymentMethod);
+    const qty = Number(it.qty || 0);
+    const lineFinal = unitFinal * qty;
 
-    return `- ${it.title} x${it.qty}${
-      discountPct > 0
-        ? ` · $${unitFinal.toLocaleString("es-AR")} c/u (${discountPct}% OFF) = $${lineFinal.toLocaleString("es-AR")}`
-        : ` · $${lineFinal.toLocaleString("es-AR")}`
-    }`;
+    const productDiscountPct = Number(it.discount || 0);
+    const payment = getPaymentConfig(it)[paymentMethod];
+    const paymentDiscountPct = Number(payment?.discountPct || 0);
+
+    const notes = [];
+
+    if (productDiscountPct > 0 && productUnit < baseUnit) {
+      notes.push(`${productDiscountPct}% OFF producto`);
+    }
+
+    if (
+      payment?.enabled &&
+      payment.applyDiscount &&
+      paymentDiscountPct > 0 &&
+      unitFinal < productUnit
+    ) {
+      notes.push(`${paymentDiscountPct}% OFF ${paymentLabel.toLowerCase()}`);
+    }
+
+    return `- ${it.title} x${qty} · $${unitFinal.toLocaleString(
+      "es-AR"
+    )} c/u${notes.length ? ` (${notes.join(" + ")})` : ""} = $${lineFinal.toLocaleString(
+      "es-AR"
+    )}`;
   });
-
-  const paymentLabel =
-    paymentMethod === "transfer"
-      ? "Transferencia"
-      : paymentMethod === "cash"
-      ? "Efectivo"
-      : "Otro medio";
 
   let deliveryLine = "Envío";
   if (deliveryMethod === "necochea") {
@@ -103,10 +137,10 @@ function buildReserveText(
       : "En Necochea";
   }
 
-  const details = [`Subtotal productos: $${baseTotal.toLocaleString("es-AR")}`];
+  const details = [`Subtotal sin descuentos: $${baseTotal.toLocaleString("es-AR")}`];
 
   if (discountAmount > 0) {
-    details.push(`Descuento: -$${discountAmount.toLocaleString("es-AR")}`);
+    details.push(`Descuentos aplicados: -$${discountAmount.toLocaleString("es-AR")}`);
   }
 
   if (deliveryMethod === "necochea" && motoSelected) {
@@ -203,28 +237,29 @@ export default function MyListPage() {
     }
   }, [deliveryAvailability, deliveryMethod]);
 
-  const discountedProductsTotal = useMemo(() => {
+  const productsTotalByPayment = useMemo(() => {
     return items.reduce((acc, item) => {
-      const discountedUnit = getDiscountedUnitPrice(item);
+      const unit = getUnitPriceByPayment(item, paymentMethod);
       const qty = Number(item.qty || 0);
-      return acc + discountedUnit * qty;
+      return acc + unit * qty;
     }, 0);
-  }, [items]);
+  }, [items, paymentMethod]);
 
   const discountAmount = useMemo(() => {
-    return Math.max(0, baseTotal - discountedProductsTotal);
-  }, [baseTotal, discountedProductsTotal]);
+    return Math.max(0, baseTotal - productsTotalByPayment);
+  }, [baseTotal, productsTotalByPayment]);
 
   const deliveryCost = useMemo(() => {
     if (deliveryMethod === "necochea" && motoSelected) {
       return motoPrice;
     }
+
     return 0;
   }, [deliveryMethod, motoSelected, motoPrice]);
 
   const finalTotal = useMemo(() => {
-    return discountedProductsTotal + deliveryCost;
-  }, [discountedProductsTotal, deliveryCost]);
+    return productsTotalByPayment + deliveryCost;
+  }, [productsTotalByPayment, deliveryCost]);
 
   const reserveText = useMemo(() => {
     return buildReserveText(
@@ -273,10 +308,23 @@ export default function MyListPage() {
               <>
                 <div className="list-table">
                   {items.map((it) => {
-                    const unitFinal = getDiscountedUnitPrice(it);
+                    const baseUnit = Number(it.price || 0);
+                    const productUnit = getProductDiscountPrice(it);
+                    const unitFinal = getUnitPriceByPayment(it, paymentMethod);
                     const lineFinal = unitFinal * Number(it.qty || 0);
-                    const discountPct = Number(it.discount || 0);
-                    const hasDiscount = discountPct > 0 && unitFinal < Number(it.price || 0);
+                    const productDiscountPct = Number(it.discount || 0);
+
+                    const payment = getPaymentConfig(it)[paymentMethod];
+                    const paymentDiscountPct = Number(payment?.discountPct || 0);
+
+                    const hasProductDiscount =
+                      productDiscountPct > 0 && productUnit < baseUnit;
+
+                    const hasPaymentDiscount =
+                      payment?.enabled &&
+                      payment.applyDiscount &&
+                      paymentDiscountPct > 0 &&
+                      unitFinal < productUnit;
 
                     return (
                       <div className="list-row" key={it.id}>
@@ -303,9 +351,10 @@ export default function MyListPage() {
                         <div className="name">
                           <div className="name-title">{it.title}</div>
                           <div className="name-sub">
-                            {hasDiscount ? (
+                            Unit: ${formatARS(unitFinal)}
+
+                            {unitFinal < baseUnit ? (
                               <>
-                                Unit: ${formatARS(unitFinal)}{" "}
                                 <span
                                   style={{
                                     textDecoration: "line-through",
@@ -313,15 +362,24 @@ export default function MyListPage() {
                                     marginLeft: 6,
                                   }}
                                 >
-                                  ${formatARS(it.price)}
+                                  ${formatARS(baseUnit)}
                                 </span>{" "}
-                                <span style={{ fontWeight: 700 }}>
-                                  ({discountPct}% OFF)
-                                </span>
                               </>
-                            ) : (
-                              <>Unit: ${formatARS(it.price)}</>
-                            )}
+                            ) : null}
+
+                            {hasProductDiscount ? (
+                              <span style={{ fontWeight: 700 }}>
+                                ({productDiscountPct}% OFF producto)
+                              </span>
+                            ) : null}
+
+                            {hasPaymentDiscount ? (
+                              <span style={{ fontWeight: 700 }}>
+                                {" "}
+                                ({paymentDiscountPct}% OFF{" "}
+                                {getPaymentLabel(paymentMethod).toLowerCase()})
+                              </span>
+                            ) : null}
                           </div>
                         </div>
 
@@ -466,10 +524,14 @@ export default function MyListPage() {
 
               {discountAmount > 0 ? (
                 <span className="totals-sub">
-                  Descuento aplicado:{" "}
+                  Descuentos aplicados:{" "}
                   <strong>- ${formatARS(discountAmount)}</strong>
                 </span>
               ) : null}
+
+              <span className="totals-sub">
+                Pago: <strong>{getPaymentLabel(paymentMethod)}</strong>
+              </span>
 
               {deliveryMethod === "necochea" ? (
                 <span className="totals-sub">

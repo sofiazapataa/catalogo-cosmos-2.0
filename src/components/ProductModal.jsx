@@ -6,6 +6,70 @@ function formatARS(n) {
   return Number(n || 0).toLocaleString("es-AR");
 }
 
+function getPaymentConfig(product) {
+  const defaults = {
+    transfer: {
+      enabled: true,
+      discountPct: 0,
+      label: "Transferencia",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    cash: {
+      enabled: true,
+      discountPct: 0,
+      label: "Efectivo",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+    other: {
+      enabled: true,
+      discountPct: 0,
+      label: "Otro medio",
+      applyDiscount: true,
+      showDiscountLabel: true,
+    },
+  };
+
+  return {
+    ...defaults,
+    ...(product.paymentOptions || {}),
+    transfer: {
+      ...defaults.transfer,
+      ...(product.paymentOptions?.transfer || {}),
+    },
+    cash: {
+      ...defaults.cash,
+      ...(product.paymentOptions?.cash || {}),
+    },
+    other: {
+      ...defaults.other,
+      ...(product.paymentOptions?.other || {}),
+    },
+  };
+}
+
+function getProductDiscountPrice(product) {
+  const basePrice = Number(product.price || 0);
+  const discountPct = Number(product.discount || 0);
+
+  if (discountPct <= 0) return basePrice;
+
+  return Math.round(basePrice * (1 - discountPct / 100));
+}
+
+function getPaymentPrice(product, method) {
+  const productPrice = getProductDiscountPrice(product);
+  const payment = getPaymentConfig(product)[method];
+  const paymentDiscount = Number(payment.discountPct || 0);
+
+  if (!payment.enabled || !payment.applyDiscount || paymentDiscount <= 0) {
+    return productPrice;
+  }
+
+  return Math.round(productPrice * (1 - paymentDiscount / 100));
+}
+
 export default function ProductModal({ product, onClose }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
@@ -17,13 +81,32 @@ export default function ProductModal({ product, onClose }) {
 
   const basePrice = Number(product.price || 0);
   const discountPct = Number(product.discount || 0);
-
-  const finalPrice = useMemo(() => {
-    if (discountPct <= 0) return basePrice;
-    return Math.round(basePrice * (1 - discountPct / 100));
-  }, [basePrice, discountPct]);
-
+  const finalPrice = getProductDiscountPrice(product);
   const hasDiscount = discountPct > 0 && finalPrice < basePrice;
+
+  const paymentConfig = getPaymentConfig(product);
+
+  const paymentRows = [
+    ["transfer", paymentConfig.transfer],
+    ["cash", paymentConfig.cash],
+    ["other", paymentConfig.other],
+  ]
+    .filter(([, cfg]) => cfg.enabled)
+    .map(([method, cfg]) => {
+      const price = getPaymentPrice(product, method);
+      const paymentDiscount = Number(cfg.discountPct || 0);
+      const hasPaymentDiscount =
+        cfg.applyDiscount && paymentDiscount > 0 && price < finalPrice;
+
+      return {
+        method,
+        label: cfg.label,
+        price,
+        discountPct: paymentDiscount,
+        showDiscountLabel: cfg.showDiscountLabel,
+        hasPaymentDiscount,
+      };
+    });
 
   const images = useMemo(() => {
     const merged = [
@@ -155,12 +238,29 @@ export default function ProductModal({ product, onClose }) {
                 <span style={{ textDecoration: "line-through", opacity: 0.8 }}>
                   ${formatARS(basePrice)}
                 </span>{" "}
-                · <span>({discountPct}% OFF)</span>
+                · <span>({discountPct}% OFF producto)</span>
               </div>
             ) : (
-              <div className="modal-price-transfer">Precio final</div>
+              <div className="modal-price-transfer">Precio lista</div>
             )}
           </div>
+
+          {paymentRows.length > 0 ? (
+            <div className="modal-section">
+              <h4>Precios por forma de pago</h4>
+
+              <div className="modal-list">
+                {paymentRows.map((row) => (
+                  <div key={row.method} className="modal-chip">
+                    {row.label}: <strong>${formatARS(row.price)}</strong>{" "}
+                    {row.hasPaymentDiscount && row.showDiscountLabel ? (
+                      <span>({row.discountPct}% OFF)</span>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           {product.skinType ? (
             <div className="modal-chip">Ideal para: {product.skinType}</div>
