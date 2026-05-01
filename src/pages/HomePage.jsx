@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import CatalogControls from "../components/CatalogControls";
 import SectionHeader from "../components/SectionHeader";
-import { filterProducts } from "../utils/catalog";
+import { filterProducts, sortProducts } from "../utils/catalog";
 import ProductModal from "../components/ProductModal";
 
 export default function HomePage() {
@@ -13,10 +13,28 @@ export default function HomePage() {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState("featured");
+  const [onlyDiscount, setOnlyDiscount] = useState(false);
+  const [onlyStock, setOnlyStock] = useState(false);
+
   const [showAllFeatured, setShowAllFeatured] = useState(false);
   const [showAllCombos, setShowAllCombos] = useState(false);
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  function applyExtraFilters(list) {
+    let filtered = [...list];
+
+    if (onlyDiscount) {
+      filtered = filtered.filter((p) => Number(p.discount || 0) > 0);
+    }
+
+    if (onlyStock) {
+      filtered = filtered.filter((p) => Number(p.stockQty || 0) > 0);
+    }
+
+    return sortProducts(filtered, sort);
+  }
 
   const allProducts = useMemo(() => {
     return [...combos, ...stock];
@@ -25,32 +43,28 @@ export default function HomePage() {
   const featuredProcessed = useMemo(() => {
     if (category !== "all") return [];
 
-    return filterProducts(
-      allProducts.filter((product) => product.featured === true),
-      query
-    );
-  }, [allProducts, query, category]);
+    const featured = allProducts.filter((product) => product.featured === true);
+    return applyExtraFilters(filterProducts(featured, query));
+  }, [allProducts, query, category, sort, onlyDiscount, onlyStock]);
 
   const combosProcessed = useMemo(() => {
+    if (category !== "all" && category !== "combos") return [];
+
     const filtered = filterProducts(combos, query);
-
-    if (category === "combos") return filtered;
-    if (category !== "all") return [];
-
-    return filtered;
-  }, [combos, query, category]);
+    return applyExtraFilters(filtered);
+  }, [combos, query, category, sort, onlyDiscount, onlyStock]);
 
   const stockProcessed = useMemo(() => {
+    if (category === "combos") return [];
+
     let filtered = filterProducts(stock, query);
 
-    if (category !== "all" && category !== "combos") {
+    if (category !== "all") {
       filtered = filtered.filter((p) => p.type === category);
     }
 
-    if (category === "combos") return [];
-
-    return filtered;
-  }, [stock, query, category]);
+    return applyExtraFilters(filtered);
+  }, [stock, query, category, sort, onlyDiscount, onlyStock]);
 
   const featuredToShow = showAllFeatured
     ? featuredProcessed
@@ -79,6 +93,12 @@ export default function HomePage() {
           onQueryChange={setQuery}
           category={category}
           onCategoryChange={setCategory}
+          sort={sort}
+          onSortChange={setSort}
+          onlyDiscount={onlyDiscount}
+          setOnlyDiscount={setOnlyDiscount}
+          onlyStock={onlyStock}
+          setOnlyStock={setOnlyStock}
         />
 
         {loading ? <p style={{ opacity: 0.7 }}>Cargando productos…</p> : null}

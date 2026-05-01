@@ -11,7 +11,7 @@ export function filterProducts(list, query) {
   if (!q) return list;
 
   return list.filter((p) => {
-    const hay = `${p.title} ${p.desc}`.toLowerCase();
+    const hay = `${p.title || ""} ${p.desc || ""} ${p.type || ""}`;
     return normalize(hay).includes(q);
   });
 }
@@ -21,23 +21,33 @@ export function sortProducts(list, sort) {
 
   switch (sort) {
     case "az":
-      return copy.sort((a, b) => a.title.localeCompare(b.title));
+      return copy.sort((a, b) =>
+        String(a.title || "").localeCompare(String(b.title || ""))
+      );
+
     case "za":
-      return copy.sort((a, b) => b.title.localeCompare(a.title));
+      return copy.sort((a, b) =>
+        String(b.title || "").localeCompare(String(a.title || ""))
+      );
+
     case "price_asc":
-      return copy.sort((a, b) => a.price - b.price);
+      return copy.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+
     case "price_desc":
-      return copy.sort((a, b) => b.price - a.price);
+      return copy.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+
     case "discount_desc":
-      return copy.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+      return copy.sort(
+        (a, b) => Number(b.discount || 0) - Number(a.discount || 0)
+      );
+
     case "featured":
     default:
-      // Recomendados: primero los que tienen descuento
-      return copy.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+      return copy.sort((a, b) => {
+        const featuredDiff = Number(b.featured === true) - Number(a.featured === true);
+        if (featuredDiff !== 0) return featuredDiff;
+
+        return Number(b.discount || 0) - Number(a.discount || 0);
+      });
   }
 }
-
-
-
-
-

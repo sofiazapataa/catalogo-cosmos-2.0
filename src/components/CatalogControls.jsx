@@ -3,6 +3,12 @@ export default function CatalogControls({
   onQueryChange,
   category,
   onCategoryChange,
+  sort,
+  onSortChange,
+  onlyDiscount,
+  setOnlyDiscount,
+  onlyStock,
+  setOnlyStock,
 }) {
   return (
     <div className="controls">
@@ -26,6 +32,37 @@ export default function CatalogControls({
         <option value="limpieza">Limpieza</option>
         <option value="tonicos">Tónicos</option>
       </select>
+
+      <select
+        className="select"
+        value={sort}
+        onChange={(e) => onSortChange(e.target.value)}
+      >
+        <option value="featured">Recomendados</option>
+        <option value="price_asc">Menor precio</option>
+        <option value="price_desc">Mayor precio</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="discount_desc">Más descuento</option>
+      </select>
+
+      <label className="filter-check">
+        <input
+          type="checkbox"
+          checked={onlyDiscount}
+          onChange={(e) => setOnlyDiscount(e.target.checked)}
+        />
+        <span>Ofertas</span>
+      </label>
+
+      <label className="filter-check">
+        <input
+          type="checkbox"
+          checked={onlyStock}
+          onChange={(e) => setOnlyStock(e.target.checked)}
+        />
+        <span>En stock</span>
+      </label>
     </div>
   );
 }

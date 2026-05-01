@@ -14,21 +14,18 @@ function getPaymentConfig(item) {
       discountPct: 0,
       label: "Transferencia",
       applyDiscount: true,
-      showDiscountLabel: true,
     },
     cash: {
       enabled: true,
       discountPct: 0,
       label: "Efectivo",
       applyDiscount: true,
-      showDiscountLabel: true,
     },
     other: {
       enabled: true,
       discountPct: 0,
       label: "Otro medio",
       applyDiscount: true,
-      showDiscountLabel: true,
     },
   };
 
@@ -58,24 +55,23 @@ function getDeliveryConfig(item) {
 }
 
 function getProductDiscountPrice(item) {
-  const basePrice = Number(item.price || 0);
-  const discountPct = Number(item.discount || 0);
+  const price = Number(item.price || 0);
+  const discount = Number(item.discount || 0);
 
-  if (discountPct <= 0) return basePrice;
-
-  return Math.round(basePrice * (1 - discountPct / 100));
+  if (discount <= 0) return price;
+  return Math.round(price * (1 - discount / 100));
 }
 
 function getUnitPriceByPayment(item, paymentMethod) {
   const productPrice = getProductDiscountPrice(item);
   const payment = getPaymentConfig(item)[paymentMethod];
-  const paymentDiscount = Number(payment?.discountPct || 0);
+  const discount = Number(payment?.discountPct || 0);
 
-  if (!payment?.enabled || !payment.applyDiscount || paymentDiscount <= 0) {
+  if (!payment?.enabled || !payment.applyDiscount || discount <= 0) {
     return productPrice;
   }
 
-  return Math.round(productPrice * (1 - paymentDiscount / 100));
+  return Math.round(productPrice * (1 - discount / 100));
 }
 
 function getPaymentLabel(method) {
@@ -84,7 +80,7 @@ function getPaymentLabel(method) {
   return "Otro medio";
 }
 
-function buildReserveText(
+function buildReserveText({
   items,
   baseTotal,
   discountAmount,
@@ -93,67 +89,44 @@ function buildReserveText(
   deliveryMethod,
   motoSelected,
   motoPrice,
-  postalCode
-) {
+  postalCode,
+  customerName,
+  note,
+}) {
   const paymentLabel = getPaymentLabel(paymentMethod);
 
-  const lines = items.map((it) => {
-    const baseUnit = Number(it.price || 0);
-    const productUnit = getProductDiscountPrice(it);
-    const unitFinal = getUnitPriceByPayment(it, paymentMethod);
-    const qty = Number(it.qty || 0);
-    const lineFinal = unitFinal * qty;
+  const lines = items.map((item) => {
+    const unit = getUnitPriceByPayment(item, paymentMethod);
+    const qty = Number(item.qty || 0);
+    const lineTotal = unit * qty;
 
-    const productDiscountPct = Number(it.discount || 0);
-    const payment = getPaymentConfig(it)[paymentMethod];
-    const paymentDiscountPct = Number(payment?.discountPct || 0);
-
-    const notes = [];
-
-    if (productDiscountPct > 0 && productUnit < baseUnit) {
-      notes.push(`${productDiscountPct}% OFF producto`);
-    }
-
-    if (
-      payment?.enabled &&
-      payment.applyDiscount &&
-      paymentDiscountPct > 0 &&
-      unitFinal < productUnit
-    ) {
-      notes.push(`${paymentDiscountPct}% OFF ${paymentLabel.toLowerCase()}`);
-    }
-
-    return `- ${it.title} x${qty} · $${unitFinal.toLocaleString(
-      "es-AR"
-    )} c/u${notes.length ? ` (${notes.join(" + ")})` : ""} = $${lineFinal.toLocaleString(
-      "es-AR"
-    )}`;
+    return `• ${item.title} x${qty}
+  $${unit.toLocaleString("es-AR")} c/u = $${lineTotal.toLocaleString("es-AR")}`;
   });
 
-  let deliveryLine = "Envío";
-  if (deliveryMethod === "necochea") {
-    deliveryLine = motoSelected
-      ? `Motoenvío en Necochea (+$${motoPrice.toLocaleString("es-AR")})`
-      : "En Necochea";
-  }
+  const deliveryText =
+    deliveryMethod === "necochea"
+      ? motoSelected
+        ? `Motoenvío en Necochea (+$${motoPrice.toLocaleString("es-AR")})`
+        : "En Necochea"
+      : `Envío${postalCode ? ` · CP ${postalCode}` : ""}`;
 
-  const details = [`Subtotal sin descuentos: $${baseTotal.toLocaleString("es-AR")}`];
+  return `Hola! Quiero hacer un pedido:
 
-  if (discountAmount > 0) {
-    details.push(`Descuentos aplicados: -$${discountAmount.toLocaleString("es-AR")}`);
-  }
+${customerName ? `👤 Nombre: ${customerName}\n` : ""}🛍️ Pedido:
+${lines.join("\n\n")}
 
-  if (deliveryMethod === "necochea" && motoSelected) {
-    details.push(`Motoenvío: $${motoPrice.toLocaleString("es-AR")}`);
-  }
+💳 Pago: ${paymentLabel}
+🚚 Entrega: ${deliveryText}
 
-  return `Hola! Quiero reservar:\n\n${lines.join("\n")}\n\n${details.join(
-    "\n"
-  )}\nTotal final: $${finalTotal.toLocaleString(
-    "es-AR"
-  )}\nPago: ${paymentLabel}\nEntrega: ${deliveryLine}${
-    deliveryMethod === "shipping" && postalCode ? `\nCP: ${postalCode}` : ""
-  }`;
+💰 Subtotal: $${baseTotal.toLocaleString("es-AR")}
+${discountAmount > 0 ? `💸 Descuentos: -$${discountAmount.toLocaleString("es-AR")}\n` : ""}${
+    deliveryMethod === "necochea" && motoSelected
+      ? `🏍️ Motoenvío: $${motoPrice.toLocaleString("es-AR")}\n`
+      : ""
+  }🧾 Total final: $${finalTotal.toLocaleString("es-AR")}
+
+${note ? `📝 Nota: ${note}` : ""}`;
 }
 
 export default function MyListPage() {
@@ -164,14 +137,13 @@ export default function MyListPage() {
   const [motoSelected, setMotoSelected] = useState(false);
   const [postalCode, setPostalCode] = useState("");
 
-  const baseTotal = useMemo(() => Number(total || 0), [total]);
+  const [customerName, setCustomerName] = useState("");
+  const [note, setNote] = useState("");
+
+  const baseTotal = Number(total || 0);
 
   const paymentAvailability = useMemo(() => {
-    const enabled = {
-      transfer: false,
-      cash: false,
-      other: false,
-    };
+    const enabled = { transfer: false, cash: false, other: false };
 
     items.forEach((item) => {
       const cfg = getPaymentConfig(item);
@@ -184,11 +156,7 @@ export default function MyListPage() {
   }, [items]);
 
   const deliveryAvailability = useMemo(() => {
-    const enabled = {
-      necochea: false,
-      shipping: false,
-      moto: false,
-    };
+    const enabled = { necochea: false, shipping: false, moto: false };
 
     items.forEach((item) => {
       const cfg = getDeliveryConfig(item);
@@ -201,68 +169,40 @@ export default function MyListPage() {
   }, [items]);
 
   const motoPrice = useMemo(() => {
-    const firstWithMoto = items.find((item) => getDeliveryConfig(item).moto.enabled);
-    if (!firstWithMoto) return 2100;
-    return Number(getDeliveryConfig(firstWithMoto).moto.price ?? 2100);
+    const itemWithMoto = items.find((item) => getDeliveryConfig(item).moto.enabled);
+    if (!itemWithMoto) return 2100;
+    return Number(getDeliveryConfig(itemWithMoto).moto.price ?? 2100);
   }, [items]);
 
   useEffect(() => {
     if (paymentMethod === "transfer" && !paymentAvailability.transfer) {
-      if (paymentAvailability.cash) setPaymentMethod("cash");
-      else setPaymentMethod("other");
+      setPaymentMethod(paymentAvailability.cash ? "cash" : "other");
     }
 
     if (paymentMethod === "cash" && !paymentAvailability.cash) {
-      if (paymentAvailability.transfer) setPaymentMethod("transfer");
-      else setPaymentMethod("other");
+      setPaymentMethod(paymentAvailability.transfer ? "transfer" : "other");
     }
 
     if (paymentMethod === "other" && !paymentAvailability.other) {
-      if (paymentAvailability.transfer) setPaymentMethod("transfer");
-      else setPaymentMethod("cash");
+      setPaymentMethod(paymentAvailability.transfer ? "transfer" : "cash");
     }
   }, [paymentAvailability, paymentMethod]);
 
-  useEffect(() => {
-    if (deliveryMethod === "necochea" && !deliveryAvailability.necochea) {
-      setDeliveryMethod("shipping");
-    }
-
-    if (deliveryMethod === "shipping" && !deliveryAvailability.shipping) {
-      setDeliveryMethod("necochea");
-    }
-
-    if (!deliveryAvailability.moto) {
-      setMotoSelected(false);
-    }
-  }, [deliveryAvailability, deliveryMethod]);
-
   const productsTotalByPayment = useMemo(() => {
     return items.reduce((acc, item) => {
-      const unit = getUnitPriceByPayment(item, paymentMethod);
-      const qty = Number(item.qty || 0);
-      return acc + unit * qty;
+      return acc + getUnitPriceByPayment(item, paymentMethod) * Number(item.qty || 0);
     }, 0);
   }, [items, paymentMethod]);
 
-  const discountAmount = useMemo(() => {
-    return Math.max(0, baseTotal - productsTotalByPayment);
-  }, [baseTotal, productsTotalByPayment]);
+  const discountAmount = Math.max(0, baseTotal - productsTotalByPayment);
 
-  const deliveryCost = useMemo(() => {
-    if (deliveryMethod === "necochea" && motoSelected) {
-      return motoPrice;
-    }
+  const deliveryCost =
+    deliveryMethod === "necochea" && motoSelected ? Number(motoPrice || 0) : 0;
 
-    return 0;
-  }, [deliveryMethod, motoSelected, motoPrice]);
-
-  const finalTotal = useMemo(() => {
-    return productsTotalByPayment + deliveryCost;
-  }, [productsTotalByPayment, deliveryCost]);
+  const finalTotal = productsTotalByPayment + deliveryCost;
 
   const reserveText = useMemo(() => {
-    return buildReserveText(
+    return buildReserveText({
       items,
       baseTotal,
       discountAmount,
@@ -271,8 +211,10 @@ export default function MyListPage() {
       deliveryMethod,
       motoSelected,
       motoPrice,
-      postalCode
-    );
+      postalCode,
+      customerName,
+      note,
+    });
   }, [
     items,
     baseTotal,
@@ -283,6 +225,8 @@ export default function MyListPage() {
     motoSelected,
     motoPrice,
     postalCode,
+    customerName,
+    note,
   ]);
 
   const whatsappHref =
@@ -293,9 +237,13 @@ export default function MyListPage() {
       <Header />
 
       <main className="container">
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Mi Lista</h2>
+        <div className="panel checkout-panel">
+          <div className="panel-head checkout-head">
+            <div>
+              <h2>Mi Lista</h2>
+              <p>Revisá tu pedido antes de enviarlo por WhatsApp.</p>
+            </div>
+
             <button className="linklike" type="button" onClick={clearList}>
               Borrar lista
             </button>
@@ -307,79 +255,57 @@ export default function MyListPage() {
             ) : (
               <>
                 <div className="list-table">
-                  {items.map((it) => {
-                    const baseUnit = Number(it.price || 0);
-                    const productUnit = getProductDiscountPrice(it);
-                    const unitFinal = getUnitPriceByPayment(it, paymentMethod);
-                    const lineFinal = unitFinal * Number(it.qty || 0);
-                    const productDiscountPct = Number(it.discount || 0);
-
-                    const payment = getPaymentConfig(it)[paymentMethod];
-                    const paymentDiscountPct = Number(payment?.discountPct || 0);
-
-                    const hasProductDiscount =
-                      productDiscountPct > 0 && productUnit < baseUnit;
-
-                    const hasPaymentDiscount =
-                      payment?.enabled &&
-                      payment.applyDiscount &&
-                      paymentDiscountPct > 0 &&
-                      unitFinal < productUnit;
+                  {items.map((item) => {
+                    const baseUnit = Number(item.price || 0);
+                    const unitFinal = getUnitPriceByPayment(item, paymentMethod);
+                    const lineFinal = unitFinal * Number(item.qty || 0);
+                    const hasDiscount = unitFinal < baseUnit;
 
                     return (
-                      <div className="list-row" key={it.id}>
-                        <div className="qtyctrl">
-                          <button
-                            className="iconbtn"
-                            type="button"
-                            onClick={() => removeOne(it.id)}
-                          >
-                            −
-                          </button>
-
-                          <div className="qtypill">{it.qty}</div>
-
-                          <button
-                            className="iconbtn"
-                            type="button"
-                            onClick={() => addToList(it)}
-                          >
-                            +
-                          </button>
-                        </div>
+                      <div className="list-row" key={item.id}>
+                        {item.image ? (
+                          <img className="list-img" src={item.image} alt={item.title} />
+                        ) : (
+                          <div className="list-img list-img-empty">Sin foto</div>
+                        )}
 
                         <div className="name">
-                          <div className="name-title">{it.title}</div>
+                          <div className="name-title">{item.title}</div>
+
                           <div className="name-sub">
-                            Unit: ${formatARS(unitFinal)}
-
-                            {unitFinal < baseUnit ? (
-                              <>
-                                <span
-                                  style={{
-                                    textDecoration: "line-through",
-                                    opacity: 0.7,
-                                    marginLeft: 6,
-                                  }}
-                                >
-                                  ${formatARS(baseUnit)}
-                                </span>{" "}
-                              </>
-                            ) : null}
-
-                            {hasProductDiscount ? (
-                              <span style={{ fontWeight: 700 }}>
-                                ({productDiscountPct}% OFF producto)
-                              </span>
-                            ) : null}
-
-                            {hasPaymentDiscount ? (
-                              <span style={{ fontWeight: 700 }}>
+                            ${formatARS(unitFinal)} c/u
+                            {hasDiscount ? (
+                              <span className="name-old-price">
                                 {" "}
-                                ({paymentDiscountPct}% OFF{" "}
-                                {getPaymentLabel(paymentMethod).toLowerCase()})
+                                ${formatARS(baseUnit)}
                               </span>
                             ) : null}
+                          </div>
+
+                          {hasDiscount ? (
+                            <div className="name-save">
+                              Ahorro aplicado según promoción / pago
+                            </div>
+                          ) : null}
+
+                          <div className="qtyctrl">
+                            <button
+                              className="iconbtn"
+                              type="button"
+                              onClick={() => removeOne(item.id)}
+                            >
+                              −
+                            </button>
+
+                            <div className="qtypill">{item.qty}</div>
+
+                            <button
+                              className="iconbtn"
+                              type="button"
+                              onClick={() => addToList(item)}
+                            >
+                              +
+                            </button>
                           </div>
                         </div>
 
@@ -389,7 +315,7 @@ export default function MyListPage() {
                           <button
                             className="trash"
                             type="button"
-                            onClick={() => deleteItem(it.id)}
+                            onClick={() => deleteItem(item.id)}
                           >
                             ✕
                           </button>
@@ -399,15 +325,42 @@ export default function MyListPage() {
                   })}
                 </div>
 
-                <div className="reserve-actions">
-                  <div className="list-configs">
+                <div className="checkout-config">
+                  <div className="checkout-box">
+                    <h3>Datos del pedido</h3>
+
+                    <label className="admin-field">
+                      <span>Nombre</span>
+                      <input
+                        className="input"
+                        type="text"
+                        placeholder="Tu nombre"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Nota opcional</span>
+                      <input
+                        className="input"
+                        type="text"
+                        placeholder="Ej: lo retiro mañana"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="checkout-box">
+                    <h3>Forma de pago</h3>
+
                     <div className="pay-methods">
                       {paymentAvailability.transfer ? (
                         <label className="pay-option">
                           <input
                             type="radio"
                             name="pay"
-                            value="transfer"
                             checked={paymentMethod === "transfer"}
                             onChange={() => setPaymentMethod("transfer")}
                           />
@@ -420,7 +373,6 @@ export default function MyListPage() {
                           <input
                             type="radio"
                             name="pay"
-                            value="cash"
                             checked={paymentMethod === "cash"}
                             onChange={() => setPaymentMethod("cash")}
                           />
@@ -433,7 +385,6 @@ export default function MyListPage() {
                           <input
                             type="radio"
                             name="pay"
-                            value="other"
                             checked={paymentMethod === "other"}
                             onChange={() => setPaymentMethod("other")}
                           />
@@ -441,6 +392,10 @@ export default function MyListPage() {
                         </label>
                       ) : null}
                     </div>
+                  </div>
+
+                  <div className="checkout-box">
+                    <h3>Entrega</h3>
 
                     <div className="pay-methods">
                       {deliveryAvailability.necochea ? (
@@ -448,7 +403,6 @@ export default function MyListPage() {
                           <input
                             type="radio"
                             name="delivery"
-                            value="necochea"
                             checked={deliveryMethod === "necochea"}
                             onChange={() => {
                               setDeliveryMethod("necochea");
@@ -464,7 +418,6 @@ export default function MyListPage() {
                           <input
                             type="radio"
                             name="delivery"
-                            value="shipping"
                             checked={deliveryMethod === "shipping"}
                             onChange={() => setDeliveryMethod("shipping")}
                           />
@@ -488,7 +441,7 @@ export default function MyListPage() {
 
                     {deliveryMethod === "shipping" ? (
                       <div className="shipping-box">
-                        <label className="admin-field" style={{ gap: 6 }}>
+                        <label className="admin-field">
                           <span>CP</span>
                           <input
                             className="input"
@@ -504,58 +457,55 @@ export default function MyListPage() {
                       </div>
                     ) : null}
                   </div>
-
-                  <a
-                    className="btn"
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Comprar por WhatsApp
-                  </a>
                 </div>
+
+                <a
+                  className="btn btn-whatsapp btn-checkout"
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Finalizar pedido por WhatsApp
+                </a>
               </>
             )}
           </div>
 
-          <div className="panel-foot totals">
-            <div className="totals-left">
-              <strong>Total</strong>
+          {items.length > 0 ? (
+            <div className="panel-foot totals">
+              <div className="totals-left">
+                <strong>Resumen</strong>
 
-              {discountAmount > 0 ? (
                 <span className="totals-sub">
-                  Descuentos aplicados:{" "}
-                  <strong>- ${formatARS(discountAmount)}</strong>
+                  Subtotal: <strong>${formatARS(baseTotal)}</strong>
                 </span>
-              ) : null}
 
-              <span className="totals-sub">
-                Pago: <strong>{getPaymentLabel(paymentMethod)}</strong>
-              </span>
+                {discountAmount > 0 ? (
+                  <span className="total-save">
+                    Ahorro: -${formatARS(discountAmount)}
+                  </span>
+                ) : null}
 
-              {deliveryMethod === "necochea" ? (
+                {deliveryCost > 0 ? (
+                  <span className="totals-sub">
+                    Envío: <strong>${formatARS(deliveryCost)}</strong>
+                  </span>
+                ) : null}
+
                 <span className="totals-sub">
-                  Entrega:{" "}
-                  <strong>
-                    {motoSelected
-                      ? `Motoenvío (+$${formatARS(motoPrice)})`
-                      : "En Necochea"}
-                  </strong>
+                  Pago: <strong>{getPaymentLabel(paymentMethod)}</strong>
                 </span>
-              ) : (
-                <span className="totals-sub">
-                  Entrega:{" "}
-                  <strong>
-                    Envío{postalCode ? ` · CP ${postalCode}` : ""}
-                  </strong>
-                </span>
-              )}
+              </div>
+
+              <div className="totals-right">
+                {discountAmount > 0 ? (
+                  <span className="total-old">${formatARS(baseTotal)}</span>
+                ) : null}
+
+                <strong className="total-main">${formatARS(finalTotal)}</strong>
+              </div>
             </div>
-
-            <div className="totals-right">
-              <strong>${formatARS(finalTotal)}</strong>
-            </div>
-          </div>
+          ) : null}
         </div>
       </main>
 
