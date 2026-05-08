@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProducts } from "../hooks/useProducts";
 
 import Header from "../components/Header";
@@ -9,6 +9,7 @@ import SectionHeader from "../components/SectionHeader";
 import ProductModal from "../components/ProductModal";
 
 import { filterProducts, sortProducts } from "../utils/catalog";
+import { getOrders } from "../services/ordersService";
 
 function formatARS(value) {
   return Number(value || 0).toLocaleString("es-AR");
@@ -22,8 +23,34 @@ function getFinalPrice(product) {
   return Math.round(price * (1 - discount / 100));
 }
 
+function buildSalesMap(orders = []) {
+  const map = {};
+
+  orders
+    .filter((order) => order.status !== "cancelled")
+    .forEach((order) => {
+      (order.items || []).forEach((item) => {
+        if (!item.id) return;
+
+        if (!map[item.id]) {
+          map[item.id] = {
+            id: item.id,
+            title: item.title || "",
+            qty: 0,
+          };
+        }
+
+        map[item.id].qty += Number(item.qty || 1);
+      });
+    });
+
+  return map;
+}
+
 export default function HomePage() {
   const { combos, stock, loading, error } = useProducts();
+
+  const [orders, setOrders] = useState([]);
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -32,22 +59,81 @@ export default function HomePage() {
   const [onlyStock, setOnlyStock] = useState(false);
 
   const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const [showAllBestSellers, setShowAllBestSellers] = useState(false);
   const [showAllCombos, setShowAllCombos] = useState(false);
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const allProducts = useMemo(() => {
+  useEffect(() => {
+    async function loadOrders() {
+      try {
+        const data = await getOrders();
+        setOrders(data || []);
+      } catch (error) {
+        console.error("No se pudieron cargar los pedidos para bestseller", error);
+      }
+    }
+
+    loadOrders();
+  }, []);
+
+  const salesMap = useMemo(() => buildSalesMap(orders), [orders]);
+
+  const allProductsRaw = useMemo(() => {
     return [...combos, ...stock];
   }, [combos, stock]);
 
+  const allProducts = useMemo(() => {
+    return allProductsRaw.map((product) => {
+      const soldQty = salesMap[product.id]?.qty || 0;
+
+      return {
+        ...product,
+        soldQty,
+        bestseller: soldQty > 0,
+      };
+    });
+  }, [allProductsRaw, salesMap]);
+
+  const combosWithSales = useMemo(() => {
+    return combos.map((product) => {
+      const soldQty = salesMap[product.id]?.qty || 0;
+
+      return {
+        ...product,
+        soldQty,
+        bestseller: soldQty > 0,
+      };
+    });
+  }, [combos, salesMap]);
+
+  const stockWithSales = useMemo(() => {
+    return stock.map((product) => {
+      const soldQty = salesMap[product.id]?.qty || 0;
+
+      return {
+        ...product,
+        soldQty,
+        bestseller: soldQty > 0,
+      };
+    });
+  }, [stock, salesMap]);
+
   const availableProductsCount = useMemo(() => {
     return allProducts.filter((p) => Number(p.stockQty ?? 1) > 0).length;
+  }, [allProducts]);
+
+  const bestSellers = useMemo(() => {
+    return [...allProducts]
+      .filter((p) => Number(p.soldQty || 0) > 0)
+      .sort((a, b) => Number(b.soldQty || 0) - Number(a.soldQty || 0));
   }, [allProducts]);
 
   const heroProduct = useMemo(() => {
     const available = allProducts.filter((p) => Number(p.stockQty ?? 1) > 0);
 
     return (
+      available.find((p) => Number(p.soldQty || 0) > 0) ||
       available.find((p) => p.featured === true) ||
       available.find((p) => Number(p.discount || 0) > 0) ||
       available[0] ||
@@ -85,28 +171,38 @@ export default function HomePage() {
     return applyExtraFilters(filterProducts(featured, query));
   }, [allProducts, query, category, sort, onlyDiscount, onlyStock]);
 
+  const bestSellersProcessed = useMemo(() => {
+    if (category !== "all") return [];
+
+    return applyExtraFilters(filterProducts(bestSellers, query));
+  }, [bestSellers, query, category, sort, onlyDiscount, onlyStock]);
+
   const combosProcessed = useMemo(() => {
     if (category !== "all" && category !== "combos") return [];
 
-    const filtered = filterProducts(combos, query);
+    const filtered = filterProducts(combosWithSales, query);
     return applyExtraFilters(filtered);
-  }, [combos, query, category, sort, onlyDiscount, onlyStock]);
+  }, [combosWithSales, query, category, sort, onlyDiscount, onlyStock]);
 
   const stockProcessed = useMemo(() => {
     if (category === "combos") return [];
 
-    let filtered = filterProducts(stock, query);
+    let filtered = filterProducts(stockWithSales, query);
 
     if (category !== "all") {
       filtered = filtered.filter((p) => p.type === category);
     }
 
     return applyExtraFilters(filtered);
-  }, [stock, query, category, sort, onlyDiscount, onlyStock]);
+  }, [stockWithSales, query, category, sort, onlyDiscount, onlyStock]);
 
   const featuredToShow = showAllFeatured
     ? featuredProcessed
     : featuredProcessed.slice(0, 4);
+
+  const bestSellersToShow = showAllBestSellers
+    ? bestSellersProcessed
+    : bestSellersProcessed.slice(0, 4);
 
   const combosToShow = showAllCombos
     ? combosProcessed
@@ -119,7 +215,10 @@ export default function HomePage() {
   const nothingFound =
     !loading &&
     !error &&
-    featuredProcessed.length + combosProcessed.length + stockProcessed.length ===
+    featuredProcessed.length +
+      bestSellersProcessed.length +
+      combosProcessed.length +
+      stockProcessed.length ===
       0;
 
   return (
@@ -130,7 +229,7 @@ export default function HomePage() {
         <section className="hero-kosmos">
           <div className="hero-kosmos-content">
             <div className="hero-kosmos-kicker">
-              Skincare coreano • Ritual consciente
+              Skincare Vegano • Ritual consciente
             </div>
 
             <h1 className="hero-kosmos-title">
@@ -168,7 +267,9 @@ export default function HomePage() {
                 onClick={() => setSelected(heroProduct)}
               >
                 <div className="hero-featured-top">
-                  <span>Producto estrella</span>
+                  <span>
+                    {heroProduct.bestseller ? "Bestseller" : "Producto estrella"}
+                  </span>
 
                   {Number(heroProduct.discount || 0) > 0 ? (
                     <strong>-{heroProduct.discount}%</strong>
@@ -275,6 +376,28 @@ export default function HomePage() {
 
         {loading ? <p style={{ opacity: 0.7 }}>Cargando productos…</p> : null}
         {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+
+        {bestSellersProcessed.length > 0 && (
+          <>
+            <SectionHeader
+              title="Más vendidos"
+              count={bestSellersProcessed.length}
+              shown={showAllBestSellers}
+              onToggle={() => setShowAllBestSellers((v) => !v)}
+              canToggle={bestSellersProcessed.length > 4}
+            />
+
+            <div className="grid">
+              {bestSellersToShow.map((p) => (
+                <ProductCard
+                  key={`bestseller-${p.id}`}
+                  product={p}
+                  onOpen={() => setSelected(p)}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {featuredProcessed.length > 0 && (
           <>

@@ -107,6 +107,7 @@ export default function ProductCard({ product, onOpen }) {
     transferPrice < finalPrice;
 
   const cardMeta = getCardMeta(product);
+  const isBestseller = product.bestseller === true || Number(product.soldQty || 0) > 0;
 
   function handleKeyOpen(e) {
     if (!canOpen) return;
@@ -127,8 +128,12 @@ export default function ProductCard({ product, onOpen }) {
         tabIndex={canOpen ? 0 : undefined}
         aria-label={canOpen ? `Ver ${product.title}` : undefined}
       >
-        {!isOutOfStock && (hasDiscount || hasTransferDiscount) ? (
+        {!isOutOfStock && (isBestseller || hasDiscount || hasTransferDiscount) ? (
           <div className="badges">
+            {isBestseller ? (
+              <span className="badge-main">Bestseller</span>
+            ) : null}
+
             {hasDiscount ? (
               <span className="badge-main">-{discountPct}%</span>
             ) : null}
@@ -173,6 +178,12 @@ export default function ProductCard({ product, onOpen }) {
         <div className="card-body">
           <p className="card-desc">{product.desc}</p>
           {cardMeta ? <p className="card-meta">{cardMeta}</p> : null}
+
+          {isBestseller ? (
+            <p className="card-meta">
+              {Number(product.soldQty || 0)} vendidos recientemente
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -188,8 +199,7 @@ export default function ProductCard({ product, onOpen }) {
 
           {hasDiscount ? (
             <div className="card-price-off">
-              Antes{" "}
-              <span className="card-old-price">${formatARS(basePrice)}</span>
+              Antes <span className="card-old-price">${formatARS(basePrice)}</span>
             </div>
           ) : (
             <div className="card-price-off">Precio lista</div>
@@ -207,7 +217,11 @@ export default function ProductCard({ product, onOpen }) {
 
         <div className="card-actions">
           {isOutOfStock ? (
-            <button className="btn btn-small btn-disabled card-main-btn" type="button" disabled>
+            <button
+              className="btn btn-small btn-disabled card-main-btn"
+              type="button"
+              disabled
+            >
               Sin stock
             </button>
           ) : qty > 0 ? (
