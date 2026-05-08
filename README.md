@@ -39,3 +39,4 @@ Incluye un panel de administración para crear, editar y eliminar productos, y u
 
 ## Variables de entorno
 Si se utilizan variables para Firebase, agregarlas en `.env`.
+# catalogo-cosmos-2.0
