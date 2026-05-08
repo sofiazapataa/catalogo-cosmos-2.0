@@ -134,9 +134,7 @@ export default function ProductCard({ product, onOpen }) {
             ) : null}
 
             {hasTransferDiscount ? (
-              <span className="badge-sub">
-                Transferencia -{transferDiscount}%
-              </span>
+              <span className="badge-sub">Transferencia -{transferDiscount}%</span>
             ) : null}
           </div>
         ) : null}
@@ -152,45 +150,56 @@ export default function ProductCard({ product, onOpen }) {
         {product.image ? (
           <img src={product.image} alt={product.title} loading="lazy" />
         ) : null}
+
+        {canOpen ? (
+          <div className="card-quick-view">
+            <span>Ver detalle</span>
+          </div>
+        ) : null}
       </div>
 
-      <h3
-        className="card-title"
-        onClick={canOpen ? onOpen : undefined}
-        onKeyDown={handleKeyOpen}
-        role={canOpen ? "button" : undefined}
-        tabIndex={canOpen ? 0 : undefined}
-        aria-label={canOpen ? `Ver ${product.title}` : undefined}
-        style={canOpen ? { cursor: "pointer" } : undefined}
-      >
-        {product.title}
-      </h3>
+      <div className="card-content">
+        <h3
+          className="card-title"
+          onClick={canOpen ? onOpen : undefined}
+          onKeyDown={handleKeyOpen}
+          role={canOpen ? "button" : undefined}
+          tabIndex={canOpen ? 0 : undefined}
+          aria-label={canOpen ? `Ver ${product.title}` : undefined}
+        >
+          {product.title}
+        </h3>
 
-      <div className="card-body">
-        <p className="card-desc">{product.desc}</p>
-        {cardMeta ? <p className="card-meta">{cardMeta}</p> : null}
+        <div className="card-body">
+          <p className="card-desc">{product.desc}</p>
+          {cardMeta ? <p className="card-meta">{cardMeta}</p> : null}
+        </div>
       </div>
 
       <div className="card-foot">
         <div className="priceblock">
-          <div className="card-price">${formatARS(finalPrice)}</div>
+          <div className="priceblock-top">
+            <div className="card-price">${formatARS(finalPrice)}</div>
+
+            {hasDiscount ? (
+              <span className="card-discount-chip">{discountPct}% OFF</span>
+            ) : null}
+          </div>
 
           {hasDiscount ? (
             <div className="card-price-off">
-              <span style={{ textDecoration: "line-through", opacity: 0.8 }}>
-                ${formatARS(basePrice)}
-              </span>{" "}
-              · <span className="off-tag">({discountPct}% OFF)</span>
+              Antes{" "}
+              <span className="card-old-price">${formatARS(basePrice)}</span>
             </div>
           ) : (
             <div className="card-price-off">Precio lista</div>
           )}
 
           {hasTransferDiscount ? (
-            <div className="card-price-off">
-              Transferencia: <strong>${formatARS(transferPrice)}</strong>{" "}
+            <div className="card-transfer-price">
+              Transferencia <strong>${formatARS(transferPrice)}</strong>
               {paymentConfig.transfer.showDiscountLabel ? (
-                <span className="off-tag">({transferDiscount}% OFF)</span>
+                <span>{transferDiscount}% OFF</span>
               ) : null}
             </div>
           ) : null}
@@ -198,7 +207,7 @@ export default function ProductCard({ product, onOpen }) {
 
         <div className="card-actions">
           {isOutOfStock ? (
-            <button className="btn btn-small btn-disabled" type="button" disabled>
+            <button className="btn btn-small btn-disabled card-main-btn" type="button" disabled>
               Sin stock
             </button>
           ) : qty > 0 ? (
@@ -228,7 +237,7 @@ export default function ProductCard({ product, onOpen }) {
               </div>
 
               <button
-                className="btn btn-outline btn-small"
+                className="btn btn-outline btn-small card-list-btn"
                 type="button"
                 onClick={() => navigate("/mi-lista")}
                 title="Ver mi lista"
@@ -238,11 +247,11 @@ export default function ProductCard({ product, onOpen }) {
             </>
           ) : (
             <button
-              className="btn btn-small"
+              className="btn btn-small card-main-btn"
               type="button"
               onClick={() => addToList(product)}
             >
-              Agregar a la lista
+              Agregar
             </button>
           )}
         </div>

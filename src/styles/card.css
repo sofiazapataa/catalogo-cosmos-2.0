@@ -1,20 +1,94 @@
 /* =========================
+   SECTION HEADER PRO
+========================= */
+
+.section-head-pro {
+  margin: 30px 0 16px;
+  padding: 0 2px;
+}
+
+.section-kicker {
+  display: inline-flex;
+  margin-bottom: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #eef4df;
+  border: 1px solid #dfe5d1;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.section-title {
+  margin: 0;
+  color: #1f270d;
+  font-size: 34px;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-weight: 950;
+}
+
+.section-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-pill,
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: #f6f7f2;
+  border: 1px solid #dfe5d1;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.section-toggle {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(63, 79, 25, 0.2);
+  background: #fff;
+  color: #2b3512;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.section-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(63, 79, 25, 0.35);
+  box-shadow: 0 10px 22px rgba(17, 24, 10, 0.06);
+}
+
+/* =========================
    PRODUCT CARD
 ========================= */
 
 .card {
-  background: var(--card);
-  border: 1px solid rgba(63, 79, 25, 0.10);
-  border-radius: 24px;
-  padding: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(63, 79, 25, 0.1);
+  border-radius: 28px;
+  padding: 12px;
   position: relative;
-  min-height: 320px;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   overflow: hidden;
   box-shadow:
-    0 10px 30px rgba(17, 24, 10, 0.05),
+    0 12px 34px rgba(17, 24, 10, 0.05),
     0 2px 8px rgba(17, 24, 10, 0.03);
   transition:
     transform 0.18s ease,
@@ -23,15 +97,15 @@
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow:
-    0 18px 40px rgba(17, 24, 10, 0.08),
-    0 4px 12px rgba(17, 24, 10, 0.04);
-  border-color: rgba(63, 79, 25, 0.18);
+    0 22px 48px rgba(17, 24, 10, 0.09),
+    0 5px 14px rgba(17, 24, 10, 0.05);
+  border-color: rgba(63, 79, 25, 0.2);
 }
 
 .card-out {
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
 /* =========================
@@ -42,10 +116,11 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 22px;
   background: #f6f4ef;
   margin-bottom: 14px;
   position: relative;
+  cursor: pointer;
 }
 
 .card-image--empty {
@@ -57,41 +132,75 @@
   height: 100%;
   object-fit: cover;
   transform: scale(1.01);
-  transition: transform 0.45s ease;
+  transition: transform 0.5s ease;
   display: block;
 }
 
 .card:hover .card-image img {
-  transform: scale(1.04);
+  transform: scale(1.055);
 }
 
 .card-image::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 65%,
-    rgba(0, 0, 0, 0.04) 100%
-  );
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.16) 100%);
+  opacity: 0;
+  transition: opacity 0.18s ease;
   pointer-events: none;
 }
 
+.card:hover .card-image::after {
+  opacity: 1;
+}
+
+.card-quick-view {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.card-quick-view span {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+  color: #2b3512;
+  font-size: 13px;
+  font-weight: 950;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.card:hover .card-quick-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* =========================
-   BADGES PRO
+   BADGES
 ========================= */
 
 .badges {
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 4;
-
+  z-index: 6;
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-
   max-width: calc(100% - 24px);
 }
 
@@ -100,33 +209,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 999px;
   white-space: nowrap;
-
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
   border: 1px solid rgba(255, 255, 255, 0.58);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  padding: 8px 11px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.2px;
 }
 
 .badge-main {
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
   color: #1b1b1b;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .badge-sub {
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
-  color: #1b1b1b;
-  background: rgba(255, 255, 255, 0.88);
+  color: var(--green);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* =========================
@@ -135,13 +237,13 @@
 
 .stock-badge {
   position: absolute;
-  z-index: 3;
+  z-index: 7;
   right: 12px;
   top: 12px;
-  padding: 8px 12px;
+  padding: 8px 11px;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
+  font-size: 11px;
+  font-weight: 950;
   letter-spacing: 0.2px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
 }
@@ -164,27 +266,31 @@
    CONTENT
 ========================= */
 
+.card-content {
+  padding: 0 4px;
+}
+
 .card-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 78px;
+  min-height: 74px;
 }
 
 .card-title {
-  margin: 0;
-  font-size: 17px;
-  line-height: 1.12;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: -0.035em;
   color: #2b3512;
+  cursor: pointer;
 }
 
 .card-desc {
   margin: 0;
   font-size: 12px;
-  color: #616161;
+  color: #666;
   line-height: 1.45;
   display: -webkit-box;
   line-clamp: 2;
@@ -194,12 +300,11 @@
 }
 
 .card-meta {
-  margin-top: 2px;
+  margin: 0;
   font-size: 12px;
   line-height: 1.35;
-  color: #4d5f21;
-  font-weight: 700;
-  opacity: 0.92;
+  color: var(--green);
+  font-weight: 850;
 }
 
 /* =========================
@@ -207,48 +312,80 @@
 ========================= */
 
 .card-foot {
+  margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 11px;
   padding-top: 14px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .priceblock {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #f8f8f4 0%, #f5f6f0 100%);
+  gap: 5px;
+  padding: 13px 14px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, #f8f8f4 0%, #f5f6f0 100%);
   border: 1px solid #e3e7d8;
   width: 100%;
-  min-height: 62px;
+}
+
+.priceblock-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .card-price {
-  font-weight: 900;
-  font-size: 20px;
+  font-weight: 950;
+  font-size: 22px;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.05em;
   color: var(--green);
 }
 
+.card-discount-chip {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #eef4df;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
 .card-price-off {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.25;
 }
 
-.card-price-off strong {
-  color: var(--green);
+.card-old-price {
+  text-decoration: line-through;
+  opacity: 0.8;
 }
 
-.off-tag {
-  font-weight: 800;
+.card-transfer-price {
+  margin-top: 3px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(63, 79, 25, 0.09);
+  font-size: 12px;
+  color: #555;
+  line-height: 1.25;
+}
+
+.card-transfer-price strong {
   color: var(--green);
+  font-weight: 950;
+}
+
+.card-transfer-price span {
+  margin-left: 5px;
+  color: var(--green);
+  font-weight: 900;
 }
 
 /* =========================
@@ -257,49 +394,57 @@
 
 .card-actions {
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
   min-width: 0;
   flex-wrap: nowrap;
 }
 
-.card-actions .btn {
-  width: auto;
-  min-width: 0;
+.card-main-btn,
+.card-list-btn {
+  min-height: 42px;
+  border-radius: 999px;
+  font-weight: 950;
+}
+
+.card-main-btn {
+  width: 100%;
 }
 
 .qtybar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
   width: auto;
+  padding: 3px;
+  border-radius: 999px;
+  background: #f6f7f2;
+  border: 1px solid #dfe5d1;
 }
 
 .qtypill {
-  min-width: 52px;
+  min-width: 46px;
   text-align: center;
-  font-weight: 900;
-  border: 1px solid #dfe5d1;
-  background: #f2f4ee;
+  font-weight: 950;
+  background: transparent;
   color: var(--green);
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 8px 6px;
+  border-radius: 999px;
   font-size: 13px;
 }
 
 .iconbtn {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  border: 1px solid rgba(63, 79, 25, 0.55);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(63, 79, 25, 0.2);
   background: rgba(255, 255, 255, 0.96);
   color: var(--green);
-  font-weight: 900;
-  font-size: 22px;
+  font-weight: 950;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
   transition:
@@ -320,15 +465,64 @@
    RESPONSIVE
 ========================= */
 
+@media (max-width: 760px) {
+  .section-head-pro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 30px;
+  }
+
+  .section-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 @media (max-width: 520px) {
+  .card {
+    border-radius: 24px;
+    padding: 10px;
+  }
+
+  .card-image {
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
   .badges {
     flex-direction: column;
     align-items: flex-start;
   }
 
   .badge-main,
-  .badge-sub {
-    font-size: 11px;
-    padding: 7px 10px;
+  .badge-sub,
+  .stock-badge {
+    font-size: 10.5px;
+    padding: 7px 9px;
+  }
+
+  .card-title {
+    font-size: 17px;
+  }
+
+  .card-price {
+    font-size: 21px;
+  }
+
+  .card-quick-view {
+    display: none;
+  }
+
+  .card-actions {
+    gap: 8px;
+  }
+
+  .card-list-btn {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
