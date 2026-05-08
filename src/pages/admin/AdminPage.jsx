@@ -105,6 +105,7 @@ export default function AdminPage() {
               </div>
 
               <div className="admin-grid">
+                
                 <Link to="/admin/productos" className="admin-card">
                   <h3>Productos</h3>
                   <p>Administrar productos, stock, destacados y visibilidad.</p>
@@ -114,6 +115,10 @@ export default function AdminPage() {
                   <h3>Combos</h3>
                   <p>Administrar combos, promociones y visibilidad.</p>
                 </Link>
+                <Link to="/admin/orders" className="admin-card">
+  <h3>Pedidos</h3>
+  <p>Ver pedidos recibidos por WhatsApp y actualizar estados.</p>
+</Link>
               </div>
             </>
           )}

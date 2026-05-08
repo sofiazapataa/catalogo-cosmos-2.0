@@ -8,6 +8,7 @@ import WhatsAppFab from "./components/WhatsAppFab";
 import AdminPage from "./pages/admin/AdminPage";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminCombosPage from "./pages/admin/AdminCombosPage";
+import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -45,6 +46,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <AdminCombosPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/orders"
+          element={
+            <ProtectedRoute>
+              <AdminOrdersPage />
             </ProtectedRoute>
           }
         />

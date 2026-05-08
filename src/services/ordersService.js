@@ -1,7 +1,13 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "./firebase";
@@ -29,9 +35,7 @@ export async function createOrder({
     items: sanitizeItems(items),
     paymentMethod,
     total: Number(total || 0),
-
     status: "pending",
-
     source: "whatsapp",
     createdAt: serverTimestamp(),
   };
@@ -41,4 +45,30 @@ export async function createOrder({
   return {
     id: docRef.id,
   };
+}
+
+export async function getOrders() {
+  const ordersRef = collection(db, "orders");
+  const q = query(ordersRef, orderBy("createdAt", "desc"));
+
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map((docItem) => ({
+    id: docItem.id,
+    ...docItem.data(),
+  }));
+}
+
+export async function updateOrderStatus(orderId, status) {
+  const orderRef = doc(db, "orders", orderId);
+
+  await updateDoc(orderRef, {
+    status,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteOrder(orderId) {
+  const orderRef = doc(db, "orders", orderId);
+  await deleteDoc(orderRef);
 }
