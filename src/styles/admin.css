@@ -1180,3 +1180,61 @@
     grid-template-columns:1fr;
   }
 }
+/* =========================
+   ADMIN ORDER CUSTOMER
+========================= */
+
+.admin-order-customer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-order-customer > div {
+  background: #f7f8f3;
+  border: 1px solid #e3e7d8;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.admin-order-customer span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--admin-text-soft);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-order-customer strong {
+  display: block;
+  color: var(--admin-text);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.admin-order-note {
+  grid-column: 1 / -1;
+}
+
+.admin-order-whatsapp {
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #25d366;
+  background: #25d366;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-order-whatsapp:hover {
+  filter: brightness(0.96);
+}

@@ -1,18 +1,20 @@
-/* 1. Base y Variables: Los cimientos van primero */
+/* 1. Base y Variables */
 @import "./base.css";
 
-/* 2. Estructura y Layout: El esqueleto */
+/* 2. Estructura y Layout */
 @import "./layout.css";
 
-/* 3. Componentes Reutilizables: Las piezas sueltas */
-/* Nota: En tu imagen el archivo se llama "Component.css" (en singular) */
+/* 3. Componentes Reutilizables */
 @import "./Component.css";
 @import "./card.css";
 @import "./modal.css";
 
-/* 4. Páginas específicas y Admin */
+/* 4. Páginas específicas */
 @import "./pages.css";
+@import "./mylist.css";
+
+/* 5. Admin */
 @import "./admin.css";
 
-/* 5. Responsive: Los ajustes para móvil SIEMPRE al final */
+/* 6. Responsive final */
 @import "./responsive.css";

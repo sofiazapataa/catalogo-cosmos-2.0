@@ -53,8 +53,18 @@ export async function createOrder({
   items = [],
   paymentMethod = "transfer",
   total = 0,
+
+  customer = {},
 }) {
   const cleanItems = sanitizeItems(items);
+
+  const cleanCustomer = {
+    name: customer.name || "",
+    phone: customer.phone || "",
+    deliveryType: customer.deliveryType || "pickup",
+    address: customer.address || "",
+    note: customer.note || "",
+  };
 
   const orderId = await runTransaction(db, async (transaction) => {
     const orderRef = doc(collection(db, "orders"));
@@ -81,6 +91,9 @@ export async function createOrder({
 
     transaction.set(orderRef, {
       items: cleanItems,
+
+      customer: cleanCustomer,
+
       paymentMethod,
       total: Number(total || 0),
 
@@ -209,7 +222,7 @@ export async function updateOrderStatus(orderId, status) {
 }
 
 export async function deleteOrder(orderId) {
-  const orderRef = doc(db, "orders", orderId);
+  const orderRef = doc(db, "orders");
 
-  await deleteDoc(orderRef);
+  await deleteDoc(doc(orderRef, orderId));
 }

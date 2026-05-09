@@ -36,6 +36,35 @@ function getStatusLabel(status) {
   return "Pendiente";
 }
 
+function getDeliveryLabel(type) {
+  if (type === "delivery") return "Envío";
+  return "Retiro";
+}
+
+function buildAdminWhatsappText(order) {
+  const customer = order.customer || {};
+
+  const products = (order.items || [])
+    .map((item) => `• ${item.title} x${item.qty}`)
+    .join("\n");
+
+  return `Hola ${customer.name || ""} ✨
+Te escribo por tu pedido de MultiSkinn.
+
+Pedido #${order.id}
+
+Productos:
+${products}
+
+Total aproximado:
+$${formatARS(order.total)}
+
+Estado:
+${getStatusLabel(order.status)}
+
+Gracias por tu pedido 🤍`;
+}
+
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente" },
   { value: "confirmed", label: "Confirmado" },
@@ -113,6 +142,16 @@ export default function AdminOrdersPage() {
     }
   }
 
+  function getWhatsappHref(order) {
+    const phone = order.customer?.phone?.replace(/\D/g, "");
+
+    if (!phone) return null;
+
+    const text = encodeURIComponent(buildAdminWhatsappText(order));
+
+    return `https://wa.me/54${phone}?text=${text}`;
+  }
+
   return (
     <>
       <Header />
@@ -123,8 +162,8 @@ export default function AdminOrdersPage() {
             <div>
               <h2>Pedidos</h2>
               <p>
-                Revisá los pedidos generados desde WhatsApp y actualizá su
-                estado.
+                Revisá los pedidos generados desde WhatsApp, datos del cliente y
+                estado de cada compra.
               </p>
             </div>
 
@@ -196,83 +235,132 @@ export default function AdminOrdersPage() {
             </div>
           ) : (
             <div className="admin-orders-list">
-              {filteredOrders.map((order) => (
-                <article key={order.id} className="admin-order-card">
-                  <div className="admin-order-head">
-                    <div>
-                      <span className="admin-order-id">Pedido #{order.id}</span>
+              {filteredOrders.map((order) => {
+                const customer = order.customer || {};
+                const whatsappHref = getWhatsappHref(order);
 
-                      <h3>${formatARS(order.total)}</h3>
+                return (
+                  <article key={order.id} className="admin-order-card">
+                    <div className="admin-order-head">
+                      <div>
+                        <span className="admin-order-id">
+                          Pedido #{order.id}
+                        </span>
 
-                      <p>
-                        {formatDate(order.createdAt)} ·{" "}
-                        {getPaymentLabel(order.paymentMethod)}
-                      </p>
+                        <h3>${formatARS(order.total)}</h3>
+
+                        <p>
+                          {formatDate(order.createdAt)} ·{" "}
+                          {getPaymentLabel(order.paymentMethod)}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`admin-order-status is-${
+                          order.status || "pending"
+                        }`}
+                      >
+                        {getStatusLabel(order.status)}
+                      </span>
                     </div>
 
-                    <span
-                      className={`admin-order-status is-${
-                        order.status || "pending"
-                      }`}
-                    >
-                      {getStatusLabel(order.status)}
-                    </span>
-                  </div>
-
-                  <div className="admin-order-products">
-                    {(order.items || []).map((item) => (
-                      <div
-                        key={`${order.id}-${item.id}`}
-                        className="admin-order-product"
-                      >
-                        {item.image ? (
-                          <img src={item.image} alt={item.title} />
-                        ) : (
-                          <div className="admin-order-product-empty">
-                            Sin foto
-                          </div>
-                        )}
-
-                        <div>
-                          <strong>{item.title}</strong>
-                          <span>
-                            x{item.qty} · ${formatARS(item.price)}
-                          </span>
-                        </div>
+                    <div className="admin-order-customer">
+                      <div>
+                        <span>Cliente</span>
+                        <strong>{customer.name || "Sin nombre"}</strong>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="admin-order-actions">
-                    {STATUS_OPTIONS.map((status) => (
+                      <div>
+                        <span>Teléfono</span>
+                        <strong>{customer.phone || "Sin teléfono"}</strong>
+                      </div>
+
+                      <div>
+                        <span>Entrega</span>
+                        <strong>{getDeliveryLabel(customer.deliveryType)}</strong>
+                      </div>
+
+                      {customer.address ? (
+                        <div>
+                          <span>Dirección / zona</span>
+                          <strong>{customer.address}</strong>
+                        </div>
+                      ) : null}
+
+                      {customer.note ? (
+                        <div className="admin-order-note">
+                          <span>Nota</span>
+                          <strong>{customer.note}</strong>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="admin-order-products">
+                      {(order.items || []).map((item) => (
+                        <div
+                          key={`${order.id}-${item.id}`}
+                          className="admin-order-product"
+                        >
+                          {item.image ? (
+                            <img src={item.image} alt={item.title} />
+                          ) : (
+                            <div className="admin-order-product-empty">
+                              Sin foto
+                            </div>
+                          )}
+
+                          <div>
+                            <strong>{item.title}</strong>
+                            <span>
+                              x{item.qty} · ${formatARS(item.price)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="admin-order-actions">
+                      {STATUS_OPTIONS.map((status) => (
+                        <button
+                          key={status.value}
+                          type="button"
+                          className={
+                            order.status === status.value
+                              ? "admin-order-action is-active"
+                              : "admin-order-action"
+                          }
+                          disabled={updatingId === order.id}
+                          onClick={() =>
+                            handleStatusChange(order.id, status.value)
+                          }
+                        >
+                          {status.label}
+                        </button>
+                      ))}
+
+                      {whatsappHref ? (
+                        <a
+                          className="admin-order-whatsapp"
+                          href={whatsappHref}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          WhatsApp
+                        </a>
+                      ) : null}
+
                       <button
-                        key={status.value}
                         type="button"
-                        className={
-                          order.status === status.value
-                            ? "admin-order-action is-active"
-                            : "admin-order-action"
-                        }
+                        className="admin-order-delete"
                         disabled={updatingId === order.id}
-                        onClick={() =>
-                          handleStatusChange(order.id, status.value)
-                        }
+                        onClick={() => handleDelete(order.id)}
                       >
-                        {status.label}
+                        Eliminar
                       </button>
-                    ))}
-
-                    <button
-                      type="button"
-                      className="admin-order-delete"
-                      disabled={updatingId === order.id}
-                      onClick={() => handleDelete(order.id)}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </article>
-              ))}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
