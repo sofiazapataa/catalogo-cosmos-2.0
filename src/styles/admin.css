@@ -1238,3 +1238,136 @@
 .admin-order-whatsapp:hover {
   filter: brightness(0.96);
 }
+/* =========================
+   FORM TABS
+========================= */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--admin-bg);
+  border-radius: 14px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--admin-text-soft);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  background: rgba(255,255,255,0.7);
+  color: var(--admin-text);
+}
+
+.admin-tab-active {
+  background: #fff;
+  color: var(--admin-text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.admin-tab-content {
+  animation: tab-in 0.15s ease;
+}
+
+@keyframes tab-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   FORM IMPROVEMENTS
+========================= */
+.admin-required {
+  color: var(--color-error);
+  font-style: normal;
+  margin-left: 2px;
+}
+
+.admin-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin-bottom: 10px;
+}
+
+.admin-price-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--admin-bg);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--admin-text-soft);
+}
+
+.admin-price-final {
+  color: var(--green);
+  font-size: 16px;
+}
+
+.admin-toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-toggle-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--admin-bg);
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.admin-toggle-option:has(input:checked) {
+  border-color: var(--green);
+  background: #f2f4ee;
+}
+
+.admin-toggle-option input {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
+  flex-shrink: 0;
+}
+
+.admin-toggle-option strong {
+  display: block;
+  font-size: 13px;
+  color: var(--admin-text);
+}
+
+.admin-toggle-option p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--admin-text-soft);
+}
+
+/* =========================
+   CONFIRM DELETE INLINE
+========================= */
+.admin-confirm-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--admin-text-soft);
+}

@@ -77,15 +77,18 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState("");
+  const [pageError, setPageError] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState("");
 
   async function loadOrders() {
     try {
       setLoading(true);
+      setPageError("");
       const data = await getOrders();
       setOrders(data);
     } catch (error) {
       console.error(error);
-      alert("No se pudieron cargar los pedidos.");
+      setPageError("No se pudieron cargar los pedidos. Revisá tu conexión e intentá de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -115,28 +118,28 @@ export default function AdminOrdersPage() {
   async function handleStatusChange(orderId, nextStatus) {
     try {
       setUpdatingId(orderId);
+      setPageError("");
       await updateOrderStatus(orderId, nextStatus);
       await loadOrders();
     } catch (error) {
       console.error(error);
-      alert("No se pudo actualizar el estado del pedido.");
+      setPageError("No se pudo actualizar el estado del pedido.");
     } finally {
       setUpdatingId("");
     }
   }
 
   async function handleDelete(orderId) {
-    const confirmDelete = window.confirm("¿Querés eliminar este pedido?");
-
-    if (!confirmDelete) return;
-
     try {
       setUpdatingId(orderId);
+      setPageError("");
       await deleteOrder(orderId);
+      setConfirmDeleteId("");
       await loadOrders();
     } catch (error) {
       console.error(error);
-      alert("No se pudo eliminar el pedido.");
+      setPageError("No se pudo eliminar el pedido.");
+      setConfirmDeleteId("");
     } finally {
       setUpdatingId("");
     }
@@ -225,6 +228,8 @@ export default function AdminOrdersPage() {
               </button>
             ))}
           </div>
+
+          {pageError ? <p className="admin-error" style={{ marginBottom: 16 }}>{pageError}</p> : null}
 
           {loading ? (
             <p style={{ opacity: 0.7 }}>Cargando pedidos…</p>
@@ -349,14 +354,22 @@ export default function AdminOrdersPage() {
                         </a>
                       ) : null}
 
-                      <button
-                        type="button"
-                        className="admin-order-delete"
-                        disabled={updatingId === order.id}
-                        onClick={() => handleDelete(order.id)}
-                      >
-                        Eliminar
-                      </button>
+                      {confirmDeleteId === order.id ? (
+                        <div className="admin-confirm-delete">
+                          <span>¿Eliminar?</span>
+                          <button type="button" className="admin-order-delete" onClick={() => handleDelete(order.id)}>Sí</button>
+                          <button type="button" className="admin-ghost-btn" onClick={() => setConfirmDeleteId("")}>No</button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="admin-order-delete"
+                          disabled={updatingId === order.id}
+                          onClick={() => setConfirmDeleteId(order.id)}
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   </article>
                 );
