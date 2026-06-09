@@ -1,6 +1,7 @@
 import {
   collection,
   getDocs,
+  getDoc,
   doc,
   setDoc,
   deleteDoc,
@@ -77,6 +78,18 @@ function buildSavePayload(item) {
     active: item.active !== false,
     featured: item.featured === true,
   });
+}
+
+export async function getProductById(id) {
+  const productSnap = await getDoc(doc(db, "products", id));
+  if (productSnap.exists()) {
+    return normalizeProductData(productSnap.id, productSnap.data());
+  }
+  const comboSnap = await getDoc(doc(db, "combos", id));
+  if (comboSnap.exists()) {
+    return normalizeProductData(comboSnap.id, comboSnap.data());
+  }
+  return null;
 }
 
 export async function getProducts() {

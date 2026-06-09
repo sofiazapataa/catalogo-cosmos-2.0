@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useList } from "../context/ListContext";
 import {
   formatARS,
@@ -12,6 +12,7 @@ export default function ProductModal({ product, onClose }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
   const [activeImage, setActiveImage] = useState(0);
+  const [copied, setCopied] = useState(false);
   const modalRef = useRef(null);
 
   const images = useMemo(() => {
@@ -136,6 +137,17 @@ export default function ProductModal({ product, onClose }) {
     addToList(product);
     onClose();
     navigate("/mi-lista");
+  }
+
+  async function handleShare() {
+    const url = `${window.location.origin}/producto/${product.id}`;
+    if (navigator.share) {
+      await navigator.share({ title: product.title, url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   }
 
   return (
@@ -326,6 +338,15 @@ export default function ProductModal({ product, onClose }) {
                 Comprar por WhatsApp
               </button>
             ) : null}
+          </div>
+
+          <div className="modal-share-row">
+            <button className="modal-share-btn" type="button" onClick={handleShare}>
+              {copied ? "¡Link copiado!" : "Compartir producto"}
+            </button>
+            <Link to={`/producto/${product.id}`} className="modal-share-btn" onClick={onClose}>
+              Ver página completa
+            </Link>
           </div>
         </section>
       </article>

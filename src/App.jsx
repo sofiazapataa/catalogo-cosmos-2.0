@@ -5,6 +5,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import WhatsAppFab from "./components/WhatsAppFab";
 
+import ProductPage from "./pages/ProductPage";
 import AdminPage from "./pages/admin/AdminPage";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminCombosPage from "./pages/admin/AdminCombosPage";
@@ -19,6 +20,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/mi-lista" element={<MyListPage />} />
+        <Route path="/producto/:id" element={<ProductPage />} />
         <Route path="/sobre-la-marca" element={<AboutPage />} />
         <Route path="/contacto" element={<ContactPage />} />
 
