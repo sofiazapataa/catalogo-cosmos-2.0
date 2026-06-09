@@ -106,6 +106,7 @@ export default function AdminProductForm({ initialData = null, mode = "product",
   const [uploadingImage, setUploadingImage] = useState(false);
   const [activeTab, setActiveTab] = useState("esencial");
   const [formError, setFormError] = useState("");
+  const [imagePanelOpen, setImagePanelOpen] = useState(false);
   const isNew = !initialData;
 
   useEffect(() => {
@@ -144,6 +145,7 @@ export default function AdminProductForm({ initialData = null, mode = "product",
     }
     setActiveTab("esencial");
     setFormError("");
+    setImagePanelOpen(false);
   }, [initialData, mode]);
 
   // Auto-generar ID desde el título solo si es nuevo producto
@@ -215,6 +217,7 @@ export default function AdminProductForm({ initialData = null, mode = "product",
       const nextImages = imageName && !currentImages.includes(imageName) ? [imageName, ...currentImages] : currentImages;
       return { ...prev, imageKey: imageName, imageUrl: "", imageFile: null, imagesKeys: nextImages };
     });
+    setImagePanelOpen(false); // cerrar el panel al seleccionar
   }
 
   function handleToggleGalleryImage(imageName) {
@@ -349,69 +352,98 @@ export default function AdminProductForm({ initialData = null, mode = "product",
               </label>
             </div>
 
-            {/* Imágenes */}
+            {/* Imágenes — panel colapsable */}
             <div className="admin-field admin-field-full" style={{ marginTop: 24 }}>
               <span className="admin-field-label">Imagen del producto</span>
 
-              <div className="admin-image-manager">
-                <div className="admin-upload-box">
-                  <div>
-                    <span className="admin-upload-title">📷 Subir foto nueva</span>
-                    <p className="admin-upload-help">Elegí una foto desde tu celular o computadora.</p>
-                  </div>
-                  <label className="admin-upload-button">
-                    Elegir imagen
-                    <input type="file" accept="image/*" onChange={(e) => handleUploadFile(e.target.files?.[0])} />
-                  </label>
-                  {form.imageFile ? (
-                    <>
-                      <div className="admin-upload-file"><strong>{form.imageFile.name}</strong><span>Lista para subir</span></div>
-                      <button type="button" className="admin-action-btn admin-action-btn-primary" disabled={uploadingImage} onClick={uploadSelectedImageNow}>
-                        {uploadingImage ? "Subiendo…" : "Subir imagen ahora"}
-                      </button>
-                    </>
-                  ) : null}
-                  {form.imageUrl && !form.imageFile ? <div className="admin-upload-status">✓ Imagen cargada</div> : null}
-                </div>
-
-                <div className="admin-image-toolbar">
-                  <input type="text" placeholder="Buscar imagen del catálogo…" value={imageSearch} onChange={(e) => setImageSearch(e.target.value)} />
-                  <div className="admin-image-filters">
-                    {IMAGE_FILTERS.map((f) => (
-                      <button key={f.id} type="button" className={`admin-filter-btn ${imageFilter === f.id ? "active" : ""}`} onClick={() => setImageFilter(f.id)}>{f.label}</button>
-                    ))}
-                  </div>
-                  <button type="button" className="btn btn-outline btn-small" onClick={clearImages}>Limpiar imágenes</button>
-                </div>
-
+              {/* Vista compacta: imagen actual + botones de acción */}
+              <div className="admin-image-compact">
                 {mainImagePreview ? (
-                  <div className="admin-main-preview">
-                    <img src={mainImagePreview} alt="Imagen principal" />
-                    <div><strong>Imagen principal</strong><p>{form.imageUrl ? "Foto subida" : form.imageKey}</p></div>
-                  </div>
-                ) : <p className="admin-help">Todavía no elegiste imagen principal. Subí una foto o seleccioná del catálogo.</p>}
+                  <img className="admin-image-compact-thumb" src={mainImagePreview} alt="Imagen actual" />
+                ) : (
+                  <div className="admin-image-compact-empty">Sin imagen</div>
+                )}
 
-                <div className="admin-image-grid">
-                  {filteredImages.map((imageName) => {
-                    const src = resolveImage(imageName);
-                    const isMain = form.imageKey === imageName && !form.imageUrl;
-                    const isGallery = form.imagesKeys.includes(imageName);
-                    return (
-                      <article key={imageName} className={`admin-image-card ${isMain ? "is-main" : ""} ${isGallery ? "is-selected" : ""}`}>
-                        <button type="button" className="admin-image-thumb" onClick={() => selectMainImage(imageName)}>
-                          <img src={src} alt={imageName} />
-                          {isMain ? <span className="admin-image-badge">Principal</span> : null}
-                        </button>
-                        <div className="admin-image-actions">
-                          <button type="button" onClick={() => selectMainImage(imageName)}>Principal</button>
-                          <button type="button" onClick={() => handleToggleGalleryImage(imageName)}>{isGallery ? "Quitar" : "Galería"}</button>
-                        </div>
-                      </article>
-                    );
-                  })}
+                <div className="admin-image-compact-actions">
+                  {mainImagePreview && (
+                    <span className="admin-image-compact-name">
+                      {form.imageUrl ? "Foto subida" : form.imageKey || "Imagen seleccionada"}
+                    </span>
+                  )}
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      className="admin-action-btn admin-action-btn-secondary"
+                      onClick={() => setImagePanelOpen((v) => !v)}
+                    >
+                      {imagePanelOpen ? "Cerrar selector" : mainImagePreview ? "Cambiar imagen" : "Elegir imagen"}
+                    </button>
+
+                    {/* Subir desde dispositivo */}
+                    <label className="admin-upload-button">
+                      📷 Subir foto
+                      <input type="file" accept="image/*" onChange={(e) => { handleUploadFile(e.target.files?.[0]); setImagePanelOpen(false); }} />
+                    </label>
+
+                    {mainImagePreview && (
+                      <button type="button" className="admin-ghost-btn" onClick={clearImages}>
+                        Quitar
+                      </button>
+                    )}
+                  </div>
+
+                  {form.imageFile && (
+                    <button type="button" className="admin-action-btn admin-action-btn-primary" disabled={uploadingImage} onClick={uploadSelectedImageNow}>
+                      {uploadingImage ? "Subiendo…" : `Subir "${form.imageFile.name}"`}
+                    </button>
+                  )}
                 </div>
-                {filteredImages.length === 0 ? <p className="admin-help">No hay imágenes con ese filtro.</p> : null}
               </div>
+
+              {/* Panel expandible: selector de catálogo */}
+              {imagePanelOpen && (
+                <div className="admin-image-panel">
+                  <div className="admin-image-toolbar">
+                    <input
+                      type="text"
+                      placeholder="Buscar imagen…"
+                      value={imageSearch}
+                      onChange={(e) => setImageSearch(e.target.value)}
+                      autoFocus
+                    />
+                    <div className="admin-image-filters">
+                      {IMAGE_FILTERS.map((f) => (
+                        <button key={f.id} type="button" className={`admin-filter-btn ${imageFilter === f.id ? "active" : ""}`} onClick={() => setImageFilter(f.id)}>
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="admin-image-grid">
+                    {filteredImages.map((imageName) => {
+                      const src = resolveImage(imageName);
+                      const isMain = form.imageKey === imageName && !form.imageUrl;
+                      const isGallery = form.imagesKeys.includes(imageName);
+                      return (
+                        <article key={imageName} className={`admin-image-card ${isMain ? "is-main" : ""} ${isGallery ? "is-selected" : ""}`}>
+                          <button type="button" className="admin-image-thumb" onClick={() => selectMainImage(imageName)}>
+                            <img src={src} alt={imageName} />
+                            {isMain ? <span className="admin-image-badge">✓ Principal</span> : null}
+                          </button>
+                          <div className="admin-image-actions">
+                            <button type="button" onClick={() => selectMainImage(imageName)}>Principal</button>
+                            <button type="button" onClick={() => handleToggleGalleryImage(imageName)}>
+                              {isGallery ? "Quitar galería" : "Galería"}
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                  {filteredImages.length === 0 && <p className="admin-help">No hay imágenes con ese filtro.</p>}
+                </div>
+              )}
             </div>
           </div>
         )}
