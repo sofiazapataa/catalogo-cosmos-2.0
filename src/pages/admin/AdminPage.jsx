@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState([]);
   const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState("");
 
   async function loadDashboard() {
     try {
@@ -31,7 +32,7 @@ export default function AdminPage() {
       setCombos(productsData.combos || []);
     } catch (error) {
       console.error(error);
-      alert("No se pudo cargar el dashboard.");
+      setDashboardError("No se pudo cargar el dashboard. Intentá de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -146,6 +147,10 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+
+          {dashboardError ? (
+            <p className="admin-error" style={{ marginTop: 16 }}>{dashboardError}</p>
+          ) : null}
 
           {loading ? (
             <p style={{ opacity: 0.7 }}>

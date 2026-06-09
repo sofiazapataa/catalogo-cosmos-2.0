@@ -515,15 +515,7 @@ $${formatARS(total)}`;
                   </div>
 
                   {orderError ? (
-                    <p
-                      style={{
-                        color: "crimson",
-                        fontSize: 13,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {orderError}
-                    </p>
+                    <p className="order-error-msg">{orderError}</p>
                   ) : null}
 
                   <button
