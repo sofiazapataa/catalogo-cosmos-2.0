@@ -28,7 +28,14 @@ export default function Header() {
             }
           >
             Mi lista
-            {count > 0 ? <span className="nav-badge">{count}</span> : null}
+            <span
+              className={count > 0 ? "nav-badge" : "nav-badge nav-badge-empty"}
+              aria-live="polite"
+              aria-atomic="true"
+              aria-label={count > 0 ? `${count} productos en tu lista` : undefined}
+            >
+              {count > 0 ? count : null}
+            </span>
           </NavLink>
         </div>
       </div>

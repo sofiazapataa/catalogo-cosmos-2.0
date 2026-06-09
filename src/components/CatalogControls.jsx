@@ -9,6 +9,8 @@ export default function CatalogControls({
   setOnlyDiscount,
   onlyStock,
   setOnlyStock,
+  skinType,
+  setSkinType,
 }) {
   return (
     <div className="controls">
@@ -25,12 +27,26 @@ export default function CatalogControls({
         value={category}
         onChange={(e) => onCategoryChange(e.target.value)}
       >
-        <option value="all">Todos</option>
+        <option value="all">Categoría</option>
         <option value="combos">Combos</option>
         <option value="cremas">Cremas</option>
         <option value="serums">Serums</option>
         <option value="limpieza">Limpieza</option>
         <option value="tonicos">Tónicos</option>
+      </select>
+
+      <select
+        className="select"
+        value={skinType}
+        onChange={(e) => setSkinType(e.target.value)}
+        aria-label="Tipo de piel"
+      >
+        <option value="all">Tipo de piel</option>
+        <option value="grasa">Grasa</option>
+        <option value="mixta">Mixta</option>
+        <option value="seca">Seca</option>
+        <option value="sensible">Sensible</option>
+        <option value="normal">Normal</option>
       </select>
 
       <select

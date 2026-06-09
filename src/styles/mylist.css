@@ -55,7 +55,7 @@
   border: 1px solid #dfe5d1;
   color: var(--green);
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -66,7 +66,7 @@
   font-size: 34px;
   line-height: 0.95;
   letter-spacing: -0.05em;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .checkout-head p {
@@ -98,7 +98,7 @@
   font-size: 22px;
   line-height: 1;
   letter-spacing: -0.04em;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .checkout-form-grid {
@@ -117,7 +117,7 @@
 .checkout-field label {
   color: #2b3512;
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -196,7 +196,7 @@
   margin: 0;
   color: #2b3512;
   font-size: 16px;
-  font-weight: 950;
+  font-weight: 900;
   line-height: 1.2;
 }
 
@@ -221,7 +221,7 @@
 .price {
   color: var(--green);
   font-size: 18px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: -0.03em;
 }
 
@@ -231,9 +231,9 @@
   border-radius: 999px;
   border: 1px solid #dfe5d1;
   background: #fff;
-  color: #666;
+  color: var(--muted);
   font-size: 18px;
-  font-weight: 950;
+  font-weight: 900;
   cursor: pointer;
 }
 
@@ -261,7 +261,7 @@
   display: block;
   color: var(--green);
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -272,7 +272,7 @@
   font-size: 34px;
   line-height: 0.95;
   letter-spacing: -0.05em;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .summary-price {
@@ -281,7 +281,7 @@
   font-size: 52px;
   line-height: 1;
   letter-spacing: -0.07em;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .checkout-box {
@@ -296,7 +296,7 @@
   margin: 0 0 14px;
   color: #2b3512;
   font-size: 16px;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .pay-methods {
@@ -339,7 +339,7 @@
   border-color: #25d366;
   color: #fff;
   font-size: 16px;
-  font-weight: 950;
+  font-weight: 900;
   box-shadow: 0 16px 34px rgba(37, 211, 102, 0.25);
 }
 
@@ -361,14 +361,14 @@
   margin: 0;
   color: #1f270d;
   font-size: 28px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: -0.04em;
 }
 
 .empty-state p {
   margin: 0;
   max-width: 340px;
-  color: #666;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -432,4 +432,59 @@
   .pay-option {
     width: 100%;
   }
+}
+/* =========================
+   STOCK ALERTS
+========================= */
+
+.stock-alert-box {
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid #fecdd3;
+  background: #fff1f2;
+}
+
+.stock-alert-box h3 {
+  margin: 0;
+  color: #9f1239;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.stock-alert-box p {
+  margin: 8px 0 0;
+  color: #7f1d1d;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.stock-alert-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.stock-alert-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #fecdd3;
+}
+
+.stock-alert-item strong {
+  color: #1f270d;
+  font-size: 13px;
+}
+
+.stock-alert-item span {
+  color: #9f1239;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: right;
 }

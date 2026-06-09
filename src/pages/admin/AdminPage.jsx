@@ -248,6 +248,17 @@ export default function AdminPage() {
                         Revisar pedidos y actualizar estados.
                       </p>
                     </Link>
+
+                    <Link
+                      to="/admin/testimonios"
+                      className="admin-card"
+                    >
+                      <h3>Testimonios</h3>
+
+                      <p>
+                        Administrar reseñas de clientes en la home.
+                      </p>
+                    </Link>
                   </div>
                 </div>
 

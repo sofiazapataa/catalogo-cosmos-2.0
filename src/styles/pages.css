@@ -51,7 +51,7 @@
   line-height: 0.95;
   letter-spacing: -0.06em;
   color: #2b3512;
-  font-weight: 950;
+  font-weight: 900;
   max-width: 680px;
 }
 
@@ -137,7 +137,7 @@
   background: #eef4df;
   color: var(--green);
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .hero-featured-top strong {
@@ -169,7 +169,7 @@
   line-height: 1;
   letter-spacing: -0.04em;
   color: #2b3512;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .hero-featured-info p {
@@ -195,7 +195,7 @@
   margin-top: 14px;
   color: var(--green);
   font-size: 26px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: -0.04em;
 }
 
@@ -237,7 +237,7 @@
   background: rgba(255, 255, 255, 0.14);
   color: #f7f8f3;
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -247,7 +247,7 @@
   font-size: 28px;
   line-height: 1;
   letter-spacing: -0.04em;
-  font-weight: 950;
+  font-weight: 900;
   color: #fff;
 }
 
@@ -314,7 +314,7 @@
   line-height: 0.95;
   letter-spacing: -0.05em;
   color: #1f270d;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .catalog-text {
@@ -340,7 +340,7 @@
   font-size: 40px;
   line-height: 1;
   letter-spacing: -0.05em;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .catalog-counter span {

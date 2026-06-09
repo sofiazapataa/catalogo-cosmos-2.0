@@ -6,50 +6,20 @@ import Footer from "../components/Footer";
 
 import { useList } from "../context/ListContext";
 import { createOrder } from "../services/ordersService";
+import { formatARS, getProductDiscountPrice, getPaymentConfig } from "../utils/pricing";
 
-function formatARS(value) {
-  return Number(value || 0).toLocaleString("es-AR");
-}
-
-function getProductDiscountPrice(item) {
-  const price = Number(item.price || 0);
-  const discount = Number(item.discount || 0);
-
-  if (discount <= 0) return price;
-
-  return Math.round(price * (1 - discount / 100));
-}
-
-function getPaymentConfig(item) {
-  const defaults = {
-    transfer: {
-      enabled: true,
-      discountPct: 0,
-      applyDiscount: true,
-    },
-
-    cash: {
-      enabled: true,
-      discountPct: 0,
-      applyDiscount: true,
-    },
-
-    other: {
-      enabled: true,
-      discountPct: 0,
-      applyDiscount: true,
-    },
-  };
-
-  return {
-    ...defaults,
-    ...(item.paymentOptions || {}),
-  };
+async function shareList(items, total) {
+  const lines = items.map((i) => `• ${i.title} x${i.qty}`).join("\n");
+  const text = `Mi lista de Kosmos:\n${lines}\n\nTotal estimado: $${formatARS(total)}`;
+  if (navigator.share) {
+    await navigator.share({ title: "Mi lista de Kosmos", text });
+  } else {
+    await navigator.clipboard.writeText(text);
+  }
 }
 
 function getItemPriceByMethod(item, paymentMethod) {
   const baseFinal = getProductDiscountPrice(item);
-
   const payment = getPaymentConfig(item)[paymentMethod];
 
   if (
@@ -60,9 +30,7 @@ function getItemPriceByMethod(item, paymentMethod) {
     return baseFinal;
   }
 
-  return Math.round(
-    baseFinal * (1 - Number(payment.discountPct || 0) / 100)
-  );
+  return Math.round(baseFinal * (1 - Number(payment.discountPct || 0) / 100));
 }
 
 function getPaymentLabel(method) {
@@ -84,6 +52,8 @@ export default function MyListPage() {
 
   const [paymentMethod, setPaymentMethod] = useState("transfer");
 
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const [shared, setShared] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
 
   const [orderError, setOrderError] = useState("");
@@ -233,14 +203,45 @@ $${formatARS(total)}`;
                   </p>
                 </div>
 
-                {items.length > 0 ? (
-                  <button
-                    className="linklike"
-                    type="button"
-                    onClick={clearList}
-                  >
-                    Vaciar lista
-                  </button>
+                {items.length > 0 && !confirmingClear ? (
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <button
+                      className="linklike"
+                      type="button"
+                      onClick={async () => {
+                        await shareList(items, total);
+                        setShared(true);
+                        setTimeout(() => setShared(false), 2000);
+                      }}
+                    >
+                      {shared ? "¡Copiado!" : "Compartir"}
+                    </button>
+                    <button
+                      className="linklike"
+                      type="button"
+                      onClick={() => setConfirmingClear(true)}
+                    >
+                      Vaciar lista
+                    </button>
+                  </div>
+                ) : confirmingClear ? (
+                  <div className="clear-confirm">
+                    <span>¿Vaciar todo?</span>
+                    <button
+                      className="btn btn-small"
+                      type="button"
+                      onClick={() => { clearList(); setConfirmingClear(false); }}
+                    >
+                      Sí, vaciar
+                    </button>
+                    <button
+                      className="linklike"
+                      type="button"
+                      onClick={() => setConfirmingClear(false)}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                 ) : null}
               </div>
 

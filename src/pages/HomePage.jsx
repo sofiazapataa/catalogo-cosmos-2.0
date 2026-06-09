@@ -7,21 +7,17 @@ import ProductCard from "../components/ProductCard";
 import CatalogControls from "../components/CatalogControls";
 import SectionHeader from "../components/SectionHeader";
 import ProductModal from "../components/ProductModal";
+import SkeletonCard from "../components/SkeletonCard";
 
 import { filterProducts, sortProducts } from "../utils/catalog";
 import { getOrders } from "../services/ordersService";
+import { formatARS, getProductDiscountPrice } from "../utils/pricing";
+import ErrorState from "../components/ErrorState";
+import TestimonialsSection from "../components/TestimonialsSection";
+import QuizModal from "../components/QuizModal";
+import RoutineSection from "../components/RoutineSection";
 
-function formatARS(value) {
-  return Number(value || 0).toLocaleString("es-AR");
-}
-
-function getFinalPrice(product) {
-  const price = Number(product?.price || 0);
-  const discount = Number(product?.discount || 0);
-
-  if (discount <= 0) return price;
-  return Math.round(price * (1 - discount / 100));
-}
+const getFinalPrice = getProductDiscountPrice;
 
 function buildSalesMap(orders = []) {
   const map = {};
@@ -48,7 +44,7 @@ function buildSalesMap(orders = []) {
 }
 
 export default function HomePage() {
-  const { combos, stock, loading, error } = useProducts();
+  const { combos, stock, loading, error, reload } = useProducts();
 
   const [orders, setOrders] = useState([]);
 
@@ -57,12 +53,14 @@ export default function HomePage() {
   const [sort, setSort] = useState("featured");
   const [onlyDiscount, setOnlyDiscount] = useState(false);
   const [onlyStock, setOnlyStock] = useState(false);
+  const [skinType, setSkinType] = useState("all");
 
   const [showAllFeatured, setShowAllFeatured] = useState(false);
   const [showAllBestSellers, setShowAllBestSellers] = useState(false);
   const [showAllCombos, setShowAllCombos] = useState(false);
   const [showAllStock, setShowAllStock] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   useEffect(() => {
     async function loadOrders() {
@@ -153,6 +151,12 @@ export default function HomePage() {
   function applyExtraFilters(list) {
     let filtered = [...list];
 
+    if (skinType !== "all") {
+      filtered = filtered.filter((p) =>
+        p.skinType?.toLowerCase().includes(skinType.toLowerCase())
+      );
+    }
+
     if (onlyDiscount) {
       filtered = filtered.filter((p) => Number(p.discount || 0) > 0);
     }
@@ -169,20 +173,20 @@ export default function HomePage() {
 
     const featured = allProducts.filter((product) => product.featured === true);
     return applyExtraFilters(filterProducts(featured, query));
-  }, [allProducts, query, category, sort, onlyDiscount, onlyStock]);
+  }, [allProducts, query, category, sort, onlyDiscount, onlyStock, skinType]);
 
   const bestSellersProcessed = useMemo(() => {
     if (category !== "all") return [];
 
     return applyExtraFilters(filterProducts(bestSellers, query));
-  }, [bestSellers, query, category, sort, onlyDiscount, onlyStock]);
+  }, [bestSellers, query, category, sort, onlyDiscount, onlyStock, skinType]);
 
   const combosProcessed = useMemo(() => {
     if (category !== "all" && category !== "combos") return [];
 
     const filtered = filterProducts(combosWithSales, query);
     return applyExtraFilters(filtered);
-  }, [combosWithSales, query, category, sort, onlyDiscount, onlyStock]);
+  }, [combosWithSales, query, category, sort, onlyDiscount, onlyStock, skinType]);
 
   const stockProcessed = useMemo(() => {
     if (category === "combos") return [];
@@ -194,7 +198,7 @@ export default function HomePage() {
     }
 
     return applyExtraFilters(filtered);
-  }, [stockWithSales, query, category, sort, onlyDiscount, onlyStock]);
+  }, [stockWithSales, query, category, sort, onlyDiscount, onlyStock, skinType]);
 
   const featuredToShow = showAllFeatured
     ? featuredProcessed
@@ -246,9 +250,13 @@ export default function HomePage() {
                 Ver catálogo
               </a>
 
-              <a href="/mi-lista" className="btn btn-outline">
-                Mi lista
-              </a>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setShowQuiz(true)}
+              >
+                ¿Cuál es mi rutina?
+              </button>
             </div>
 
             <div className="hero-kosmos-badges">
@@ -341,6 +349,8 @@ export default function HomePage() {
           </div>
         </section>
 
+        <RoutineSection />
+
         <section className="catalog-shell" id="catalogo">
           <div className="catalog-top">
             <div>
@@ -371,11 +381,19 @@ export default function HomePage() {
             setOnlyDiscount={setOnlyDiscount}
             onlyStock={onlyStock}
             setOnlyStock={setOnlyStock}
+            skinType={skinType}
+            setSkinType={setSkinType}
           />
         </section>
 
-        {loading ? <p style={{ opacity: 0.7 }}>Cargando productos…</p> : null}
-        {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+        {loading ? (
+          <div className="grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : null}
+        {error ? <ErrorState onRetry={reload} /> : null}
 
         {bestSellersProcessed.length > 0 && (
           <>
@@ -470,12 +488,25 @@ export default function HomePage() {
             No encontramos resultados para “{query}”.
           </p>
         )}
+
+        <TestimonialsSection />
       </main>
 
       <Footer />
 
       {selected ? (
         <ProductModal product={selected} onClose={() => setSelected(null)} />
+      ) : null}
+
+      {showQuiz ? (
+        <QuizModal
+          onClose={() => setShowQuiz(false)}
+          onApplyFilter={(skinType) => {
+            setSkinType(skinType);
+            setShowQuiz(false);
+            scrollToCatalog();
+          }}
+        />
       ) : null}
     </>
   );

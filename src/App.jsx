@@ -10,6 +10,7 @@ import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminCombosPage from "./pages/admin/AdminCombosPage";
 import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import AdminTestimonialsPage from "./pages/admin/AdminTestimonialsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -55,6 +56,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <AdminOrdersPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/testimonios"
+          element={
+            <ProtectedRoute>
+              <AdminTestimonialsPage />
             </ProtectedRoute>
           }
         />

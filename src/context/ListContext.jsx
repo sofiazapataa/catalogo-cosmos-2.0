@@ -1,5 +1,4 @@
-// Sirve para compartir datos entre componentes. Sirve para compartir datos entre componentes.
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 const ListContext = createContext(null);
 
@@ -20,11 +19,19 @@ export function ListProvider({ children }) {
     return saved ? safeParse(saved) : [];
   });
 
+  const [toast, setToast] = useState(null);
+  const toastTimerRef = useRef(null);
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  // ✅ Agrega producto o suma cantidad si ya existe
+  function showToast(message) {
+    clearTimeout(toastTimerRef.current);
+    setToast({ message, id: Date.now() });
+    toastTimerRef.current = setTimeout(() => setToast(null), 2200);
+  }
+
   function addToList(product) {
     setItems((prev) => {
       const found = prev.find((i) => i.id === product.id);
@@ -35,9 +42,9 @@ export function ListProvider({ children }) {
       }
       return [...prev, { ...product, qty: 1 }];
     });
+    showToast(`${product.title} agregado a tu lista`);
   }
 
-  // ✅ Resta 1 (si llega a 0, lo saca)
   function removeOne(productId) {
     setItems((prev) => {
       const found = prev.find((i) => i.id === productId);
@@ -49,23 +56,19 @@ export function ListProvider({ children }) {
     });
   }
 
-  // ✅ Elimina el item completo
   function deleteItem(productId) {
     setItems((prev) => prev.filter((i) => i.id !== productId));
   }
 
-  // ✅ Borra toda la lista
   function clearList() {
     setItems([]);
   }
 
-  // ✅ Devuelve cantidad de un producto en la lista (0 si no está)
   function getQty(productId) {
     const found = items.find((i) => i.id === productId);
     return found ? found.qty : 0;
   }
 
-  // ✅ Setea cantidad exacta (si <=0, elimina)
   function setQty(productId, qty) {
     setItems((prev) => {
       if (qty <= 0) return prev.filter((i) => i.id !== productId);
@@ -73,12 +76,10 @@ export function ListProvider({ children }) {
     });
   }
 
-  // ✅ Total (sumatoria de price * qty)
   const total = useMemo(() => {
     return items.reduce((acc, it) => acc + it.price * it.qty, 0);
   }, [items]);
 
-  // ✅ Cantidad total de items (sumatoria de qty)
   const count = useMemo(() => {
     return items.reduce((acc, it) => acc + it.qty, 0);
   }, [items]);
@@ -94,8 +95,9 @@ export function ListProvider({ children }) {
       setQty,
       total,
       count,
+      toast,
     }),
-    [items, total, count]
+    [items, total, count, toast]
   );
 
   return <ListContext.Provider value={value}>{children}</ListContext.Provider>;

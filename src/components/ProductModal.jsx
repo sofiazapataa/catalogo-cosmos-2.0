@@ -1,68 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useList } from "../context/ListContext";
-
-function formatARS(value) {
-  return Number(value || 0).toLocaleString("es-AR");
-}
-
-function getPaymentConfig(product) {
-  const defaults = {
-    transfer: {
-      enabled: true,
-      discountPct: 0,
-      label: "Transferencia",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-    cash: {
-      enabled: true,
-      discountPct: 0,
-      label: "Efectivo",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-    other: {
-      enabled: true,
-      discountPct: 0,
-      label: "Otro medio",
-      applyDiscount: true,
-      showDiscountLabel: true,
-    },
-  };
-
-  return {
-    ...defaults,
-    ...(product.paymentOptions || {}),
-    transfer: { ...defaults.transfer, ...(product.paymentOptions?.transfer || {}) },
-    cash: { ...defaults.cash, ...(product.paymentOptions?.cash || {}) },
-    other: { ...defaults.other, ...(product.paymentOptions?.other || {}) },
-  };
-}
-
-function getProductDiscountPrice(product) {
-  const price = Number(product.price || 0);
-  const discount = Number(product.discount || 0);
-  if (discount <= 0) return price;
-  return Math.round(price * (1 - discount / 100));
-}
-
-function getPaymentPrice(product, method) {
-  const productPrice = getProductDiscountPrice(product);
-  const payment = getPaymentConfig(product)[method];
-  const discount = Number(payment.discountPct || 0);
-
-  if (!payment.enabled || !payment.applyDiscount || discount <= 0) {
-    return productPrice;
-  }
-
-  return Math.round(productPrice * (1 - discount / 100));
-}
+import {
+  formatARS,
+  getPaymentConfig,
+  getProductDiscountPrice,
+  getPaymentPrice,
+} from "../utils/pricing";
 
 export default function ProductModal({ product, onClose }) {
   const navigate = useNavigate();
   const { addToList, removeOne, getQty } = useList();
   const [activeImage, setActiveImage] = useState(0);
+  const modalRef = useRef(null);
 
   const images = useMemo(() => {
     if (!product) return [];
@@ -74,6 +24,7 @@ export default function ProductModal({ product, onClose }) {
     setActiveImage(0);
   }, [product?.id]);
 
+  // Keyboard: Escape + gallery arrows
   useEffect(() => {
     function handleKey(e) {
       if (e.key === "Escape") onClose();
@@ -95,6 +46,43 @@ export default function ProductModal({ product, onClose }) {
       document.body.style.overflow = "";
     };
   }, [images.length, onClose]);
+
+  // Focus trap + move focus into modal on open
+  useEffect(() => {
+    if (!product) return;
+    const modalEl = modalRef.current;
+    if (!modalEl) return;
+
+    const focusableSelectors =
+      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () =>
+      Array.from(modalEl.querySelectorAll(focusableSelectors));
+
+    const focusable = getFocusable();
+    focusable[0]?.focus();
+
+    function trapFocus(e) {
+      if (e.key !== "Tab") return;
+      const els = getFocusable();
+      const first = els[0];
+      const last = els[els.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    }
+
+    modalEl.addEventListener("keydown", trapFocus);
+    return () => modalEl.removeEventListener("keydown", trapFocus);
+  }, [product]);
 
   if (!product) return null;
 
@@ -153,7 +141,11 @@ export default function ProductModal({ product, onClose }) {
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <article
+        ref={modalRef}
         className="modal modal-product"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-product-title"
         onMouseDown={(e) => e.stopPropagation()}
       >
         <button
@@ -228,7 +220,7 @@ export default function ProductModal({ product, onClose }) {
         <section className="modal-info">
           <div className="modal-kicker">Kosmos Skin</div>
 
-          <h2 className="modal-title">{product.title}</h2>
+          <h2 id="modal-product-title" className="modal-title">{product.title}</h2>
 
           <p className="modal-desc">{product.desc}</p>
 
