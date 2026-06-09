@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
 
 // Páginas secundarias — se cargan solo cuando se navega a ellas
+const NotFoundPage      = lazy(() => import("./pages/NotFoundPage"));
 const MyListPage        = lazy(() => import("./pages/MyListPage"));
 const ProductPage       = lazy(() => import("./pages/ProductPage"));
 const AboutPage         = lazy(() => import("./pages/AboutPage"));
@@ -48,6 +49,9 @@ export default function App() {
           <Route path="/admin/testimonios" element={
             <ProtectedRoute><AdminTestimonialsPage /></ProtectedRoute>
           } />
+
+          {/* 404 — cualquier ruta no definida */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
 

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin-login
+
+Sitemap: https://catalogo-cosmos-2-0.vercel.app/sitemap.xml
