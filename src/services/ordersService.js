@@ -33,6 +33,7 @@ async function findProductRef(transaction, itemId) {
     return {
       ref: productRef,
       snap: productSnap,
+      collectionName: "products",
     };
   }
 
@@ -43,17 +44,94 @@ async function findProductRef(transaction, itemId) {
     return {
       ref: comboRef,
       snap: comboSnap,
+      collectionName: "combos",
     };
   }
 
   return null;
 }
 
+function buildStockError(items = []) {
+  const error = new Error("STOCK_ERROR");
+  error.code = "STOCK_ERROR";
+  error.items = items;
+  return error;
+}
+
+export async function validateOrderStock(items = []) {
+  const cleanItems = sanitizeItems(items);
+  const problems = [];
+
+  for (const item of cleanItems) {
+    const productSnap = await getDoc(doc(db, "products", item.id));
+    const comboSnap = !productSnap.exists()
+      ? await getDoc(doc(db, "combos", item.id))
+      : null;
+
+    const snap = productSnap.exists() ? productSnap : comboSnap;
+
+    if (!snap || !snap.exists()) {
+      problems.push({
+        id: item.id,
+        title: item.title,
+        requested: Number(item.qty || 1),
+        available: 0,
+        reason: "not-found",
+      });
+
+      continue;
+    }
+
+    const data = snap.data();
+    const active = data.active !== false;
+    const available = Number(data.stockQty || 0);
+    const requested = Number(item.qty || 1);
+
+    if (!active) {
+      problems.push({
+        id: item.id,
+        title: item.title,
+        requested,
+        available: 0,
+        reason: "inactive",
+      });
+
+      continue;
+    }
+
+    if (available <= 0) {
+      problems.push({
+        id: item.id,
+        title: item.title,
+        requested,
+        available: 0,
+        reason: "out",
+      });
+
+      continue;
+    }
+
+    if (requested > available) {
+      problems.push({
+        id: item.id,
+        title: item.title,
+        requested,
+        available,
+        reason: "low",
+      });
+    }
+  }
+
+  return {
+    ok: problems.length === 0,
+    problems,
+  };
+}
+
 export async function createOrder({
   items = [],
   paymentMethod = "transfer",
   total = 0,
-
   customer = {},
 }) {
   const cleanItems = sanitizeItems(items);
@@ -68,41 +146,82 @@ export async function createOrder({
 
   const orderId = await runTransaction(db, async (transaction) => {
     const orderRef = doc(collection(db, "orders"));
+    const stockProblems = [];
 
     for (const item of cleanItems) {
       const found = await findProductRef(transaction, item.id);
 
-      if (!found) continue;
+      if (!found) {
+        stockProblems.push({
+          id: item.id,
+          title: item.title,
+          requested: Number(item.qty || 1),
+          available: 0,
+          reason: "not-found",
+        });
 
-      const currentStock = Number(found.snap.data().stockQty || 0);
+        continue;
+      }
 
+      const productData = found.snap.data();
+      const active = productData.active !== false;
+      const currentStock = Number(productData.stockQty || 0);
       const qtyToSubtract = Number(item.qty || 1);
 
-      const nextStock = Math.max(
-        0,
-        currentStock - qtyToSubtract
-      );
+      if (!active) {
+        stockProblems.push({
+          id: item.id,
+          title: item.title,
+          requested: qtyToSubtract,
+          available: 0,
+          reason: "inactive",
+        });
+
+        continue;
+      }
+
+      if (currentStock <= 0) {
+        stockProblems.push({
+          id: item.id,
+          title: item.title,
+          requested: qtyToSubtract,
+          available: 0,
+          reason: "out",
+        });
+
+        continue;
+      }
+
+      if (qtyToSubtract > currentStock) {
+        stockProblems.push({
+          id: item.id,
+          title: item.title,
+          requested: qtyToSubtract,
+          available: currentStock,
+          reason: "low",
+        });
+
+        continue;
+      }
 
       transaction.update(found.ref, {
-        stockQty: nextStock,
+        stockQty: currentStock - qtyToSubtract,
         updatedAt: serverTimestamp(),
       });
     }
 
+    if (stockProblems.length > 0) {
+      throw buildStockError(stockProblems);
+    }
+
     transaction.set(orderRef, {
       items: cleanItems,
-
       customer: cleanCustomer,
-
       paymentMethod,
       total: Number(total || 0),
-
       status: "pending",
-
       stockRestored: false,
-
       source: "whatsapp",
-
       createdAt: serverTimestamp(),
     });
 
@@ -121,10 +240,7 @@ async function restoreStock(items = []) {
 
       if (!found) continue;
 
-      const currentStock = Number(
-        found.snap.data().stockQty || 0
-      );
-
+      const currentStock = Number(found.snap.data().stockQty || 0);
       const qtyToRestore = Number(item.qty || 1);
 
       transaction.update(found.ref, {
@@ -137,11 +253,7 @@ async function restoreStock(items = []) {
 
 export async function getOrders() {
   const ordersRef = collection(db, "orders");
-
-  const q = query(
-    ordersRef,
-    orderBy("createdAt", "desc")
-  );
+  const q = query(ordersRef, orderBy("createdAt", "desc"));
 
   const snapshot = await getDocs(q);
 
@@ -153,7 +265,6 @@ export async function getOrders() {
 
 export async function updateOrderStatus(orderId, status) {
   const orderRef = doc(db, "orders", orderId);
-
   const orderSnap = await getDoc(orderRef);
 
   if (!orderSnap.exists()) {
@@ -161,7 +272,6 @@ export async function updateOrderStatus(orderId, status) {
   }
 
   const orderData = orderSnap.data();
-
   const previousStatus = orderData.status;
 
   if (
@@ -180,29 +290,38 @@ export async function updateOrderStatus(orderId, status) {
     return;
   }
 
-  if (
-    previousStatus === "cancelled" &&
-    status !== "cancelled"
-  ) {
+  if (previousStatus === "cancelled" && status !== "cancelled") {
     await runTransaction(db, async (transaction) => {
+      const stockProblems = [];
+
       for (const item of orderData.items || []) {
-        const found = await findProductRef(
-          transaction,
-          item.id
-        );
+        const found = await findProductRef(transaction, item.id);
 
         if (!found) continue;
 
-        const currentStock = Number(
-          found.snap.data().stockQty || 0
-        );
-
+        const currentStock = Number(found.snap.data().stockQty || 0);
         const qty = Number(item.qty || 1);
 
+        if (qty > currentStock) {
+          stockProblems.push({
+            id: item.id,
+            title: item.title,
+            requested: qty,
+            available: currentStock,
+            reason: "low",
+          });
+
+          continue;
+        }
+
         transaction.update(found.ref, {
-          stockQty: Math.max(0, currentStock - qty),
+          stockQty: currentStock - qty,
           updatedAt: serverTimestamp(),
         });
+      }
+
+      if (stockProblems.length > 0) {
+        throw buildStockError(stockProblems);
       }
     });
 
@@ -222,7 +341,6 @@ export async function updateOrderStatus(orderId, status) {
 }
 
 export async function deleteOrder(orderId) {
-  const orderRef = doc(db, "orders");
-
-  await deleteDoc(doc(orderRef, orderId));
+  const orderRef = doc(db, "orders", orderId);
+  await deleteDoc(orderRef);
 }
