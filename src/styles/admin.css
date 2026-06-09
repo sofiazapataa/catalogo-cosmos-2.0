@@ -1431,3 +1431,39 @@
   background: #fff;
   animation: tab-in 0.15s ease;
 }
+
+/* =========================
+   STAT CARDS ACCIONABLES
+========================= */
+.admin-stat-card-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.admin-stat-card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--admin-shadow-hover);
+}
+
+.admin-stat-card-warn {
+  border-color: #f59e0b !important;
+  background: #fffbeb !important;
+}
+
+.admin-stat-card-warn strong {
+  color: #b45309;
+}
+
+.admin-stat-card-alert {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+}
+
+.admin-stat-card-alert strong {
+  color: #b91c1c;
+}
+
+/* Sin alert cuando el valor es 0 */
+.admin-stat-card-alert:has(strong:empty),
+.admin-stat-card-alert strong:not(:empty) { }

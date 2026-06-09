@@ -133,7 +133,7 @@ export default function AdminPage() {
 
               <p className="page-lead">
                 Administrá productos, pedidos y métricas de
-                MultiSkinn desde un solo lugar.
+                Kosmos desde un solo lugar.
               </p>
             </div>
 
@@ -159,59 +159,58 @@ export default function AdminPage() {
           ) : (
             <>
               <div className="admin-stats-grid">
+                {/* Métricas de ventas — solo informativos */}
                 <div className="admin-stat-card">
                   <span>Ventas estimadas</span>
-                  <strong>
-                    ${formatARS(stats.totalRevenue)}
-                  </strong>
+                  <strong>${formatARS(stats.totalRevenue)}</strong>
                 </div>
 
                 <div className="admin-stat-card">
-                  <span>Pedidos</span>
+                  <span>Total pedidos</span>
                   <strong>{stats.totalOrders}</strong>
                 </div>
 
                 <div className="admin-stat-card">
                   <span>Ticket promedio</span>
-                  <strong>
-                    ${formatARS(stats.averageTicket)}
-                  </strong>
+                  <strong>${formatARS(stats.averageTicket)}</strong>
                 </div>
 
-                <div className="admin-stat-card">
-                  <span>Pendientes</span>
+                {/* Pedidos por estado — accionables */}
+                <Link to="/admin/orders" className="admin-stat-card admin-stat-card-link admin-stat-card-alert" title="Ver pedidos pendientes">
+                  <span>⏳ Pendientes</span>
                   <strong>{stats.pendingOrders}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
-                  <span>Confirmados</span>
+                <Link to="/admin/orders" className="admin-stat-card admin-stat-card-link">
+                  <span>✓ Confirmados</span>
                   <strong>{stats.confirmedOrders}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
-                  <span>Entregados</span>
+                <Link to="/admin/orders" className="admin-stat-card admin-stat-card-link">
+                  <span>📦 Entregados</span>
                   <strong>{stats.deliveredOrders}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
+                {/* Productos — accionables */}
+                <Link to="/admin/productos" className="admin-stat-card admin-stat-card-link">
                   <span>Productos activos</span>
                   <strong>{stats.activeProducts}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
-                  <span>Destacados</span>
+                <Link to="/admin/productos" className="admin-stat-card admin-stat-card-link">
+                  <span>⭐ Destacados</span>
                   <strong>{stats.featured}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
-                  <span>Stock bajo</span>
+                <Link to="/admin/productos" className={`admin-stat-card admin-stat-card-link ${stats.lowStock > 0 ? "admin-stat-card-warn" : ""}`} title="Ver productos con stock bajo">
+                  <span>⚠️ Stock bajo</span>
                   <strong>{stats.lowStock}</strong>
-                </div>
+                </Link>
 
-                <div className="admin-stat-card">
-                  <span>Sin stock</span>
+                <Link to="/admin/productos" className={`admin-stat-card admin-stat-card-link ${stats.outOfStock > 0 ? "admin-stat-card-alert" : ""}`} title="Ver productos sin stock">
+                  <span>🚫 Sin stock</span>
                   <strong>{stats.outOfStock}</strong>
-                </div>
+                </Link>
               </div>
 
               <div className="admin-dashboard-grid">
