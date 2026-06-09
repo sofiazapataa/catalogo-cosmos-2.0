@@ -19,6 +19,7 @@ export default function AdminTestimonialsPage() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -66,12 +67,13 @@ export default function AdminTestimonialsPage() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("¿Eliminar este testimonio?")) return;
     try {
       await deleteTestimonial(id);
       setItems((prev) => prev.filter((t) => t.id !== id));
+      setConfirmDeleteId(null);
     } catch {
       setError("No se pudo eliminar.");
+      setConfirmDeleteId(null);
     }
   }
 
@@ -185,13 +187,21 @@ export default function AdminTestimonialsPage() {
                       Editar
                     </button>
 
-                    <button
-                      className="admin-action-btn admin-action-btn-danger"
-                      type="button"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      Eliminar
-                    </button>
+                    {confirmDeleteId === item.id ? (
+                      <div className="admin-confirm-delete">
+                        <span>¿Eliminar?</span>
+                        <button className="admin-action-btn admin-action-btn-danger" type="button" onClick={() => handleDelete(item.id)}>Sí</button>
+                        <button className="admin-ghost-btn" type="button" onClick={() => setConfirmDeleteId(null)}>No</button>
+                      </div>
+                    ) : (
+                      <button
+                        className="admin-action-btn admin-action-btn-danger"
+                        type="button"
+                        onClick={() => setConfirmDeleteId(item.id)}
+                      >
+                        Eliminar
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

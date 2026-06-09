@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import {
@@ -6,10 +7,7 @@ import {
   getOrders,
   updateOrderStatus,
 } from "../../services/ordersService";
-
-function formatARS(value) {
-  return Number(value || 0).toLocaleString("es-AR");
-}
+import { formatARS } from "../../utils/pricing";
 
 function formatDate(value) {
   if (!value?.toDate) return "Sin fecha";
@@ -163,6 +161,7 @@ export default function AdminOrdersPage() {
         <section className="admin-panel">
           <div className="admin-topbar">
             <div>
+              <Link to="/admin" className="admin-back-link">← Dashboard</Link>
               <h2>Pedidos</h2>
               <p>
                 Revisá los pedidos generados desde WhatsApp, datos del cliente y

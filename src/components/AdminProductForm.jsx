@@ -10,9 +10,7 @@ function benefitsToText(b) {
 function textToBenefits(t) {
   return t.split("\n").map((s) => s.trim()).filter(Boolean);
 }
-function formatARS(v) {
-  return Number(v || 0).toLocaleString("es-AR");
-}
+import { formatARS } from "../utils/pricing";
 function toNumber(v, fallback = 0) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;

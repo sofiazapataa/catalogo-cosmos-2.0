@@ -133,12 +133,12 @@ $${formatARS(total)}`;
     if (!items.length || savingOrder) return;
 
     if (!customerName.trim()) {
-      alert("Ingresá tu nombre.");
+      setOrderError("Ingresá tu nombre para continuar.");
       return;
     }
 
     if (!customerPhone.trim()) {
-      alert("Ingresá tu teléfono.");
+      setOrderError("Ingresá tu teléfono para continuar.");
       return;
     }
 

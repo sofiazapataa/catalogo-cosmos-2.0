@@ -6,10 +6,7 @@ import Footer from "../../components/Footer";
 
 import { getOrders } from "../../services/ordersService";
 import { getProducts } from "../../services/productsServices";
-
-function formatARS(value) {
-  return Number(value || 0).toLocaleString("es-AR");
-}
+import { formatARS } from "../../utils/pricing";
 
 export default function AdminPage() {
   const [orders, setOrders] = useState([]);
