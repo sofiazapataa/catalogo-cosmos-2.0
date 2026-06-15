@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
@@ -30,6 +31,7 @@ function getStockChip(product) {
 }
 
 export default function AdminProductsPage() {
+  usePageTitle("Productos · Admin");
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -125,7 +127,7 @@ export default function AdminProductsPage() {
           <div className="admin-topbar">
             <div>
               <Link to="/admin" className="admin-back-link">← Dashboard</Link>
-              <h2>Productos</h2>
+              <h1>Productos</h1>
               <p>Gestioná stock, visibilidad, destacados e información de tus productos.</p>
             </div>
 
@@ -188,7 +190,7 @@ export default function AdminProductsPage() {
               return (
                 <article key={product.id} className="admin-list-item">
                   {preview ? (
-                    <img src={preview} alt={product.title} className="admin-list-image" />
+                    <img src={preview} alt={product.title} className="admin-list-image" loading="lazy" />
                   ) : (
                     <div className="admin-list-image admin-list-image-empty">Sin foto</div>
                   )}
@@ -206,10 +208,10 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="admin-quick-actions">
-                      <div className="admin-stock-control">
-                        <button type="button" disabled={isSaving} onClick={() => handleStockChange(product, -1)}>−</button>
-                        <strong>{Number(product.stockQty || 0)}</strong>
-                        <button type="button" disabled={isSaving} onClick={() => handleStockChange(product, 1)}>+</button>
+                      <div className="admin-stock-control" role="group" aria-label={`Stock de ${product.title}`}>
+                        <button type="button" disabled={isSaving} onClick={() => handleStockChange(product, -1)} aria-label={`Reducir stock de ${product.title}`}>−</button>
+                        <strong aria-live="polite">{Number(product.stockQty || 0)}</strong>
+                        <button type="button" disabled={isSaving} onClick={() => handleStockChange(product, 1)} aria-label={`Aumentar stock de ${product.title}`}>+</button>
                       </div>
 
                       <button type="button" className={`admin-toggle-btn ${product.active === false ? "is-off" : "is-on"}`} disabled={isSaving} onClick={() => handleToggleActive(product)}>
@@ -237,9 +239,9 @@ export default function AdminProductsPage() {
                     </button>
 
                     {isConfirmingDelete ? (
-                      <div className="admin-confirm-delete">
+                      <div className="admin-confirm-delete" role="alert">
                         <span>¿Borrar?</span>
-                        <button type="button" className="admin-btn delete" onClick={() => handleDelete(product)}>Sí</button>
+                        <button type="button" className="admin-btn delete" onClick={() => handleDelete(product)} aria-label={`Confirmar borrar ${product.title}`}>Sí</button>
                         <button type="button" className="admin-ghost-btn" onClick={() => setConfirmDeleteId(null)}>No</button>
                       </div>
                     ) : (

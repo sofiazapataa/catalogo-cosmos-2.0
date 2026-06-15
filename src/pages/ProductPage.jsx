@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useList } from "../context/ListContext";
+import { useListRead, useListWrite } from "../context/ListContext";
 import { getProductById } from "../services/productsServices";
 import {
   formatARS,
@@ -10,17 +10,57 @@ import {
   getPaymentPrice,
   getProductDiscountPrice,
 } from "../utils/pricing";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToList, removeOne, getQty } = useList();
+  const { getQty }               = useListRead();
+  const { addToList, removeOne } = useListWrite();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [copied, setCopied] = useState(false);
+
+  usePageTitle(product?.title);
+
+  // JSON-LD: inject Product schema when product data is available
+  useEffect(() => {
+    if (!product) return;
+    const finalPrice = getProductDiscountPrice(product);
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
+      description: product.desc || "",
+      image: product.image || undefined,
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "ARS",
+        price: finalPrice,
+        availability:
+          Number(product.stockQty ?? 0) > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        seller: { "@type": "Organization", name: "Kosmos Skincare" },
+      },
+    };
+    const el = document.getElementById("jsonld-product");
+    if (el) {
+      el.textContent = JSON.stringify(schema);
+    } else {
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.id = "jsonld-product";
+      script.textContent = JSON.stringify(schema);
+      document.head.appendChild(script);
+    }
+    return () => {
+      document.getElementById("jsonld-product")?.remove();
+    };
+  }, [product]);
 
   useEffect(() => {
     setLoading(true);
@@ -57,7 +97,7 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="container product-page-loading">
+        <main id="main-content" className="container product-page-loading" role="status" aria-label="Cargando producto">
           <div className="sk sk-product-img" />
           <div className="sk sk-product-title" />
           <div className="sk sk-product-line" />
@@ -71,7 +111,7 @@ export default function ProductPage() {
     return (
       <>
         <Header />
-        <main className="container product-page-notfound">
+        <main id="main-content" className="container product-page-notfound">
           <h1>Producto no encontrado</h1>
           <p>Este producto no existe o fue dado de baja.</p>
           <Link to="/" className="btn">Ver catálogo</Link>
@@ -111,7 +151,7 @@ export default function ProductPage() {
   return (
     <>
       <Header />
-      <main className="container">
+      <main id="main-content" className="container">
         <nav className="product-page-breadcrumb" aria-label="Ruta de navegación">
           <Link to="/">Catálogo</Link>
           <span aria-hidden="true"> / </span>
@@ -125,7 +165,7 @@ export default function ProductPage() {
               {isOutOfStock && <div className="modal-stock modal-stock-out">Sin stock</div>}
               {hasDiscount && <div className="modal-badge">-{discountPct}%</div>}
               {images.length > 0 ? (
-                <img src={images[activeImage]} alt={product.title} />
+                <img src={images[activeImage]} alt={product.title} loading="lazy" />
               ) : (
                 <div className="product-page-no-img">Sin imagen</div>
               )}
@@ -135,13 +175,13 @@ export default function ProductPage() {
               <div className="product-page-thumbs">
                 {images.map((img, i) => (
                   <button
-                    key={i}
+                    key={img}
                     className={`product-page-thumb ${activeImage === i ? "active" : ""}`}
                     type="button"
                     onClick={() => setActiveImage(i)}
                     aria-label={`Ver imagen ${i + 1}`}
                   >
-                    <img src={img} alt="" />
+                    <img src={img} alt="" loading="lazy" />
                   </button>
                 ))}
               </div>
@@ -243,7 +283,13 @@ export default function ProductPage() {
             </div>
 
             {/* Compartir */}
-            <button className="product-page-share" type="button" onClick={handleShare}>
+            <button
+              className="product-page-share"
+              type="button"
+              onClick={handleShare}
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {copied ? "¡Link copiado!" : "Compartir producto"}
             </button>
           </div>

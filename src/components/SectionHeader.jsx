@@ -16,7 +16,13 @@ export default function SectionHeader({
         <span className="pill section-pill">{count} productos</span>
 
         {canToggle ? (
-          <button className="section-toggle" type="button" onClick={onToggle}>
+          <button
+            className="section-toggle"
+            type="button"
+            aria-expanded={shown}
+            aria-label={shown ? `Ver menos ${title}` : `Ver más ${title}`}
+            onClick={onToggle}
+          >
             {shown ? "Ver menos" : "Ver más"}
           </button>
         ) : null}

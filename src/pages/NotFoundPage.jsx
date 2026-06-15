@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function NotFoundPage() {
+  usePageTitle("Página no encontrada");
   return (
     <>
       <Header />
-      <main className="container not-found-page">
+      <main id="main-content" className="container not-found-page">
         <div className="not-found-content">
           <div className="not-found-kicker">Error 404</div>
           <h1 className="not-found-title">Esta página no existe</h1>

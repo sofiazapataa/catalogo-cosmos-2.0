@@ -5,6 +5,8 @@
   /* ---- Brand colors ---- */
   --green:        #3f4f19;
   --green-2:      #2f3d12;
+  --green-dark:   #2b3512;  /* texto de marca: labels, nav, títulos de sección */
+  --green-darker: #1f270d;  /* titulares grandes, headings destacados */
   --green-100:    #eef4df;  /* chips, badges, priceblock bg */
   --green-50:     #f4f7ee;  /* hover sutiles, backgrounds */
 
@@ -12,14 +14,31 @@
   --bg:           #ececec;
   --card:         #ffffff;
   --neutral-50:   #f7f8f5;  /* surface alternativo */
+  --neutral-100:  #f4f4f4;  /* empty image placeholder start */
+  --neutral-150:  #f0f0f0;  /* skeleton shimmer mid / inactive chip */
+  --neutral-200:  #ededed;  /* empty image placeholder end */
+  --neutral-300:  #e4e4e4;  /* skeleton shimmer bg */
+  --overlay-dark: #1f1f1f;  /* sin-stock badge, dark overlays */
+
+  /* ---- Warm surfaces (gradients & hover) ---- */
+  --warm-bg:           #f8f7f2;  /* hero / section gradient start */
+  --warm-bg-dark:      #eef1e6;  /* hero / section gradient end + nav hover */
+  --modal-img-bg:      #f1f1ed;  /* modal empty-image / img placeholder */
+  --color-placeholder: #9aa1ad;  /* input placeholder text */
+  --footer-text:       #dfe6d3;  /* texto sobre footer verde oscuro */
 
   /* ---- Text ---- */
   --text:         #1b1b1b;
   --muted:        #595959;  /* ratio 5.5:1 sobre blanco — pasa WCAG AA */
 
+  /* ---- Surface ---- */
+  --green-surface: #f6f4ef;  /* warm off-white: image placeholder, hero bg */
+  --surface-chip:  #f6f7f2;  /* light neutral: qty bar, section pills */
+
   /* ---- Border ---- */
-  --border:       #d9d9d9;
-  --border-brand: rgba(63, 79, 25, 0.15);
+  --border:        #d9d9d9;
+  --border-brand:  rgba(63, 79, 25, 0.15);
+  --border-subtle: #dfe5d1;  /* green-tinted subtle border (nav, chips, qtybar) */
 
   /* ---- Semantic ---- */
   --color-success:    #25d366;
@@ -70,12 +89,20 @@
   --admin-border-soft:  rgba(27, 27, 27, 0.05);
   --admin-text:         #233014;
   --admin-text-soft:    #6b7280;
+  --admin-text-muted:   #98a2b3;  /* iconos apagados, placeholders */
   --admin-shadow:       0 8px 24px rgba(15, 23, 42, 0.04);
   --admin-shadow-hover: 0 14px 34px rgba(15, 23, 42, 0.08);
   --admin-radius:       20px;
   --admin-radius-sm:    14px;
   --admin-accent:       var(--green);
   --admin-accent-soft:  #f2f4ee;
+  --admin-section-bg:   #f7f8f3;  /* fondos de sección/panel */
+  --admin-warm-bg:      #fafaf8;  /* fondos cálidos neutros */
+  --admin-border-subtle: #e3e7d8; /* bordes suaves green-tinted */
+  --admin-dark:         #111827;  /* botón oscuro, contraste máximo */
+  --admin-tag-bg:       #f3f4f6;  /* fondo de badges/tags */
+  --admin-tag-text:     #374151;  /* texto de badges/tags */
+  --admin-tag-border:   #e5e7eb;  /* borde de badges/tags */
 }
 
 /* =========================
@@ -84,6 +111,21 @@
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+
+/* ---- Focus visible — teclado y a11y (WCAG 2.4.7) ---- */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+/* Inputs tienen indicador alternativo (border + box-shadow).
+   Suprimimos el outline global para no duplicar. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
 
 body {
   margin: 0;

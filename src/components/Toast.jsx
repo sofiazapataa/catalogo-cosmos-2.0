@@ -1,7 +1,7 @@
-import { useList } from "../context/ListContext";
+import { useListRead } from "../context/ListContext";
 
 export default function Toast() {
-  const { toast } = useList();
+  const { toast } = useListRead();
 
   if (!toast) return null;
 

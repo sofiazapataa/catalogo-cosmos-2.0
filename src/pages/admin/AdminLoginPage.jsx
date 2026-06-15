@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -6,6 +7,7 @@ import Footer from "../../components/Footer";
 import { auth } from "../../services/auth";
 
 export default function AdminLoginPage() {
+  usePageTitle("Ingresar · Admin");
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -37,7 +39,7 @@ export default function AdminLoginPage() {
         <section className="admin-panel">
           <div className="admin-topbar">
             <div>
-              <h2 className="page-title">Ingreso Admin</h2>
+              <h1 className="page-title">Ingreso Admin</h1>
               <p className="page-lead">
                 Solo vos podés acceder al panel de administración.
               </p>

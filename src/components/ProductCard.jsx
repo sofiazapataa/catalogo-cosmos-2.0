@@ -1,5 +1,6 @@
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useList } from "../context/ListContext";
+import { useListRead, useListWrite } from "../context/ListContext";
 import {
   formatARS,
   getPaymentConfig,
@@ -15,13 +16,15 @@ function getCardMeta(product) {
   return null;
 }
 
-export default function ProductCard({ product, onOpen }) {
+function ProductCard({ product, onOpen }) {
   const navigate = useNavigate();
-  const { addToList, removeOne, getQty } = useList();
+  const { getQty }               = useListRead();
+  const { addToList, removeOne } = useListWrite();
 
   if (!product) return null;
 
   const qty = getQty(product.id);
+  // onOpen can be a setter (receives product) or a zero-arg callback
   const canOpen = typeof onOpen === "function";
 
   const isOutOfStock = Number(product.stockQty ?? 0) <= 0;
@@ -51,7 +54,7 @@ export default function ProductCard({ product, onOpen }) {
     if (!canOpen) return;
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onOpen();
+      onOpen(product);
     }
   }
 
@@ -59,7 +62,7 @@ export default function ProductCard({ product, onOpen }) {
     <article className={`card ${isOutOfStock ? "card-out" : ""}`}>
       <div
         className={`card-image ${!product.image ? "card-image--empty" : ""}`}
-        onClick={canOpen ? onOpen : undefined}
+        onClick={canOpen ? () => onOpen(product) : undefined}
         onKeyDown={handleKeyOpen}
         role={canOpen ? "button" : undefined}
         tabIndex={canOpen ? 0 : undefined}
@@ -103,11 +106,7 @@ export default function ProductCard({ product, onOpen }) {
       <div className="card-content">
         <h3
           className="card-title"
-          onClick={canOpen ? onOpen : undefined}
-          onKeyDown={handleKeyOpen}
-          role={canOpen ? "button" : undefined}
-          tabIndex={canOpen ? 0 : undefined}
-          aria-label={canOpen ? `Ver ${product.title}` : undefined}
+          onClick={canOpen ? () => onOpen(product) : undefined}
         >
           {product.title}
         </h3>
@@ -191,6 +190,7 @@ export default function ProductCard({ product, onOpen }) {
                 className="btn btn-outline btn-small card-list-btn"
                 type="button"
                 onClick={() => navigate("/mi-lista")}
+                aria-label="Ver mi lista"
                 title="Ver mi lista"
               >
                 Ver lista
@@ -201,6 +201,7 @@ export default function ProductCard({ product, onOpen }) {
               className="btn btn-small card-main-btn"
               type="button"
               onClick={() => addToList(product)}
+              aria-label={`Agregar ${product.title}`}
             >
               Agregar
             </button>
@@ -210,3 +211,5 @@ export default function ProductCard({ product, onOpen }) {
     </article>
   );
 }
+
+export default memo(ProductCard);

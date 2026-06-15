@@ -47,9 +47,47 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="https://catalogo-cosmos-2-0.vercel.app/" />
+
+    <!-- JSON-LD — LocalBusiness schema (schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "Kosmos Skincare",
+      "description": "Skincare coreano original, vegano y cruelty-free. Rutinas simples y asesoramiento personalizado en Necochea.",
+      "url": "https://catalogo-cosmos-2-0.vercel.app/",
+      "telephone": "+542262357366",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Necochea",
+        "addressRegion": "Buenos Aires",
+        "addressCountry": "AR"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "telephone": "+542262357366",
+        "availableLanguage": "Spanish"
+      },
+      "sameAs": [
+        "https://wa.me/542262357366"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Catálogo Kosmos",
+        "description": "Productos de skincare coreano vegano y cruelty-free"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <style>
+        body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #ececec; color: #1b1b1b; text-align: center; padding: 24px; }
+      </style>
+      <p>Kosmos necesita JavaScript para funcionar. Por favor activalo en tu navegador.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

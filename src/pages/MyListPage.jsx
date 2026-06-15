@@ -6,7 +6,8 @@ import Footer from "../components/Footer";
 
 import { useList } from "../context/ListContext";
 import { createOrder } from "../services/ordersService";
-import { formatARS, getProductDiscountPrice, getPaymentConfig } from "../utils/pricing";
+import { formatARS, getProductDiscountPrice, getPaymentConfig, getPaymentPrice } from "../utils/pricing";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 async function shareList(items, total) {
   const lines = items.map((i) => `• ${i.title} x${i.qty}`).join("\n");
@@ -18,21 +19,6 @@ async function shareList(items, total) {
   }
 }
 
-function getItemPriceByMethod(item, paymentMethod) {
-  const baseFinal = getProductDiscountPrice(item);
-  const payment = getPaymentConfig(item)[paymentMethod];
-
-  if (
-    !payment?.enabled ||
-    !payment.applyDiscount ||
-    Number(payment.discountPct || 0) <= 0
-  ) {
-    return baseFinal;
-  }
-
-  return Math.round(baseFinal * (1 - Number(payment.discountPct || 0) / 100));
-}
-
 function getPaymentLabel(method) {
   if (method === "transfer") return "Transferencia";
   if (method === "cash") return "Efectivo";
@@ -41,6 +27,8 @@ function getPaymentLabel(method) {
 }
 
 export default function MyListPage() {
+  usePageTitle("Mi lista");
+
   const {
     items,
     addToList,
@@ -79,7 +67,7 @@ export default function MyListPage() {
     return items.reduce((acc, item) => {
       return (
         acc +
-        getItemPriceByMethod(item, paymentMethod) *
+        getPaymentPrice(item, paymentMethod) *
           Number(item.qty || 1)
       );
     }, 0);
@@ -87,7 +75,7 @@ export default function MyListPage() {
 
   function buildWhatsappText(orderId) {
     const lines = items.map((item) => {
-      const itemPrice = getItemPriceByMethod(
+      const itemPrice = getPaymentPrice(
         item,
         paymentMethod
       );
@@ -99,7 +87,7 @@ export default function MyListPage() {
 
     return `Hola ✨
 
-Quiero consultar disponibilidad de este pedido de MultiSkinn.
+Quiero consultar disponibilidad de este pedido de Kosmos.
 
 Pedido #${orderId}
 
@@ -185,7 +173,7 @@ $${formatARS(total)}`;
     <>
       <Header />
 
-      <main className="container">
+      <main id="main-content" className="container">
         <div className="checkout-page">
           <div className="checkout-main">
             <section className="panel checkout-panel">
@@ -195,7 +183,7 @@ $${formatARS(total)}`;
                     Tu selección
                   </span>
 
-                  <h2>Mi lista</h2>
+                  <h1>Mi lista</h1>
 
                   <p>
                     Revisá tus productos y completá tus
@@ -248,7 +236,7 @@ $${formatARS(total)}`;
               <div className="panel-body">
                 {!items.length ? (
                   <div className="empty-state">
-                    <h3>Tu lista está vacía</h3>
+                    <h2>Tu lista está vacía</h2>
 
                     <p>
                       Explorá productos y agregalos para
@@ -262,13 +250,14 @@ $${formatARS(total)}`;
                 ) : (
                   <>
                     <div className="checkout-customer-box">
-                      <h3>Datos del cliente</h3>
+                      <h2>Datos del cliente</h2>
 
                       <div className="checkout-form-grid">
                         <div className="checkout-field">
-                          <label>Nombre</label>
+                          <label htmlFor="customer-name">Nombre</label>
 
                           <input
+                            id="customer-name"
                             type="text"
                             value={customerName}
                             onChange={(e) =>
@@ -281,9 +270,10 @@ $${formatARS(total)}`;
                         </div>
 
                         <div className="checkout-field">
-                          <label>Teléfono</label>
+                          <label htmlFor="customer-phone">Teléfono</label>
 
                           <input
+                            id="customer-phone"
                             type="text"
                             value={customerPhone}
                             onChange={(e) =>
@@ -297,9 +287,10 @@ $${formatARS(total)}`;
                       </div>
 
                       <div className="checkout-field">
-                        <label>Entrega</label>
+                        <label htmlFor="customer-delivery">Entrega</label>
 
                         <select
+                          id="customer-delivery"
                           value={deliveryType}
                           onChange={(e) =>
                             setDeliveryType(
@@ -319,11 +310,12 @@ $${formatARS(total)}`;
 
                       {deliveryType === "delivery" ? (
                         <div className="checkout-field">
-                          <label>
+                          <label htmlFor="customer-address">
                             Dirección / zona
                           </label>
 
                           <input
+                            id="customer-address"
                             type="text"
                             value={customerAddress}
                             onChange={(e) =>
@@ -337,9 +329,10 @@ $${formatARS(total)}`;
                       ) : null}
 
                       <div className="checkout-field">
-                        <label>Nota</label>
+                        <label htmlFor="customer-note">Nota</label>
 
                         <textarea
+                          id="customer-note"
                           value={customerNote}
                           onChange={(e) =>
                             setCustomerNote(
@@ -354,7 +347,7 @@ $${formatARS(total)}`;
                     <div className="list-table">
                       {items.map((item) => {
                         const finalPrice =
-                          getItemPriceByMethod(
+                          getPaymentPrice(
                             item,
                             paymentMethod
                           );
@@ -369,6 +362,7 @@ $${formatARS(total)}`;
                                 src={item.image}
                                 alt={item.title}
                                 className="list-img"
+                                loading="lazy"
                               />
                             ) : (
                               <div className="list-img list-img-empty">
@@ -448,7 +442,7 @@ $${formatARS(total)}`;
                       Resumen
                     </span>
 
-                    <h3>Total estimado</h3>
+                    <h2>Total estimado</h2>
                   </div>
 
                   <div className="summary-price">
@@ -456,7 +450,7 @@ $${formatARS(total)}`;
                   </div>
 
                   <div className="checkout-box">
-                    <h3>Método de pago</h3>
+                    <h2>Método de pago</h2>
 
                     <div className="pay-methods">
                       <label className="pay-option">

@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
@@ -13,6 +14,7 @@ import {
 } from "../../services/productsServices";
 
 export default function AdminCombosPage() {
+  usePageTitle("Combos · Admin");
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -96,7 +98,7 @@ export default function AdminCombosPage() {
           <div className="admin-topbar">
             <div>
               <Link to="/admin" className="admin-back-link">← Dashboard</Link>
-              <h2>Combos</h2>
+              <h1>Combos</h1>
               <p>Gestioná promociones, rutinas y combos del catálogo.</p>
             </div>
 
@@ -155,7 +157,7 @@ export default function AdminCombosPage() {
               return (
                 <article key={combo.id} className="admin-list-item">
                   {preview ? (
-                    <img src={preview} alt={combo.title} className="admin-list-image" />
+                    <img src={preview} alt={combo.title} className="admin-list-image" loading="lazy" />
                   ) : (
                     <div className="admin-list-image admin-list-image-empty">Sin foto</div>
                   )}

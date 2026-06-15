@@ -1,6 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-const ListContext = createContext(null);
+// ─── Contexts ──────────────────────────────────────────────
+// Split into read / write so components that only mutate the list
+// (addToList, removeOne, etc.) don't re-render when items change.
+const ListReadContext  = createContext(null);
+const ListWriteContext = createContext(null);
 
 const STORAGE_KEY = "kosmos_my_list_v1";
 
@@ -26,13 +30,14 @@ export function ListProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  function showToast(message) {
+  // ─── Write operations (stable refs — no deps that change) ───
+  const showToast = useCallback((message) => {
     clearTimeout(toastTimerRef.current);
     setToast({ message, id: Date.now() });
     toastTimerRef.current = setTimeout(() => setToast(null), 2200);
-  }
+  }, []);
 
-  function addToList(product) {
+  const addToList = useCallback((product) => {
     setItems((prev) => {
       const found = prev.find((i) => i.id === product.id);
       if (found) {
@@ -43,9 +48,9 @@ export function ListProvider({ children }) {
       return [...prev, { ...product, qty: 1 }];
     });
     showToast(`${product.title} agregado a tu lista`);
-  }
+  }, [showToast]);
 
-  function removeOne(productId) {
+  const removeOne = useCallback((productId) => {
     setItems((prev) => {
       const found = prev.find((i) => i.id === productId);
       if (!found) return prev;
@@ -54,59 +59,80 @@ export function ListProvider({ children }) {
         i.id === productId ? { ...i, qty: i.qty - 1 } : i
       );
     });
-  }
+  }, []);
 
-  function deleteItem(productId) {
+  const deleteItem = useCallback((productId) => {
     setItems((prev) => prev.filter((i) => i.id !== productId));
-  }
+  }, []);
 
-  function clearList() {
+  const clearList = useCallback(() => {
     setItems([]);
-  }
+  }, []);
 
-  function getQty(productId) {
-    const found = items.find((i) => i.id === productId);
-    return found ? found.qty : 0;
-  }
-
-  function setQty(productId, qty) {
+  const setQty = useCallback((productId, qty) => {
     setItems((prev) => {
       if (qty <= 0) return prev.filter((i) => i.id !== productId);
       return prev.map((i) => (i.id === productId ? { ...i, qty } : i));
     });
-  }
+  }, []);
 
-  const total = useMemo(() => {
-    return items.reduce((acc, it) => acc + it.price * it.qty, 0);
-  }, [items]);
-
-  const count = useMemo(() => {
-    return items.reduce((acc, it) => acc + it.qty, 0);
-  }, [items]);
-
-  const value = useMemo(
-    () => ({
-      items,
-      addToList,
-      removeOne,
-      deleteItem,
-      clearList,
-      getQty,
-      setQty,
-      total,
-      count,
-      toast,
-    }),
-    [items, total, count, toast]
+  // ─── WriteContext value — stable, never changes ──────────────
+  const writeValue = useMemo(
+    () => ({ addToList, removeOne, deleteItem, clearList, setQty }),
+    [addToList, removeOne, deleteItem, clearList, setQty]
   );
 
-  return <ListContext.Provider value={value}>{children}</ListContext.Provider>;
+  // ─── Read-only derived values ────────────────────────────────
+  const total = useMemo(
+    () => items.reduce((acc, it) => acc + it.price * it.qty, 0),
+    [items]
+  );
+
+  const count = useMemo(
+    () => items.reduce((acc, it) => acc + it.qty, 0),
+    [items]
+  );
+
+  const getQty = useCallback(
+    (productId) => {
+      const found = items.find((i) => i.id === productId);
+      return found ? found.qty : 0;
+    },
+    [items]
+  );
+
+  // ─── ReadContext value — changes when items / toast change ───
+  const readValue = useMemo(
+    () => ({ items, count, total, getQty, toast }),
+    [items, count, total, getQty, toast]
+  );
+
+  return (
+    <ListWriteContext.Provider value={writeValue}>
+      <ListReadContext.Provider value={readValue}>
+        {children}
+      </ListReadContext.Provider>
+    </ListWriteContext.Provider>
+  );
 }
 
-export function useList() {
-  const ctx = useContext(ListContext);
-  if (!ctx) {
-    throw new Error("useList debe usarse dentro de <ListProvider />");
-  }
+// ─── Hooks ──────────────────────────────────────────────────
+
+/** Read-only: items, count, total, getQty, toast */
+export function useListRead() {
+  const ctx = useContext(ListReadContext);
+  if (!ctx) throw new Error("useListRead debe usarse dentro de <ListProvider />");
   return ctx;
+}
+
+/** Write-only: addToList, removeOne, deleteItem, clearList, setQty */
+export function useListWrite() {
+  const ctx = useContext(ListWriteContext);
+  if (!ctx) throw new Error("useListWrite debe usarse dentro de <ListProvider />");
+  return ctx;
+}
+
+/** Convenience: merges read + write (use only when you need both, e.g. MyListPage) */
+export function useList() {
+  return { ...useListRead(), ...useListWrite() };
 }

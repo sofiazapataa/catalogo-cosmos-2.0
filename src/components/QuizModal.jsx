@@ -98,7 +98,13 @@ export default function QuizModal({ onClose, onApplyFilter }) {
 
   return (
     <div className="modal-overlay quiz-overlay" onMouseDown={handleOverlayClick}>
-      <div className="quiz-modal" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className="quiz-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quiz-modal-title"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <button className="modal-close" type="button" onClick={onClose} aria-label="Cerrar">
           ✕
         </button>
@@ -114,8 +120,8 @@ export default function QuizModal({ onClose, onApplyFilter }) {
               ))}
             </div>
 
-            <p className="quiz-step-label">Paso {step + 1} de {totalSteps}</p>
-            <h2 className="quiz-question">{STEPS[step].question}</h2>
+            <p className="quiz-step-label" aria-live="polite" aria-atomic="true">Paso {step + 1} de {totalSteps}</p>
+            <h2 id="quiz-modal-title" className="quiz-question">{STEPS[step].question}</h2>
 
             <div className="quiz-options">
               {STEPS[step].options.map((opt) => (
@@ -135,6 +141,7 @@ export default function QuizModal({ onClose, onApplyFilter }) {
               <button
                 className="quiz-back"
                 type="button"
+                aria-label="Volver al paso anterior"
                 onClick={() => setStep((s) => s - 1)}
               >
                 ← Volver
@@ -144,7 +151,7 @@ export default function QuizModal({ onClose, onApplyFilter }) {
         ) : (
           <>
             <div className="quiz-result-kicker">Tu rutina personalizada</div>
-            <h2 className="quiz-question">
+            <h2 id="quiz-modal-title" className="quiz-question">
               Rutina para piel {answers.skinType}
             </h2>
             <p className="quiz-result-sub">

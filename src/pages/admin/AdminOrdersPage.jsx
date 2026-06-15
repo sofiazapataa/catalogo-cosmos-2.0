@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
@@ -47,7 +48,7 @@ function buildAdminWhatsappText(order) {
     .join("\n");
 
   return `Hola ${customer.name || ""} ✨
-Te escribo por tu pedido de MultiSkinn.
+Te escribo por tu pedido de Kosmos.
 
 Pedido #${order.id}
 
@@ -71,6 +72,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function AdminOrdersPage() {
+  usePageTitle("Pedidos · Admin");
   const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -162,7 +164,7 @@ export default function AdminOrdersPage() {
           <div className="admin-topbar">
             <div>
               <Link to="/admin" className="admin-back-link">← Dashboard</Link>
-              <h2>Pedidos</h2>
+              <h1>Pedidos</h1>
               <p>
                 Revisá los pedidos generados desde WhatsApp, datos del cliente y
                 estado de cada compra.
@@ -207,10 +209,11 @@ export default function AdminOrdersPage() {
             </div>
           </div>
 
-          <div className="admin-filters admin-orders-filters">
+          <div className="admin-filters admin-orders-filters" role="group" aria-label="Filtrar pedidos por estado">
             <button
               type="button"
               className={statusFilter === "all" ? "active" : ""}
+              aria-pressed={statusFilter === "all"}
               onClick={() => setStatusFilter("all")}
             >
               Todos
@@ -221,6 +224,7 @@ export default function AdminOrdersPage() {
                 key={status.value}
                 type="button"
                 className={statusFilter === status.value ? "active" : ""}
+                aria-pressed={statusFilter === status.value}
                 onClick={() => setStatusFilter(status.value)}
               >
                 {status.label}
@@ -306,7 +310,7 @@ export default function AdminOrdersPage() {
                           className="admin-order-product"
                         >
                           {item.image ? (
-                            <img src={item.image} alt={item.title} />
+                            <img src={item.image} alt={item.title} loading="lazy" />
                           ) : (
                             <div className="admin-order-product-empty">
                               Sin foto
@@ -323,7 +327,7 @@ export default function AdminOrdersPage() {
                       ))}
                     </div>
 
-                    <div className="admin-order-actions">
+                    <div className="admin-order-actions" role="group" aria-label="Estado del pedido">
                       {STATUS_OPTIONS.map((status) => (
                         <button
                           key={status.value}
@@ -333,6 +337,7 @@ export default function AdminOrdersPage() {
                               ? "admin-order-action is-active"
                               : "admin-order-action"
                           }
+                          aria-pressed={order.status === status.value}
                           disabled={updatingId === order.id}
                           onClick={() =>
                             handleStatusChange(order.id, status.value)
@@ -354,9 +359,9 @@ export default function AdminOrdersPage() {
                       ) : null}
 
                       {confirmDeleteId === order.id ? (
-                        <div className="admin-confirm-delete">
+                        <div className="admin-confirm-delete" role="alert">
                           <span>¿Eliminar?</span>
-                          <button type="button" className="admin-order-delete" onClick={() => handleDelete(order.id)}>Sí</button>
+                          <button type="button" className="admin-order-delete" onClick={() => handleDelete(order.id)} aria-label="Confirmar eliminar pedido">Sí</button>
                           <button type="button" className="admin-ghost-btn" onClick={() => setConfirmDeleteId("")}>No</button>
                         </div>
                       ) : (

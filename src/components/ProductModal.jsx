@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useList } from "../context/ListContext";
+import { useListRead, useListWrite } from "../context/ListContext";
 import {
   formatARS,
   getPaymentConfig,
@@ -10,7 +10,8 @@ import {
 
 export default function ProductModal({ product, onClose }) {
   const navigate = useNavigate();
-  const { addToList, removeOne, getQty } = useList();
+  const { getQty }               = useListRead();
+  const { addToList, removeOne } = useListWrite();
   const [activeImage, setActiveImage] = useState(0);
   const [copied, setCopied] = useState(false);
   const modalRef = useRef(null);
@@ -183,6 +184,7 @@ export default function ProductModal({ product, onClose }) {
                   className="modal-img"
                   src={images[activeImage]}
                   alt={product.title}
+                  loading="lazy"
                 />
               </div>
 
@@ -217,7 +219,7 @@ export default function ProductModal({ product, onClose }) {
                         onClick={() => setActiveImage(index)}
                         aria-label={`Ver imagen ${index + 1}`}
                       >
-                        <img src={img} alt="" />
+                        <img src={img} alt="" loading="lazy" />
                       </button>
                     ))}
                   </div>

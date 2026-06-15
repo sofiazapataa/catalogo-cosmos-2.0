@@ -357,7 +357,7 @@ export default function AdminProductForm({ initialData = null, mode = "product",
               {/* Vista compacta: imagen actual + botones de acción */}
               <div className="admin-image-compact">
                 {mainImagePreview ? (
-                  <img className="admin-image-compact-thumb" src={mainImagePreview} alt="Imagen actual" />
+                  <img className="admin-image-compact-thumb" src={mainImagePreview} alt="Imagen actual" loading="lazy" />
                 ) : (
                   <div className="admin-image-compact-empty">Sin imagen</div>
                 )}
@@ -426,7 +426,7 @@ export default function AdminProductForm({ initialData = null, mode = "product",
                       return (
                         <article key={imageName} className={`admin-image-card ${isMain ? "is-main" : ""} ${isGallery ? "is-selected" : ""}`}>
                           <button type="button" className="admin-image-thumb" onClick={() => selectMainImage(imageName)}>
-                            <img src={src} alt={imageName} />
+                            <img src={src} alt={imageName} loading="lazy" />
                             {isMain ? <span className="admin-image-badge">✓ Principal</span> : null}
                           </button>
                           <div className="admin-image-actions">

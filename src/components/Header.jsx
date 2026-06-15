@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { useList } from "../context/ListContext";
+import { useListRead } from "../context/ListContext";
 
 export default function Header() {
-  const { count } = useList();
+  const { count } = useListRead();
 
   return (
     <header className="topbar">
+      {/* Skip link — WCAG 2.4.1: visible solo al recibir foco con teclado */}
+      <a href="#main-content" className="skip-link">Saltar al contenido</a>
+
       <div className="topbar-inner">
         <NavLink to="/" className="brand" aria-label="Ir al inicio">
           <span className="brand-small">Catálogo skincare</span>

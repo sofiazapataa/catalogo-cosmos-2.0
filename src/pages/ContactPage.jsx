@@ -1,11 +1,13 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const WHATSAPP_NUMBER = "542262357366"; // wa.me necesita prefijo país sin +, sin espacios
 const DISPLAY_PHONE = "(2262) 357366";
 const EMAIL = "sofizapata2004@gmail.com";
 
 export default function ContactPage() {
+  usePageTitle("Contacto");
   const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     "Hola! Quiero hacer una consulta / reservar."
   )}`;
@@ -18,10 +20,10 @@ export default function ContactPage() {
     <>
       <Header />
 
-      <main className="container">
+      <main id="main-content" className="container">
         <section className="page-hero" style={{ alignItems: "stretch" }}>
           <div>
-            <h2 className="page-title">Contacto</h2>
+            <h1 className="page-title">Contacto</h1>
             <p className="page-lead">
               Reservas por mensaje directo. <strong>Entrega inmediata.</strong>
             </p>

@@ -18,7 +18,7 @@
 .modal {
   width: min(1080px, 100%);
   height: min(92dvh, 920px);
-  background: #fff;
+  background: var(--card);
   border-radius: 30px;
   position: relative;
   overflow: hidden;
@@ -43,7 +43,7 @@
   border-radius: 999px;
   border: 1px solid rgba(63, 79, 25, 0.14);
   background: rgba(255, 255, 255, 0.94);
-  color: #24300d;
+  color: var(--green-darker);
   font-size: 19px;
   font-weight: 900;
   cursor: pointer;
@@ -58,7 +58,7 @@
   align-self: start;
   height: min(92dvh, 920px);
   padding: 26px;
-  background: linear-gradient(180deg, #f8f6ef 0%, #eeece4 100%);
+  background: linear-gradient(180deg, var(--green-surface) 0%, var(--warm-bg-dark) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +71,7 @@
   max-height: 820px;
   border-radius: 26px;
   overflow: hidden;
-  background: #f6f4ef;
+  background: var(--green-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,7 +90,7 @@
   border-radius: 26px;
   display: grid;
   place-items: center;
-  background: #f1f1ed;
+  background: var(--modal-img-bg);
   color: var(--muted);
   font-weight: 900;
 }
@@ -106,7 +106,7 @@
   padding: 10px 15px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.9);
-  color: #1b1b1b;
+  color: var(--text);
   font-size: 14px;
   font-weight: 900;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
@@ -115,8 +115,8 @@
 .modal-stock {
   left: auto;
   right: 42px;
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--overlay-dark);
+  color: var(--card);
 }
 
 /* GALLERY */
@@ -131,7 +131,7 @@
   border-radius: 999px;
   border: 1px solid rgba(63, 79, 25, 0.13);
   background: rgba(255, 255, 255, 0.92);
-  color: #2b3512;
+  color: var(--green-dark);
   font-size: 32px;
   line-height: 1;
   display: grid;
@@ -172,7 +172,7 @@
   border: 2px solid transparent;
   overflow: hidden;
   cursor: pointer;
-  background: #fff;
+  background: var(--card);
   opacity: 0.72;
 }
 
@@ -201,8 +201,8 @@
   margin-bottom: 12px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: #f2f4ee;
-  border: 1px solid #dfe5d1;
+  background: var(--admin-accent-soft);
+  border: 1px solid var(--border-subtle);
   color: var(--green);
   font-size: 12px;
   font-weight: 900;
@@ -214,7 +214,7 @@
   margin: 0;
   font-size: 36px;
   line-height: 1;
-  color: #2b3512;
+  color: var(--green-dark);
   font-weight: 900;
   letter-spacing: -0.055em;
 }
@@ -231,15 +231,15 @@
   margin-top: 16px;
   padding: 10px 14px;
   border-radius: 999px;
-  background: #f2f4ee;
-  border: 1px solid #dfe5d1;
+  background: var(--admin-accent-soft);
+  border: 1px solid var(--border-subtle);
   color: var(--green);
   font-size: 13px;
   font-weight: 900;
 }
 
 .modal-chip-main {
-  background: #eef4df;
+  background: var(--green-100);
 }
 
 /* PRICE */
@@ -248,8 +248,8 @@
   margin: 22px 0 0;
   padding: 18px;
   border-radius: 22px;
-  border: 1px solid #e3e7d8;
-  background: linear-gradient(180deg, #f8f8f4 0%, #f5f6f0 100%);
+  border: 1px solid var(--admin-border-subtle);
+  background: linear-gradient(180deg, var(--surface-chip) 0%, var(--green-surface) 100%);
 }
 
 .modal-price-label {
@@ -300,10 +300,10 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: 15px;
-  background: #fff;
-  border: 1px solid #e3e7d8;
+  background: var(--card);
+  border: 1px solid var(--admin-border-subtle);
   font-size: 13px;
-  color: #2b3512;
+  color: var(--green-dark);
 }
 
 .modal-payment-row span {
@@ -320,7 +320,7 @@
   font-size: 11px;
   font-weight: 900;
   color: var(--green);
-  background: #eef4df;
+  background: var(--green-100);
   border-radius: 999px;
   padding: 5px 8px;
 }
@@ -339,7 +339,7 @@
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #2b3512;
+  color: var(--green-dark);
 }
 
 .modal-section p,
@@ -348,7 +348,7 @@
 .modal-block li {
   font-size: 14px;
   line-height: 1.6;
-  color: #444;
+  color: var(--text);
 }
 
 .modal-list,
@@ -381,14 +381,14 @@
 .modal-qtybar {
   padding: 3px;
   border-radius: 18px;
-  background: #f6f7f2;
-  border: 1px solid #dfe5d1;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-subtle);
 }
 
 .modal-whatsapp {
-  background: #25d366;
-  border-color: #25d366;
-  color: #fff;
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--card);
   box-shadow: 0 12px 26px rgba(37, 211, 102, 0.2);
 }
 

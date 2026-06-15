@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   runTransaction,
@@ -251,16 +252,22 @@ async function restoreStock(items = []) {
   });
 }
 
-export async function getOrders() {
-  const ordersRef = collection(db, "orders");
-  const q = query(ordersRef, orderBy("createdAt", "desc"));
-
+export async function getOrders({ maxResults = 200 } = {}) {
+  const q = query(
+    collection(db, "orders"),
+    orderBy("createdAt", "desc"),
+    limit(maxResults)
+  );
   const snapshot = await getDocs(q);
-
   return snapshot.docs.map((docItem) => ({
     id: docItem.id,
     ...docItem.data(),
   }));
+}
+
+// Para la HomePage solo necesitamos los últimos pedidos para calcular bestsellers
+export async function getRecentOrders(maxResults = 100) {
+  return getOrders({ maxResults });
 }
 
 export async function updateOrderStatus(orderId, status) {

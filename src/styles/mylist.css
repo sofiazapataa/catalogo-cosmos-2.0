@@ -51,8 +51,8 @@
   padding: 8px 12px;
   margin-bottom: 10px;
   border-radius: 999px;
-  background: #eef4df;
-  border: 1px solid #dfe5d1;
+  background: var(--green-100);
+  border: 1px solid var(--border-subtle);
   color: var(--green);
   font-size: 11px;
   font-weight: 900;
@@ -62,7 +62,7 @@
 
 .checkout-head h2 {
   margin: 0;
-  color: #1f270d;
+  color: var(--green-darker);
   font-size: 34px;
   line-height: 0.95;
   letter-spacing: -0.05em;
@@ -88,13 +88,13 @@
   margin-bottom: 24px;
   padding: 18px;
   border-radius: 24px;
-  background: #f7f8f3;
-  border: 1px solid #e3e7d8;
+  background: var(--admin-section-bg);
+  border: 1px solid var(--admin-border-subtle);
 }
 
 .checkout-customer-box h3 {
   margin: 0 0 16px;
-  color: #1f270d;
+  color: var(--green-darker);
   font-size: 22px;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -115,7 +115,7 @@
 }
 
 .checkout-field label {
-  color: #2b3512;
+  color: var(--green-dark);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -127,15 +127,15 @@
 .checkout-field textarea {
   width: 100%;
   border: 1px solid rgba(63, 79, 25, 0.14);
-  background: #fff;
-  color: #1b1b1b;
+  background: var(--card);
+  color: var(--text);
   border-radius: 16px;
   padding: 13px 14px;
-  outline: none;
   font-size: 14px;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+  /* outline gestionado por :focus-visible global */
 }
 
 .checkout-field input:focus,
@@ -167,7 +167,7 @@
   align-items: center;
   padding: 14px;
   border-radius: 22px;
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(63, 79, 25, 0.1);
 }
 
@@ -176,8 +176,8 @@
   height: 76px;
   border-radius: 18px;
   object-fit: cover;
-  border: 1px solid #e3e7d8;
-  background: #f6f4ef;
+  border: 1px solid var(--admin-border-subtle);
+  background: var(--green-surface);
 }
 
 .list-img-empty {
@@ -194,7 +194,7 @@
 
 .name-title {
   margin: 0;
-  color: #2b3512;
+  color: var(--green-dark);
   font-size: 16px;
   font-weight: 900;
   line-height: 1.2;
@@ -207,8 +207,8 @@
   margin-top: 12px;
   padding: 4px;
   border-radius: 999px;
-  background: #f6f7f2;
-  border: 1px solid #dfe5d1;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-subtle);
 }
 
 .rightcol {
@@ -229,8 +229,8 @@
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  border: 1px solid #dfe5d1;
-  background: #fff;
+  border: 1px solid var(--border-subtle);
+  background: var(--card);
   color: var(--muted);
   font-size: 18px;
   font-weight: 900;
@@ -268,7 +268,7 @@
 
 .summary-top h3 {
   margin: 12px 0 0;
-  color: #1f270d;
+  color: var(--green-darker);
   font-size: 34px;
   line-height: 0.95;
   letter-spacing: -0.05em;
@@ -288,13 +288,13 @@
   margin-top: 18px;
   padding: 16px;
   border-radius: 22px;
-  background: #f8f8f4;
-  border: 1px solid #dfe5d1;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-subtle);
 }
 
 .checkout-box h3 {
   margin: 0 0 14px;
-  color: #2b3512;
+  color: var(--green-dark);
   font-size: 16px;
   font-weight: 900;
 }
@@ -312,12 +312,22 @@
   gap: 10px;
   padding: 0 14px;
   border-radius: 18px;
-  background: #fff;
-  border: 1px solid #dfe5d1;
-  color: #333;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.pay-option:hover {
+  border-color: var(--green);
+  box-shadow: 0 8px 18px rgba(17, 24, 10, 0.06);
+  transform: translateY(-1px);
 }
 
 .pay-option input {
@@ -328,6 +338,7 @@
 
 .pay-option input:checked + span {
   color: var(--green);
+  font-weight: 900;
 }
 
 .btn-whatsapp {
@@ -335,9 +346,9 @@
   margin-top: 18px;
   min-height: 58px;
   border-radius: 20px;
-  background: #25d366;
-  border-color: #25d366;
-  color: #fff;
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--card);
   font-size: 16px;
   font-weight: 900;
   box-shadow: 0 16px 34px rgba(37, 211, 102, 0.25);
@@ -359,7 +370,7 @@
 
 .empty-state h3 {
   margin: 0;
-  color: #1f270d;
+  color: var(--green-darker);
   font-size: 28px;
   font-weight: 900;
   letter-spacing: -0.04em;
@@ -432,59 +443,4 @@
   .pay-option {
     width: 100%;
   }
-}
-/* =========================
-   STOCK ALERTS
-========================= */
-
-.stock-alert-box {
-  margin-bottom: 18px;
-  padding: 16px;
-  border-radius: 22px;
-  border: 1px solid #fecdd3;
-  background: #fff1f2;
-}
-
-.stock-alert-box h3 {
-  margin: 0;
-  color: #9f1239;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-}
-
-.stock-alert-box p {
-  margin: 8px 0 0;
-  color: #7f1d1d;
-  font-size: 13px;
-  line-height: 1.45;
-  font-weight: 700;
-}
-
-.stock-alert-list {
-  display: grid;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.stock-alert-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: #fff;
-  border: 1px solid #fecdd3;
-}
-
-.stock-alert-item strong {
-  color: #1f270d;
-  font-size: 13px;
-}
-
-.stock-alert-item span {
-  color: #9f1239;
-  font-size: 13px;
-  font-weight: 900;
-  text-align: right;
 }

@@ -122,41 +122,14 @@
     padding: 7px 10px;
   }
 
-  /* =========================
-     FIX MODAL / PANEL MOBILE
-     ========================= */
-  .reserve-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    width: 100%;
-    align-items: stretch;
-  }
-
-  .list-configs {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    gap: 12px;
-    flex: 1 1 auto;
-  }
-
-  .pay-methods,
-  .delivery-methods,
-  .shipping-box,
-  .panel-total,
-  .total-box,
-  .summary-box {
-    width: 100%;
-    min-width: 0;
-  }
-
   .pay-methods {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 12px;
     border-radius: 16px;
+    width: 100%;
+    min-width: 0;
   }
 
   .pay-option {
@@ -182,31 +155,6 @@
     flex: 1;
     min-width: 0;
   }
-
-  .reserve-actions .btn,
-  .reserve-actions a.btn {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    min-height: 52px;
-    padding: 13px 16px;
-    border-radius: 16px;
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.2px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(63, 79, 25, 0.14);
-  }
-
-  .reserve-actions .btn:hover,
-  .reserve-actions a.btn:hover {
-    transform: none;
-    box-shadow: 0 8px 20px rgba(63, 79, 25, 0.14);
-  }
 }
 
 /* =========================
@@ -217,19 +165,6 @@
     width: 100%;
     min-width: 0;
     margin-left: 0;
-  }
-
-  .reserve-actions {
-    width: 100%;
-  }
-
-  .list-configs {
-    min-width: 0;
-  }
-
-  .reserve-actions .btn,
-  .reserve-actions a.btn {
-    min-width: 0;
   }
 }
 
@@ -285,5 +220,53 @@
 
   .card {
     padding: 16px;
+  }
+}
+
+/* =========================
+   5. MOTION PREFERENCES
+   WCAG 2.1 SC 2.3.3 — Animation from Interactions
+   ========================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Skeleton: mostrar fondo sólido en lugar de shimmer */
+  .sk {
+    background: var(--neutral-200) !important;
+    background-size: unset !important;
+  }
+}
+
+/* =========================
+   6. TOUCH / MÓVIL UX
+   ========================= */
+@media (hover: none) and (pointer: coarse) {
+  /* Elimina el highlight azul al tocar en mobile */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Previene el delay de 300ms en elementos interactivos */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Card hover overlay solo relevante en desktop */
+  .card-quick-view {
+    display: none;
   }
 }

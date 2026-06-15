@@ -17,6 +17,7 @@ export default function CatalogControls({
       <input
         className="input"
         type="search"
+        aria-label="Buscar productos"
         placeholder="Buscar productos…"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
@@ -24,6 +25,7 @@ export default function CatalogControls({
 
       <select
         className="select"
+        aria-label="Categoría"
         value={category}
         onChange={(e) => onCategoryChange(e.target.value)}
       >
@@ -51,6 +53,7 @@ export default function CatalogControls({
 
       <select
         className="select"
+        aria-label="Ordenar por"
         value={sort}
         onChange={(e) => onSortChange(e.target.value)}
       >

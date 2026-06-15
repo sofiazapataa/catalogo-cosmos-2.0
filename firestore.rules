@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    function isValidOrder() {
+      let data = request.resource.data;
+      return data.keys().hasAll(["items", "paymentMethod", "total", "status", "createdAt"])
+        && data.items is list
+        && data.items.size() > 0
+        && data.items.size() <= 30
+        && data.total is number
+        && data.total >= 0
+        && data.total <= 9999999
+        && data.status == "pending"
+        && data.source == "whatsapp"
+        && (data.paymentMethod == "transfer" || data.paymentMethod == "cash" || data.paymentMethod == "other");
+    }
+
+    // ─── Products ─────────────────────────────────────────────────────────────
+    // Público: solo leer productos activos
+    // Admin: crear, editar, borrar
+    match /products/{productId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── Combos ───────────────────────────────────────────────────────────────
+    match /combos/{comboId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── Orders ───────────────────────────────────────────────────────────────
+    // Público: crear pedido (con validación) + actualizar stockRestored
+    // Admin: leer todos, actualizar estado, borrar
+    match /orders/{orderId} {
+      allow read: if isAdmin();
+      allow create: if isValidOrder();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ─── Testimonials ─────────────────────────────────────────────────────────
+    // Público: leer solo los activos
+    // Admin: crear, editar, borrar
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── Bloqueo total para cualquier otra colección ───────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

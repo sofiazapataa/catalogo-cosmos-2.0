@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProducts } from "../hooks/useProducts";
 
 import Header from "../components/Header";
@@ -10,14 +10,13 @@ import ProductModal from "../components/ProductModal";
 import SkeletonCard from "../components/SkeletonCard";
 
 import { filterProducts, sortProducts } from "../utils/catalog";
-import { getOrders } from "../services/ordersService";
+import { getRecentOrders } from "../services/ordersService";
 import { formatARS, getProductDiscountPrice } from "../utils/pricing";
 import ErrorState from "../components/ErrorState";
 import TestimonialsSection from "../components/TestimonialsSection";
 import QuizModal from "../components/QuizModal";
 import RoutineSection from "../components/RoutineSection";
-
-const getFinalPrice = getProductDiscountPrice;
+import { usePageTitle } from "../hooks/usePageTitle";
 
 function buildSalesMap(orders = []) {
   const map = {};
@@ -44,6 +43,8 @@ function buildSalesMap(orders = []) {
 }
 
 export default function HomePage() {
+  usePageTitle("Catálogo");
+
   const { combos, stock, loading, error, reload } = useProducts();
 
   const [orders, setOrders] = useState([]);
@@ -65,7 +66,7 @@ export default function HomePage() {
   useEffect(() => {
     async function loadOrders() {
       try {
-        const data = await getOrders();
+        const data = await getRecentOrders(100);
         setOrders(data || []);
       } catch (error) {
         console.error("No se pudieron cargar los pedidos para bestseller", error);
@@ -77,45 +78,24 @@ export default function HomePage() {
 
   const salesMap = useMemo(() => buildSalesMap(orders), [orders]);
 
-  const allProductsRaw = useMemo(() => {
-    return [...combos, ...stock];
-  }, [combos, stock]);
-
   const allProducts = useMemo(() => {
-    return allProductsRaw.map((product) => {
+    return [...combos, ...stock].map((product) => {
       const soldQty = salesMap[product.id]?.qty || 0;
-
-      return {
-        ...product,
-        soldQty,
-        bestseller: soldQty > 0,
-      };
+      return { ...product, soldQty, bestseller: soldQty > 0 };
     });
-  }, [allProductsRaw, salesMap]);
+  }, [combos, stock, salesMap]);
 
-  const combosWithSales = useMemo(() => {
-    return combos.map((product) => {
-      const soldQty = salesMap[product.id]?.qty || 0;
+  const comboIds = useMemo(() => new Set(combos.map((c) => c.id)), [combos]);
 
-      return {
-        ...product,
-        soldQty,
-        bestseller: soldQty > 0,
-      };
-    });
-  }, [combos, salesMap]);
+  const combosWithSales = useMemo(
+    () => allProducts.filter((p) => comboIds.has(p.id)),
+    [allProducts, comboIds]
+  );
 
-  const stockWithSales = useMemo(() => {
-    return stock.map((product) => {
-      const soldQty = salesMap[product.id]?.qty || 0;
-
-      return {
-        ...product,
-        soldQty,
-        bestseller: soldQty > 0,
-      };
-    });
-  }, [stock, salesMap]);
+  const stockWithSales = useMemo(
+    () => allProducts.filter((p) => !comboIds.has(p.id)),
+    [allProducts, comboIds]
+  );
 
   const availableProductsCount = useMemo(() => {
     return allProducts.filter((p) => Number(p.stockQty ?? 1) > 0).length;
@@ -148,57 +128,53 @@ export default function HomePage() {
     }, 50);
   }
 
-  function applyExtraFilters(list) {
-    let filtered = [...list];
+  const applyExtraFilters = useCallback(
+    (list) => {
+      let filtered = [...list];
 
-    if (skinType !== "all") {
-      filtered = filtered.filter((p) =>
-        p.skinType?.toLowerCase().includes(skinType.toLowerCase())
-      );
-    }
+      if (skinType !== "all") {
+        filtered = filtered.filter((p) =>
+          p.skinType?.toLowerCase().includes(skinType.toLowerCase())
+        );
+      }
 
-    if (onlyDiscount) {
-      filtered = filtered.filter((p) => Number(p.discount || 0) > 0);
-    }
+      if (onlyDiscount) {
+        filtered = filtered.filter((p) => Number(p.discount || 0) > 0);
+      }
 
-    if (onlyStock) {
-      filtered = filtered.filter((p) => Number(p.stockQty || 0) > 0);
-    }
+      if (onlyStock) {
+        filtered = filtered.filter((p) => Number(p.stockQty || 0) > 0);
+      }
 
-    return sortProducts(filtered, sort);
-  }
+      return sortProducts(filtered, sort);
+    },
+    [skinType, onlyDiscount, onlyStock, sort]
+  );
 
   const featuredProcessed = useMemo(() => {
     if (category !== "all") return [];
-
     const featured = allProducts.filter((product) => product.featured === true);
     return applyExtraFilters(filterProducts(featured, query));
-  }, [allProducts, query, category, sort, onlyDiscount, onlyStock, skinType]);
+  }, [allProducts, query, category, applyExtraFilters]);
 
   const bestSellersProcessed = useMemo(() => {
     if (category !== "all") return [];
-
     return applyExtraFilters(filterProducts(bestSellers, query));
-  }, [bestSellers, query, category, sort, onlyDiscount, onlyStock, skinType]);
+  }, [bestSellers, query, category, applyExtraFilters]);
 
   const combosProcessed = useMemo(() => {
     if (category !== "all" && category !== "combos") return [];
-
-    const filtered = filterProducts(combosWithSales, query);
-    return applyExtraFilters(filtered);
-  }, [combosWithSales, query, category, sort, onlyDiscount, onlyStock, skinType]);
+    return applyExtraFilters(filterProducts(combosWithSales, query));
+  }, [combosWithSales, query, category, applyExtraFilters]);
 
   const stockProcessed = useMemo(() => {
     if (category === "combos") return [];
-
     let filtered = filterProducts(stockWithSales, query);
-
     if (category !== "all") {
       filtered = filtered.filter((p) => p.type === category);
     }
-
     return applyExtraFilters(filtered);
-  }, [stockWithSales, query, category, sort, onlyDiscount, onlyStock, skinType]);
+  }, [stockWithSales, query, category, applyExtraFilters]);
 
   const featuredToShow = showAllFeatured
     ? featuredProcessed
@@ -229,7 +205,7 @@ export default function HomePage() {
     <>
       <Header />
 
-      <main className="container" id="productos">
+      <main id="main-content" className="container">
         <section className="hero-kosmos">
           <div className="hero-kosmos-content">
             <div className="hero-kosmos-kicker">
@@ -301,7 +277,7 @@ export default function HomePage() {
                   ) : null}
 
                   <div className="hero-featured-price">
-                    ${formatARS(getFinalPrice(heroProduct))}
+                    ${formatARS(getProductDiscountPrice(heroProduct))}
                   </div>
 
                   <div className="hero-featured-cta">Ver producto</div>
@@ -410,7 +386,7 @@ export default function HomePage() {
                 <ProductCard
                   key={`bestseller-${p.id}`}
                   product={p}
-                  onOpen={() => setSelected(p)}
+                  onOpen={setSelected}
                 />
               ))}
             </div>
@@ -432,7 +408,7 @@ export default function HomePage() {
                 <ProductCard
                   key={`featured-${p.id}`}
                   product={p}
-                  onOpen={() => setSelected(p)}
+                  onOpen={setSelected}
                 />
               ))}
             </div>
@@ -454,7 +430,7 @@ export default function HomePage() {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onOpen={() => setSelected(p)}
+                  onOpen={setSelected}
                 />
               ))}
             </div>
@@ -476,7 +452,7 @@ export default function HomePage() {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onOpen={() => setSelected(p)}
+                  onOpen={setSelected}
                 />
               ))}
             </div>
@@ -484,8 +460,8 @@ export default function HomePage() {
         )}
 
         {nothingFound && (
-          <p style={{ opacity: 0.7, marginTop: 16 }}>
-            No encontramos resultados para “{query}”.
+          <p className="catalog-empty">
+            No encontramos resultados para &ldquo;{query}&rdquo;.
           </p>
         )}
 

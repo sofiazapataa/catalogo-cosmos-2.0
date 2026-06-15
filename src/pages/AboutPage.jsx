@@ -1,16 +1,18 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function AboutPage() {
+  usePageTitle("Sobre la marca");
   return (
     <>
       <Header />
 
-      <main className="container">
+      <main id="main-content" className="container">
         {/* HERO */}
         <section className="page-hero">
           <div>
-            <h2 className="page-title">Sobre la marca</h2>
+            <h1 className="page-title">Sobre la marca</h1>
             <p className="page-lead">
               Kosmos es dermocosmética con enfoque en rutinas simples y efectivas.
               Fórmulas <strong>veganas</strong> y <strong>cruelty-free</strong>, pensadas para
@@ -39,11 +41,11 @@ export default function AboutPage() {
 
         {/* BLOQUES */}
         <section className="page-section">
-          <h3 className="page-h3">Qué vas a notar</h3>
+          <h2 className="page-h3">Qué vas a notar</h2>
 
           <div className="page-grid">
             <div className="page-card">
-              <h4 className="page-h4">Rutina más fácil</h4>
+              <h3 className="page-h3">Rutina más fácil</h3>
               <p className="page-p">
                 Productos pensados para combinarse sin que tengas que “adivinar”
                 compatibilidades.
@@ -51,7 +53,7 @@ export default function AboutPage() {
             </div>
 
             <div className="page-card">
-              <h4 className="page-h4">Texturas livianas</h4>
+              <h3 className="page-h3">Texturas livianas</h3>
               <p className="page-p">
                 Capas que se absorben bien y ayudan a mantener una sensación cómoda
                 durante el día.
@@ -59,7 +61,7 @@ export default function AboutPage() {
             </div>
 
             <div className="page-card">
-              <h4 className="page-h4">Objetivos claros</h4>
+              <h3 className="page-h3">Objetivos claros</h3>
               <p className="page-p">
                 Limpieza, hidratación, glow y balance: elegís por necesidad y listo.
               </p>
@@ -69,7 +71,7 @@ export default function AboutPage() {
 
         {/* COMO COMPRAR */}
         <section className="page-section">
-          <h3 className="page-h3">Cómo comprar en el catálogo</h3>
+          <h2 className="page-h3">Cómo comprar en el catálogo</h2>
 
           <div className="page-steps">
             <div className="page-step">
@@ -121,7 +123,7 @@ export default function AboutPage() {
 
         {/* FAQ MINI */}
         <section className="page-section">
-          <h3 className="page-h3">Preguntas rápidas</h3>
+          <h2 className="page-h3">Preguntas rápidas</h2>
 
           <div className="page-faq">
             <details className="page-faqItem">

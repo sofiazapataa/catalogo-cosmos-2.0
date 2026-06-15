@@ -3,16 +3,16 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBk5pqgbONOr77kdNjzRH826Y65CfLRj3g",
-  authDomain: "multiskinn.firebaseapp.com",
-  projectId: "multiskinn",
-  storageBucket: "multiskinn.firebasestorage.app",
-  messagingSenderId: "54108494377",
-  appId: "1:54108494377:web:4af831a3eab0490e9cda38",
-  measurementId: "G-H220EYKKXT"
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+export const db      = getFirestore(app);
 export const storage = getStorage(app);

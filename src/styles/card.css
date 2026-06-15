@@ -12,8 +12,8 @@
   margin-bottom: 8px;
   padding: 7px 11px;
   border-radius: 999px;
-  background: #eef4df;
-  border: 1px solid #dfe5d1;
+  background: var(--green-100);
+  border: 1px solid var(--border-subtle);
   color: var(--green);
   font-size: 11px;
   font-weight: 900;
@@ -23,7 +23,7 @@
 
 .section-title {
   margin: 0;
-  color: #1f270d;
+  color: var(--green-darker);
   font-size: 34px;
   line-height: 0.95;
   letter-spacing: -0.05em;
@@ -44,8 +44,8 @@
   min-height: 36px;
   padding: 0 13px;
   border-radius: 999px;
-  background: #f6f7f2;
-  border: 1px solid #dfe5d1;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-subtle);
   color: var(--green);
   font-size: 12px;
   font-weight: 900;
@@ -56,8 +56,8 @@
   padding: 0 14px;
   border-radius: 999px;
   border: 1px solid rgba(63, 79, 25, 0.2);
-  background: #fff;
-  color: #2b3512;
+  background: var(--card);
+  color: var(--green-dark);
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
@@ -117,14 +117,19 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 22px;
-  background: #f6f4ef;
+  background: var(--green-surface);
   margin-bottom: 14px;
   position: relative;
   cursor: pointer;
 }
 
+.card-image:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
 .card-image--empty {
-  background: linear-gradient(135deg, #f4f4f4, #ededed);
+  background: linear-gradient(135deg, var(--neutral-100), var(--neutral-200));
 }
 
 .card-image img {
@@ -176,7 +181,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.92);
-  color: #2b3512;
+  color: var(--green-dark);
   font-size: 13px;
   font-weight: 900;
   backdrop-filter: blur(10px);
@@ -222,7 +227,7 @@
 }
 
 .badge-main {
-  color: #1b1b1b;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -249,8 +254,8 @@
 }
 
 .stock-badge-out {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--overlay-dark);
+  color: var(--card);
 }
 
 .stock-badge-low {
@@ -283,7 +288,7 @@
   line-height: 1.08;
   font-weight: 900;
   letter-spacing: -0.035em;
-  color: #2b3512;
+  color: var(--green-dark);
   cursor: pointer;
 }
 
@@ -304,7 +309,7 @@
   font-size: 12px;
   line-height: 1.35;
   color: var(--green);
-  font-weight: 850;
+  font-weight: 800;
 }
 
 /* =========================
@@ -327,8 +332,8 @@
   padding: 13px 14px;
   border-radius: 20px;
   background:
-    linear-gradient(180deg, #f8f8f4 0%, #f5f6f0 100%);
-  border: 1px solid #e3e7d8;
+    linear-gradient(180deg, var(--surface-chip) 0%, var(--green-surface) 100%);
+  border: 1px solid var(--border-subtle);
   width: 100%;
 }
 
@@ -350,7 +355,7 @@
 .card-discount-chip {
   padding: 6px 9px;
   border-radius: 999px;
-  background: #eef4df;
+  background: var(--green-100);
   color: var(--green);
   font-size: 11px;
   font-weight: 900;
@@ -421,8 +426,8 @@
   width: auto;
   padding: 3px;
   border-radius: 999px;
-  background: #f6f7f2;
-  border: 1px solid #dfe5d1;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-subtle);
 }
 
 .qtypill {

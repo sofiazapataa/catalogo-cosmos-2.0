@@ -5,6 +5,8 @@ import {
   doc,
   setDoc,
   deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { resolveImage, resolveImages } from "../utils/imageMap";
@@ -93,12 +95,13 @@ export async function getProductById(id) {
 }
 
 export async function getProducts() {
-  const productsRef = collection(db, "products");
-  const combosRef = collection(db, "combos");
+  const activeFilter = where("active", "!=", false);
+  const productsQuery = query(collection(db, "products"), activeFilter);
+  const combosQuery   = query(collection(db, "combos"),   activeFilter);
 
   const [productsSnapshot, combosSnapshot] = await Promise.all([
-    getDocs(productsRef),
-    getDocs(combosRef),
+    getDocs(productsQuery),
+    getDocs(combosQuery),
   ]);
 
   const stock = productsSnapshot.docs.map((docItem) =>

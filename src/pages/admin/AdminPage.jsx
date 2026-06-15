@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,6 +10,7 @@ import { getProducts } from "../../services/productsServices";
 import { formatARS } from "../../utils/pricing";
 
 export default function AdminPage() {
+  usePageTitle("Dashboard · Admin");
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [combos, setCombos] = useState([]);

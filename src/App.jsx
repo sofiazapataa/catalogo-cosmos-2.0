@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import WhatsAppFab from "./components/WhatsAppFab";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Páginas secundarias — se cargan solo cuando se navega a ellas
 const NotFoundPage      = lazy(() => import("./pages/NotFoundPage"));
@@ -24,6 +25,7 @@ const AdminTestimonialsPage = lazy(() => import("./pages/admin/AdminTestimonials
 export default function App() {
   return (
     <BrowserRouter>
+      <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/"               element={<HomePage />} />
@@ -54,6 +56,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
 
       <WhatsAppFab />
     </BrowserRouter>

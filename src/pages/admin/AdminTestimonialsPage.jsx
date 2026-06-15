@@ -1,3 +1,4 @@
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
@@ -13,6 +14,7 @@ import {
 const EMPTY_FORM = { author: "", text: "" };
 
 export default function AdminTestimonialsPage() {
+  usePageTitle("Testimonios · Admin");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -111,8 +113,9 @@ export default function AdminTestimonialsPage() {
 
             <form onSubmit={handleSubmit} className="admin-testimonial-form">
               <div className="admin-field">
-                <label>Nombre de la clienta</label>
+                <label htmlFor="test-author">Nombre de la clienta</label>
                 <input
+                  id="test-author"
                   type="text"
                   value={form.author}
                   onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))}
@@ -122,8 +125,9 @@ export default function AdminTestimonialsPage() {
               </div>
 
               <div className="admin-field">
-                <label>Texto del testimonio</label>
+                <label htmlFor="test-text">Texto del testimonio</label>
                 <textarea
+                  id="test-text"
                   value={form.text}
                   onChange={(e) => setForm((f) => ({ ...f, text: e.target.value }))}
                   placeholder="Ej: Me encantó el tónico, mi piel quedó increíble…"
